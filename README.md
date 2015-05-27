@@ -26,6 +26,7 @@ $ python testrpc.py
 The RPC methods currently implemented are:
 
 * `eth_coinbase`
+* `eth_accounts`
 * `eth_getBalance`
 * `eth_gasPrice`
 * `eth_blockNumber`

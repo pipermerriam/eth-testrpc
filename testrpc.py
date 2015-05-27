@@ -5,6 +5,7 @@ from ethereum import tester as t
 from rlp.utils import encode_hex
 from ethereum.utils import sha3
 from ethereum.tester import keys
+from ethereum.tester import accounts
 
 # CONFIG
 BALANCE = 100000000000000000000000000000
@@ -58,6 +59,12 @@ def eth_blockNumber():
 def send(transaction):
     global BALANCE
 
+    if "from" in transaction:
+        addr = strip_0x(transaction['from']).decode("hex")
+        sender = keys[accounts.index(addr)]
+    else:
+        sender = keys[0]
+
     if "value" in transaction:
         value = transaction['value']
     else:
@@ -81,26 +88,25 @@ def send(transaction):
 
     if to == None and data != None:
         print "Adding contract..."
-        r = evm.evm(data, keys[0], value).encode("hex")
+        r = evm.evm(data, sender, value).encode("hex")
     else:
-        print "Sending transaction..."
-        r = evm.send(keys[0], to, value, data).encode("hex")
+        r = evm.send(sender, to, value, data).encode("hex")
     
     # Remove padded zeroes. 
     # WARNING: This might be super hacky.
-    while len(r) > 0 and r[0] == "0":
-        r = r[1:]
+    r = "0x" + r.lstrip("0")
 
-    r = "0x" + r
-
-    print "return: " + r
     return r
 
+
+# To mimic a real transaction, we return the transaction hash
+# instead of the return value of the transaction. 
 def eth_sendTransaction(transaction):
     print 'eth_sendTransaction'
-    r = send(transaction)
+    send(transaction)
     evm.mine()
-    return r
+    tx = evm.last_tx
+    return "0x" + tx.hash.encode("hex")
     
 
 def eth_call(transaction, block_number):
@@ -108,6 +114,13 @@ def eth_call(transaction, block_number):
     snapshot = evm.snapshot()
     r = send(transaction)
     evm.revert(snapshot)
+    return r
+
+
+def eth_accounts():
+    r = []
+    for index in range(len(accounts)):
+        r.append("0x" + accounts[index].encode("hex"))
     return r
 
 
@@ -120,6 +133,7 @@ server = SimpleJSONRPCServer(('localhost', 8545))
 server.register_function(evm_reset, 'evm_reset')
 server.register_function(eth_coinbase, 'eth_coinbase')
 server.register_function(eth_getBalance, 'eth_getBalance')
+server.register_function(eth_accounts, 'eth_accounts')
 server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(eth_gasPrice, 'eth_gasPrice')
 server.register_function(eth_blockNumber, 'eth_blockNumber')
