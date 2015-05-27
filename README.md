@@ -23,7 +23,7 @@ $ python testrpc.py
 
 ### Implemented methods
 
-The currently implemented RPC methods are:
+The RPC methods currently implemented are:
 
 * `eth_coinbase`
 * `eth_getBalance`
@@ -33,8 +33,8 @@ The currently implemented RPC methods are:
 * `eth_call`
 * `web3_sha3`
 
-There’s also a special non-standard method not included within the original RPC specification:
+There’s also a special non-standard method that’s not included within the original RPC specification:
 
 * `evm_reset`
 
-When calling `evm_reset`, the `testrpc` will revert the state of its internal chain back to the genesis block and it will act as if no processing ever transactions ever took place. This is useful for automated tests to ensure tests are running against a known clean state.
+When calling `evm_reset`, the `testrpc` will revert the state of its internal chain back to the genesis block and it will act as if no processing of transactions ever took place. This is useful for automated tests to ensure tests are running against a known clean state.
