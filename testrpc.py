@@ -128,15 +128,19 @@ def web3_sha3(argument):
     print 'web3_sha3'
     return '0x' + sha3(argument[2:].decode('hex')).encode('hex')
 
+def web3_clientVersion():
+    return "Consensys TestRPC/v0.0.1/python"
+
 
 server = SimpleJSONRPCServer(('localhost', 8545))
 server.register_function(evm_reset, 'evm_reset')
 server.register_function(eth_coinbase, 'eth_coinbase')
 server.register_function(eth_getBalance, 'eth_getBalance')
 server.register_function(eth_accounts, 'eth_accounts')
-server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(eth_gasPrice, 'eth_gasPrice')
 server.register_function(eth_blockNumber, 'eth_blockNumber')
 server.register_function(eth_call, 'eth_call')
 server.register_function(eth_sendTransaction, 'eth_sendTransaction')
+server.register_function(web3_sha3, 'web3_sha3')
+server.register_function(web3_clientVersion, 'web3_clientVersion')
 server.serve_forever()

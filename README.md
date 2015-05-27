@@ -33,6 +33,7 @@ The RPC methods currently implemented are:
 * `eth_sendTransaction`
 * `eth_call`
 * `web3_sha3`
+* `web3_clientVersion`
 
 There’s also a special non-standard method that’s not included within the original RPC specification:
 
