@@ -6,6 +6,7 @@ from rlp.utils import encode_hex
 from ethereum.utils import sha3
 from ethereum.tester import keys
 from ethereum.tester import accounts
+from ethereum.tester import languages
 
 # CONFIG
 BALANCE = 100000000000000000000000000000
@@ -136,9 +137,35 @@ def eth_accounts():
     return r
 
 
+def eth_getCompilers():
+    return languages.keys()
+
+
+def eth_compileSolidity(code):
+    combined = languages["solidity"].combined(code)
+    contract = combined[len(combined) - 1][1]
+    return {
+        "code": '0x' + contract['binary'],
+        "info": {
+            "source": code,
+            "language": "Solidity",
+            "languageVersion": "0",
+            "compilerVersion": "0",
+            "abiDefinition": contract['json-abi'],
+            "userDoc": {
+              "methods": {}
+            },
+            "developerDoc": {
+              "methods": {}
+            }
+        }
+    }
+
+
 def web3_sha3(argument):
     print 'web3_sha3'
     return '0x' + sha3(argument[2:].decode('hex')).encode('hex')
+
 
 def web3_clientVersion():
     return "Consensys TestRPC/v0.0.1/python"
@@ -153,6 +180,8 @@ server.register_function(eth_gasPrice, 'eth_gasPrice')
 server.register_function(eth_blockNumber, 'eth_blockNumber')
 server.register_function(eth_call, 'eth_call')
 server.register_function(eth_sendTransaction, 'eth_sendTransaction')
+server.register_function(eth_getCompilers, 'eth_getCompilers')
+server.register_function(eth_compileSolidity, 'eth_compileSolidity')
 server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(web3_clientVersion, 'web3_clientVersion')
 server.serve_forever()
