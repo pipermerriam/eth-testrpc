@@ -31,6 +31,13 @@ def strip_0x(s):
     return s
 
 
+def isContract(transaction):
+    if "to" not in transaction and "data" in transaction:
+        return True
+    else:
+        return False
+
+
 def int_to_hex(int_value):
     encoded = format(int_value, 'x')
     return encoded.zfill(len(encoded)*2 % 2)
@@ -80,13 +87,14 @@ def send(transaction):
     else:
         data = None
     
-    # print value
-    # print to
-    # print data.encode("hex")
+    # print "value: " + value.encode("hex")
+    # print "to: " + to
+    # print "from: " + accounts[keys.index(sender)].encode("hex")
+    # print "data: " + data.encode("hex")
 
     BALANCE -= value
 
-    if to == None and data != None:
+    if isContract(transaction):
         print "Adding contract..."
         r = evm.evm(data, sender, value).encode("hex")
     else:
@@ -103,10 +111,14 @@ def send(transaction):
 # instead of the return value of the transaction. 
 def eth_sendTransaction(transaction):
     print 'eth_sendTransaction'
-    send(transaction)
+    r = send(transaction)
     evm.mine()
-    tx = evm.last_tx
-    return "0x" + tx.hash.encode("hex")
+
+    if isContract(transaction):
+        return r
+    else:
+        tx = evm.last_tx
+        return "0x" + tx.hash.encode("hex")
     
 
 def eth_call(transaction, block_number):
