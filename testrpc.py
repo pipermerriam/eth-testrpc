@@ -3,6 +3,7 @@
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 from ethereum import tester as t
 from rlp.utils import encode_hex
+from ethereum import blocks
 from ethereum.utils import sha3
 from ethereum.tester import keys
 from ethereum.tester import accounts
@@ -162,6 +163,64 @@ def eth_compileSolidity(code):
     }
 
 
+# Warning: block.get_code() seems to ignore the block number.
+def eth_getCode(address, block_number="latest"): 
+    address = strip_0x(address)
+
+    if block_number == "latest" or block_number == "pending":
+        block_number = len(evm.blocks) - 1
+    elif block_number == "earliest":
+        block_number = 0
+    else:
+        block_number = int(strip_0x(block_number), 16)
+
+    if block_number >= len(evm.blocks):
+        return None
+
+    block = evm.blocks[block_number]
+
+    return "0x" + block.get_code(address).encode("hex")
+
+
+def eth_getTransactionByHash(h):
+    h = strip_0x(h).decode("hex")
+
+    total = len(evm.blocks)
+    current = total - 1
+
+    tx = None
+    tx_index = 0
+    block = None
+
+    while current >= 0 and tx == None:
+        block = evm.blocks[current]
+        if block.includes_transaction(h):
+            tx_index = 0
+            for tx in block.get_transactions():
+                tx_index += 1
+                if tx.hash == h:
+                    break
+
+        current -= 1
+
+    if tx == None:
+        return None
+
+    return {
+        "hash": "0x" + tx.hash.encode("hex"),
+        "nonce": "0x" + int_to_hex(tx.nonce),
+        "blockHash": "0x" + block.hash.encode("hex"),
+        "blockNumber": "0x" + int_to_hex(block.number),
+        "transactionIndex": "0x" + int_to_hex(tx_index),
+        "from": "0x" + tx.sender.encode("hex"),
+        "to": "0x" + tx.to.encode("hex"),
+        "value": "0x" + int_to_hex(tx.value),
+        "gas": "0x" + int_to_hex(tx.startgas),
+        "gasPrice": "0x" + int_to_hex(tx.gasprice),
+        "input": "0x" + tx.data.encode("hex")
+    }
+
+
 def web3_sha3(argument):
     print 'web3_sha3'
     return '0x' + sha3(argument[2:].decode('hex')).encode('hex')
@@ -182,6 +241,8 @@ server.register_function(eth_call, 'eth_call')
 server.register_function(eth_sendTransaction, 'eth_sendTransaction')
 server.register_function(eth_getCompilers, 'eth_getCompilers')
 server.register_function(eth_compileSolidity, 'eth_compileSolidity')
+server.register_function(eth_getCode, 'eth_getCode')
+server.register_function(eth_getTransactionByHash, 'eth_getTransactionByHash')
 server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(web3_clientVersion, 'web3_clientVersion')
 server.serve_forever()

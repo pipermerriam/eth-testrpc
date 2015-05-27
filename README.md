@@ -34,6 +34,8 @@ The RPC methods currently implemented are:
 * `eth_call`
 * `eth_getCompilers`
 * `eth_compileSolidity`
+* `eth_getCode` (only supports block number “latest”)
+* `eth_getTransactionByHash`
 * `web3_sha3`
 * `web3_clientVersion`
 
