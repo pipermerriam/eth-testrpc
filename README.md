@@ -27,7 +27,6 @@ The RPC methods currently implemented are:
 
 * `eth_coinbase`
 * `eth_accounts`
-* `eth_getBalance`
 * `eth_gasPrice`
 * `eth_blockNumber`
 * `eth_sendTransaction`
@@ -39,11 +38,17 @@ The RPC methods currently implemented are:
 * `web3_sha3`
 * `web3_clientVersion`
 
-There’s also a special non-standard method that’s not included within the original RPC specification:
+There’s also special non-standard methods that aren’t included within the original RPC specification:
 
 * `evm_reset`
+* `evm_snapshot` : No params. Returns the integer id of the snapshot created.
+* `evm_revert` : One optional param. Reverts to the snapshot id passed, or the latest snapshot.
 
-When calling `evm_reset`, the `testrpc` will revert the state of its internal chain back to the genesis block and it will act as if no processing of transactions ever took place. This is useful for automated tests to ensure tests are running against a known clean state.
+When calling `evm_reset`, the `testrpc` will revert the state of its internal chain back to the genesis block and it will act as if no processing of transactions has taken place. Similarly, you can use `evm_snapshot` and `evm_revert` methods to save and restore the evm state at as desired. Example use cases for these methods are as follows:
+
+* `evm_reset` : Run once at the beginning of your test suite. 
+* `evm_snapshot` : Run at the beginning of each test, snapshotting hte state of the evm.
+* `evm_revert` : Run at the end of each test, reverting back to a known clean state.
 
 ### License
 

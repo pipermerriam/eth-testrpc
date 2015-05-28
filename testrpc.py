@@ -8,29 +8,67 @@ from ethereum.utils import sha3
 from ethereum.tester import keys
 from ethereum.tester import accounts
 from ethereum.tester import languages
+from collections import namedtuple
 
-# CONFIG
-BALANCE = 100000000000000000000000000000
+Snapshot = namedtuple("Snapshot", ["block_number", "data"])
 
 evm = None
+snapshots = None
+
+def strip_0x(s):
+    if s[0] == "0" and s[1] == "x":
+        s = s[2:]
+    return s
 
 # Special non-standard function to reset the evm
 # state. Useful for automated testing.
 def evm_reset():
     global evm
+    global snapshots
     print "Resetting EVM state..."
     evm = t.state()
+    snapshots = []
+
+def evm_snapshot():
+    global evm
+    global snapshots
+    print "Creating snapshot #" + str(len(snapshots))
+    snapshots.append(Snapshot(block_number=evm.block.number, data=evm.snapshot()))
+    return "0x" + int_to_hex(len(snapshots) - 1)
+
+def evm_revert(index=None):
+    global evm
+    global snapshots
+    if index != None:
+        index = int(strip_0x(index), 16)
+    else:
+        index = len(snapshots) - 1
+
+    print "Reverting snapshot #" + str(index)
+
+    if index >= len(snapshots):
+        return False
+
+    snapshot = snapshots[index]
+
+    # print str(snapshot.block_number + 1)
+    # print str(len(evm.blocks))
+
+    # Remove all blocks after our saved block number.
+    del evm.blocks[snapshot.block_number + 1:len(evm.blocks)]
+
+    # Revert the evm
+    evm.revert(snapshot.data)
+
+    # Remove all snapshots after and including this one.
+    del snapshots[index:len(snapshots)]
+    return True
 
 # init state
 t.set_logging_level(2)
 evm_reset()
 
 print "Ready!"
-
-def strip_0x(s):
-    if s[0] == "0" and s[1] == "x":
-        s = s[2:]
-    return s
 
 
 def isContract(transaction):
@@ -50,11 +88,6 @@ def eth_coinbase():
     return '0x' + encode_hex(evm.block.coinbase)
 
 
-def eth_getBalance(address, block_number):
-    print 'eth_getBalance'
-    return '0x' + int_to_hex(BALANCE)
-
-
 def eth_gasPrice():
     print 'eth_gasPrice'
     return '0x' + int_to_hex(1)
@@ -66,8 +99,6 @@ def eth_blockNumber():
 
 
 def send(transaction):
-    global BALANCE
-
     if "from" in transaction:
         addr = strip_0x(transaction['from']).decode("hex")
         sender = keys[accounts.index(addr)]
@@ -93,8 +124,6 @@ def send(transaction):
     # print "to: " + to
     # print "from: " + accounts[keys.index(sender)].encode("hex")
     # print "data: " + data.encode("hex")
-
-    BALANCE -= value
 
     if isContract(transaction):
         print "Adding contract..."
@@ -231,9 +260,7 @@ def web3_clientVersion():
 
 
 server = SimpleJSONRPCServer(('localhost', 8545))
-server.register_function(evm_reset, 'evm_reset')
 server.register_function(eth_coinbase, 'eth_coinbase')
-server.register_function(eth_getBalance, 'eth_getBalance')
 server.register_function(eth_accounts, 'eth_accounts')
 server.register_function(eth_gasPrice, 'eth_gasPrice')
 server.register_function(eth_blockNumber, 'eth_blockNumber')
@@ -245,4 +272,7 @@ server.register_function(eth_getCode, 'eth_getCode')
 server.register_function(eth_getTransactionByHash, 'eth_getTransactionByHash')
 server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(web3_clientVersion, 'web3_clientVersion')
+server.register_function(evm_reset, 'evm_reset')
+server.register_function(evm_snapshot, 'evm_snapshot')
+server.register_function(evm_revert, 'evm_revert')
 server.serve_forever()
