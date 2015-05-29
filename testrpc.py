@@ -28,6 +28,7 @@ def evm_reset():
     print "Resetting EVM state..."
     evm = t.state()
     snapshots = []
+    return True
 
 def evm_snapshot():
     global evm
@@ -39,6 +40,10 @@ def evm_snapshot():
 def evm_revert(index=None):
     global evm
     global snapshots
+
+    if len(snapshots) == 0:
+        return False
+
     if index != None:
         index = int(strip_0x(index), 16)
     else:
@@ -119,17 +124,31 @@ def send(transaction):
         data = strip_0x(transaction['data']).decode("hex")
     else:
         data = None
+
+    if "gas" in transaction:
+        gas = int(strip_0x(transaction['gas']), 16)
+    else:
+        gas = None
     
     # print "value: " + value.encode("hex")
     # print "to: " + to
     # print "from: " + accounts[keys.index(sender)].encode("hex")
     # print "data: " + data.encode("hex")
+    # print "gas: " + str(gas)
 
     if isContract(transaction):
+        estimated_cost = len(data.encode("hex")) / 2 * 200
+
         print "Adding contract..."
-        r = evm.evm(data, sender, value).encode("hex")
+
+        if gas != None and estimated_cost > gas:
+            print "* "
+            print "* WARNING: Estimated cost higher than sent gas: " + str(estimated_cost) + " > " + str(gas)
+            print "* "
+
+        r = evm.evm(data, sender, value, gas).encode("hex")
     else:
-        r = evm.send(sender, to, value, data).encode("hex")
+        r = evm.send(sender, to, value, data, gas).encode("hex")
     
     # Remove padded zeroes. 
     # WARNING: This might be super hacky.
