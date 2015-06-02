@@ -4,11 +4,18 @@ from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 from ethereum import tester as t
 from rlp.utils import encode_hex
 from ethereum import blocks
+from ethereum import utils
+from ethereum import transactions
+from ethereum import processblock
 from ethereum.utils import sha3
 from ethereum.tester import keys
 from ethereum.tester import accounts
 from ethereum.tester import languages
 from collections import namedtuple
+from ethereum import slogging
+
+# Ensure tester.py uses the "official" gas limit.
+t.gas_limit = 3141592 
 
 Snapshot = namedtuple("Snapshot", ["block_number", "data"])
 
@@ -70,8 +77,11 @@ def evm_revert(index=None):
     return True
 
 # init state
-t.set_logging_level(2)
 evm_reset()
+
+t.set_logging_level(2)
+#slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
+#slogging.configure(':info,eth.vm.exit')
 
 print "Ready!"
 
@@ -140,6 +150,7 @@ def send(transaction):
         estimated_cost = len(data.encode("hex")) / 2 * 200
 
         print "Adding contract..."
+        print "Estimated gas cost: " + str(estimated_cost)
 
         if gas != None and estimated_cost > gas:
             print "* "
@@ -149,17 +160,15 @@ def send(transaction):
         r = evm.evm(data, sender, value, gas).encode("hex")
     else:
         r = evm.send(sender, to, value, data, gas).encode("hex")
-    
-    # Remove padded zeroes. 
-    # WARNING: This might be super hacky.
-    r = "0x" + r.lstrip("0")
 
+    r = "0x" + r
     return r
 
 
 # To mimic a real transaction, we return the transaction hash
 # instead of the return value of the transaction. 
 def eth_sendTransaction(transaction):
+    global evm
     print 'eth_sendTransaction'
     r = send(transaction)
     evm.mine()
