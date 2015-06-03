@@ -10,6 +10,7 @@ To install `testrpc`, follow these steps. It’s recommended you perform these w
 2. `$ git clone https://github.com/ethereum/pyethereum` (doesn’t need to be inside the clone of this responsitory)
 3. `$ cd pythereum`
 4. `$ python setup.py install`
+5. `$ pip install jsonrpclib`
 
 There’s nothing more to install beyond `pythereum`.
 
