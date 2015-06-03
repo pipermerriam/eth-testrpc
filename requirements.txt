@@ -1,0 +1,4 @@
+https://github.com/ethereum/pyethereum/tarball/develop#egg=ethereum-0.9.66
+jsonrpclib
+serpent
+
