@@ -7,11 +7,8 @@ Limited RPC client intended for use with automated testing. Uses [pythereum](htt
 To install `testrpc`, follow these steps. It’s recommended you perform these within a virtualenv.
 
 1. `$ git clone https://github.com/Consensys/testrpc` (clone this repository)
-2. `$ git clone https://github.com/ethereum/pyethereum` (doesn’t need to be inside the clone of this responsitory)
-3. `$ cd pythereum`
-4. `$ python setup.py install`
-
-There’s nothing more to install beyond `pythereum`.
+2. `cd testrpc`
+3. `$ pip install -r requirements.txt`
 
 ### Run
 
