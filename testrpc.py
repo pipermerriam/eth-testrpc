@@ -201,8 +201,10 @@ def eth_getCompilers():
 
 def eth_compileSolidity(code):
     combined = languages["solidity"].combined(code)
+    name = combined[len(combined) - 1][0]
     contract = combined[len(combined) - 1][1]
-    return {
+    val = {}
+    val[name] = {
         "code": '0x' + contract['binary'],
         "info": {
             "source": code,
@@ -218,6 +220,7 @@ def eth_compileSolidity(code):
             }
         }
     }
+    return val
 
 
 # Warning: block.get_code() seems to ignore the block number.
