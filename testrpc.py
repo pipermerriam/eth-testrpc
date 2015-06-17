@@ -81,7 +81,7 @@ evm_reset()
 
 t.set_logging_level(2)
 #slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
-#slogging.configure(':info,eth.vm.exit')
+#slogging.configure(':info,eth.vm.exit:debug,eth.pb.tx:info')
 
 print "Ready!"
 
@@ -171,13 +171,13 @@ def eth_sendTransaction(transaction):
     global evm
     print 'eth_sendTransaction'
     r = send(transaction)
-    evm.mine()
 
-    if isContract(transaction):
-        return r
-    else:
-        tx = evm.last_tx
-        return "0x" + tx.hash.encode("hex")
+    if not isContract(transaction):
+        tx = evm.block.transaction_list[-1]
+        r = "0x" + tx.hash.encode("hex")
+
+    evm.mine()
+    return r
     
 
 def eth_call(transaction, block_number):
@@ -254,17 +254,20 @@ def eth_getTransactionByHash(h):
 
     while current >= 0 and tx == None:
         block = evm.blocks[current]
-        if block.includes_transaction(h):
-            tx_index = 0
-            for tx in block.get_transactions():
-                tx_index += 1
-                if tx.hash == h:
-                    break
+        tx_index = 0
+        for tx in block.get_transactions():
+            tx_index += 1
+            if tx.hash == h:
+                break
 
         current -= 1
 
+    # Comply with the RPC spec as much as possible. 
+    # We need to return an object with some things as null.
     if tx == None:
-        return None
+        return {
+            "hash": "0x" + h.encode("hex")
+        }
 
     return {
         "hash": "0x" + tx.hash.encode("hex"),
