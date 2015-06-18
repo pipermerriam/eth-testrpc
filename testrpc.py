@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
+from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCRequestHandler
 from ethereum import tester as t
 from rlp.utils import encode_hex
 from ethereum import blocks
@@ -13,6 +14,21 @@ from ethereum.tester import accounts
 from ethereum.tester import languages
 from collections import namedtuple
 from ethereum import slogging
+
+# Override the SimpleJSONRPCRequestHandler to support access control (*) 
+class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.end_headers()
+
+    # Add these headers to all responses
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Headers", 
+                         "Origin, X-Requested-With, Content-Type, Accept")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        SimpleJSONRPCRequestHandler.end_headers(self)
+
+ 
 
 # Ensure tester.py uses the "official" gas limit.
 t.gas_limit = 3141592 
@@ -293,7 +309,7 @@ def web3_clientVersion():
     return "Consensys TestRPC/v0.0.1/python"
 
 
-server = SimpleJSONRPCServer(('localhost', 8545))
+server = SimpleJSONRPCServer(('localhost', 8545), SimpleJSONRPCRequestHandlerWithCORS)
 server.register_function(eth_coinbase, 'eth_coinbase')
 server.register_function(eth_accounts, 'eth_accounts')
 server.register_function(eth_gasPrice, 'eth_gasPrice')
