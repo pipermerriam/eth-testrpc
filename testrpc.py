@@ -15,7 +15,7 @@ from ethereum.tester import languages
 from collections import namedtuple
 from ethereum import slogging
 
-# Override the SimpleJSONRPCRequestHandler to support access control (*) 
+# Override the SimpleJSONRPCRequestHandler to support access control (*)
 class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
@@ -23,15 +23,15 @@ class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
 
     # Add these headers to all responses
     def end_headers(self):
-        self.send_header("Access-Control-Allow-Headers", 
+        self.send_header("Access-Control-Allow-Headers",
                          "Origin, X-Requested-With, Content-Type, Accept")
         self.send_header("Access-Control-Allow-Origin", "*")
         SimpleJSONRPCRequestHandler.end_headers(self)
 
- 
+
 
 # Ensure tester.py uses the "official" gas limit.
-t.gas_limit = 3141592 
+t.gas_limit = 3141592
 
 Snapshot = namedtuple("Snapshot", ["block_number", "data"])
 
@@ -155,7 +155,7 @@ def send(transaction):
         gas = int(strip_0x(transaction['gas']), 16)
     else:
         gas = None
-    
+
     # print "value: " + value.encode("hex")
     # print "to: " + to
     # print "from: " + accounts[keys.index(sender)].encode("hex")
@@ -182,7 +182,7 @@ def send(transaction):
 
 
 # To mimic a real transaction, we return the transaction hash
-# instead of the return value of the transaction. 
+# instead of the return value of the transaction.
 def eth_sendTransaction(transaction):
     global evm
     print 'eth_sendTransaction'
@@ -194,7 +194,7 @@ def eth_sendTransaction(transaction):
 
     evm.mine()
     return r
-    
+
 
 def eth_call(transaction, block_number):
     print "eth_call"
@@ -240,7 +240,7 @@ def eth_compileSolidity(code):
 
 
 # Warning: block.get_code() seems to ignore the block number.
-def eth_getCode(address, block_number="latest"): 
+def eth_getCode(address, block_number="latest"):
     address = strip_0x(address)
 
     if block_number == "latest" or block_number == "pending":
@@ -256,6 +256,24 @@ def eth_getCode(address, block_number="latest"):
     block = evm.blocks[block_number]
 
     return "0x" + block.get_code(address).encode("hex")
+
+
+def eth_getBalance(address, block_number="latest"):
+    address = strip_0x(address)
+
+    if block_number == "latest" or block_number == "pending":
+        block_number = len(evm.blocks) - 1
+    elif block_number == "earliest":
+        block_number = 0
+    else:
+        block_number = int(strip_0x(block_number), 16)
+
+    if block_number >= len(evm.blocks):
+        return None
+
+    block = evm.blocks[block_number]
+
+    return "0x" + int_to_hex(block.get_balance(address.decode('hex')))
 
 
 def eth_getTransactionByHash(h):
@@ -278,7 +296,7 @@ def eth_getTransactionByHash(h):
 
         current -= 1
 
-    # Comply with the RPC spec as much as possible. 
+    # Comply with the RPC spec as much as possible.
     # We need to return an object with some things as null.
     if tx == None:
         return {
@@ -319,6 +337,7 @@ server.register_function(eth_sendTransaction, 'eth_sendTransaction')
 server.register_function(eth_getCompilers, 'eth_getCompilers')
 server.register_function(eth_compileSolidity, 'eth_compileSolidity')
 server.register_function(eth_getCode, 'eth_getCode')
+server.register_function(eth_getBalance, 'eth_getBalance')
 server.register_function(eth_getTransactionByHash, 'eth_getTransactionByHash')
 server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(web3_clientVersion, 'web3_clientVersion')
