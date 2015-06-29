@@ -9,6 +9,7 @@ from ethereum import utils
 from ethereum import transactions
 from ethereum import processblock
 from ethereum.utils import sha3
+from ethereum.utils import rlp
 from ethereum.tester import keys
 from ethereum.tester import accounts
 from ethereum.tester import languages
@@ -318,6 +319,42 @@ def eth_getTransactionByHash(h):
     }
 
 
+def eth_getBlockByNumber(block_number, full_tx):
+    if block_number == "latest" or block_number == "pending":
+        block_number = len(evm.blocks) - 1
+    elif block_number == "earliest":
+        block_number = 0
+    else:
+        block_number = int(strip_0x(block_number), 16)
+
+    if block_number >= len(evm.blocks):
+        return None
+
+    block = evm.blocks[block_number]
+
+    return {
+        "number": "0x" + int_to_hex(block.number),
+        "hash": block.hash.encode('hex'),
+        "parentHash": block.prevhash.encode('hex'),
+        "nonce": "0x" + block.nonce.encode('hex'),
+        "sha3Uncles": "0x" + block.uncles_hash.encode('hex'),
+        # TODO logsBloom / padding
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "transactionsRoot": "0x" + block.tx_list_root.encode('hex'),
+        "stateRoot": "0x" + block.state_root.encode('hex'),
+        "miner": "0x" + block.coinbase.encode('hex'),
+        "difficulty": "0x" + int_to_hex(block.difficulty),
+        "totalDifficulty": "0x" + int_to_hex(block.chain_difficulty()),
+        "size": "0x" + int_to_hex(len(rlp.encode(block))),
+        "extraData": "0x" + block.extra_data.encode('hex'),
+        "gasLimit": "0x" + int_to_hex(block.gas_limit),
+        "gasUsed": "0x" + int_to_hex(block.gas_used),
+        "timestamp": "0x" + int_to_hex(block.timestamp),
+        "transactions": block.get_transactions() if full_tx else block.get_transaction_hashes,
+        "uncles": block.uncles
+	}
+
+
 def web3_sha3(argument):
     print 'web3_sha3'
     return '0x' + sha3(argument[2:].decode('hex')).encode('hex')
@@ -339,6 +376,7 @@ server.register_function(eth_compileSolidity, 'eth_compileSolidity')
 server.register_function(eth_getCode, 'eth_getCode')
 server.register_function(eth_getBalance, 'eth_getBalance')
 server.register_function(eth_getTransactionByHash, 'eth_getTransactionByHash')
+server.register_function(eth_getBlockByNumber, 'eth_getBlockByNumber')
 server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(web3_clientVersion, 'web3_clientVersion')
 server.register_function(evm_reset, 'evm_reset')
