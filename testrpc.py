@@ -9,13 +9,14 @@ from ethereum import utils
 from ethereum import transactions
 from ethereum import processblock
 from ethereum.utils import sha3
+from ethereum.utils import rlp
 from ethereum.tester import keys
 from ethereum.tester import accounts
 from ethereum.tester import languages
 from collections import namedtuple
 from ethereum import slogging
 
-# Override the SimpleJSONRPCRequestHandler to support access control (*) 
+# Override the SimpleJSONRPCRequestHandler to support access control (*)
 class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
@@ -23,15 +24,15 @@ class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
 
     # Add these headers to all responses
     def end_headers(self):
-        self.send_header("Access-Control-Allow-Headers", 
+        self.send_header("Access-Control-Allow-Headers",
                          "Origin, X-Requested-With, Content-Type, Accept")
         self.send_header("Access-Control-Allow-Origin", "*")
         SimpleJSONRPCRequestHandler.end_headers(self)
 
- 
+
 
 # Ensure tester.py uses the "official" gas limit.
-t.gas_limit = 3141592 
+t.gas_limit = 3141592
 
 Snapshot = namedtuple("Snapshot", ["block_number", "data"])
 
@@ -155,7 +156,7 @@ def send(transaction):
         gas = int(strip_0x(transaction['gas']), 16)
     else:
         gas = None
-    
+
     # print "value: " + value.encode("hex")
     # print "to: " + to
     # print "from: " + accounts[keys.index(sender)].encode("hex")
@@ -182,7 +183,7 @@ def send(transaction):
 
 
 # To mimic a real transaction, we return the transaction hash
-# instead of the return value of the transaction. 
+# instead of the return value of the transaction.
 def eth_sendTransaction(transaction):
     global evm
     print 'eth_sendTransaction'
@@ -194,7 +195,7 @@ def eth_sendTransaction(transaction):
 
     evm.mine()
     return r
-    
+
 
 def eth_call(transaction, block_number):
     print "eth_call"
@@ -240,7 +241,7 @@ def eth_compileSolidity(code):
 
 
 # Warning: block.get_code() seems to ignore the block number.
-def eth_getCode(address, block_number="latest"): 
+def eth_getCode(address, block_number="latest"):
     address = strip_0x(address)
 
     if block_number == "latest" or block_number == "pending":
@@ -278,7 +279,7 @@ def eth_getTransactionByHash(h):
 
         current -= 1
 
-    # Comply with the RPC spec as much as possible. 
+    # Comply with the RPC spec as much as possible.
     # We need to return an object with some things as null.
     if tx == None:
         return {
@@ -298,6 +299,42 @@ def eth_getTransactionByHash(h):
         "gasPrice": "0x" + int_to_hex(tx.gasprice),
         "input": "0x" + tx.data.encode("hex")
     }
+
+
+def eth_getBlockByNumber(block_number, full_tx):
+    if block_number == "latest" or block_number == "pending":
+        block_number = len(evm.blocks) - 1
+    elif block_number == "earliest":
+        block_number = 0
+    else:
+        block_number = int(strip_0x(block_number), 16)
+
+    if block_number >= len(evm.blocks):
+        return None
+
+    block = evm.blocks[block_number]
+
+    return {
+        "number": "0x" + int_to_hex(block.number),
+        "hash": block.hash.encode('hex'),
+        "parentHash": block.prevhash.encode('hex'),
+        "nonce": "0x" + block.nonce.encode('hex'),
+        "sha3Uncles": "0x" + block.uncles_hash.encode('hex'),
+        # TODO logsBloom / padding
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "transactionsRoot": "0x" + block.tx_list_root.encode('hex'),
+        "stateRoot": "0x" + block.state_root.encode('hex'),
+        "miner": "0x" + block.coinbase.encode('hex'),
+        "difficulty": "0x" + int_to_hex(block.difficulty),
+        "totalDifficulty": "0x" + int_to_hex(block.chain_difficulty()),
+        "size": "0x" + int_to_hex(len(rlp.encode(block))),
+        "extraData": "0x" + block.extra_data.encode('hex'),
+        "gasLimit": "0x" + int_to_hex(block.gas_limit),
+        "gasUsed": "0x" + int_to_hex(block.gas_used),
+        "timestamp": "0x" + int_to_hex(block.timestamp),
+        "transactions": block.get_transactions() if full_tx else block.get_transaction_hashes,
+        "uncles": block.uncles
+	}
 
 
 def web3_sha3(argument):
@@ -320,6 +357,7 @@ server.register_function(eth_getCompilers, 'eth_getCompilers')
 server.register_function(eth_compileSolidity, 'eth_compileSolidity')
 server.register_function(eth_getCode, 'eth_getCode')
 server.register_function(eth_getTransactionByHash, 'eth_getTransactionByHash')
+server.register_function(eth_getBlockByNumber, 'eth_getBlockByNumber')
 server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(web3_clientVersion, 'web3_clientVersion')
 server.register_function(evm_reset, 'evm_reset')
