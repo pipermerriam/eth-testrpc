@@ -334,8 +334,8 @@ def eth_getBlockByNumber(block_number, full_tx):
 
     return {
         "number": "0x" + int_to_hex(block.number),
-        "hash": block.hash.encode('hex'),
-        "parentHash": block.prevhash.encode('hex'),
+        "hash": "0x" + block.hash.encode('hex'),
+        "parentHash": "0x" + block.prevhash.encode('hex'),
         "nonce": "0x" + block.nonce.encode('hex'),
         "sha3Uncles": "0x" + block.uncles_hash.encode('hex'),
         # TODO logsBloom / padding
@@ -344,13 +344,14 @@ def eth_getBlockByNumber(block_number, full_tx):
         "stateRoot": "0x" + block.state_root.encode('hex'),
         "miner": "0x" + block.coinbase.encode('hex'),
         "difficulty": "0x" + int_to_hex(block.difficulty),
-        "totalDifficulty": "0x" + int_to_hex(block.chain_difficulty()),
+        # https://github.com/ethereum/pyethereum/issues/266
+        # "totalDifficulty": "0x" + int_to_hex(block.chain_difficulty()),
         "size": "0x" + int_to_hex(len(rlp.encode(block))),
         "extraData": "0x" + block.extra_data.encode('hex'),
         "gasLimit": "0x" + int_to_hex(block.gas_limit),
         "gasUsed": "0x" + int_to_hex(block.gas_used),
         "timestamp": "0x" + int_to_hex(block.timestamp),
-        "transactions": block.get_transactions() if full_tx else block.get_transaction_hashes,
+        "transactions": block.get_transactions() if full_tx else block.get_transaction_hashes(),
         "uncles": block.uncles
 	}
 
