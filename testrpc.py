@@ -138,7 +138,7 @@ def send(transaction):
         sender = keys[0]
 
     if "value" in transaction:
-        value = transaction['value']
+        value = int(strip_0x(transaction['value']), 16)
     else:
         value = 0
 
