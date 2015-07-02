@@ -114,6 +114,18 @@ def int_to_hex(int_value):
     encoded = format(int_value, 'x')
     return encoded.zfill(len(encoded)*2 % 2)
 
+def format_block_number(block_number):
+    if block_number == "latest" or block_number == "pending":
+        block_number = len(evm.blocks) - 1
+    elif block_number == "earliest":
+        block_number = 0
+    else:
+        block_number = int(strip_0x(block_number), 16)
+
+    if block_number >= len(evm.blocks):
+        return None
+
+    return block_number
 
 def eth_coinbase():
     print 'eth_coinbase'
@@ -244,16 +256,7 @@ def eth_compileSolidity(code):
 def eth_getCode(address, block_number="latest"):
     address = strip_0x(address)
 
-    if block_number == "latest" or block_number == "pending":
-        block_number = len(evm.blocks) - 1
-    elif block_number == "earliest":
-        block_number = 0
-    else:
-        block_number = int(strip_0x(block_number), 16)
-
-    if block_number >= len(evm.blocks):
-        return None
-
+    block_number = format_block_number(block_number)
     block = evm.blocks[block_number]
 
     return "0x" + block.get_code(address).encode("hex")
@@ -262,19 +265,19 @@ def eth_getCode(address, block_number="latest"):
 def eth_getBalance(address, block_number="latest"):
     address = strip_0x(address)
 
-    if block_number == "latest" or block_number == "pending":
-        block_number = len(evm.blocks) - 1
-    elif block_number == "earliest":
-        block_number = 0
-    else:
-        block_number = int(strip_0x(block_number), 16)
-
-    if block_number >= len(evm.blocks):
-        return None
-
+    block_number = format_block_number(block_number)
     block = evm.blocks[block_number]
 
     return "0x" + int_to_hex(block.get_balance(address.decode('hex')))
+
+
+def eth_getTransactionCount(address, block_number="latest"):
+    address = strip_0x(address)
+
+    block_number = format_block_number(block_number)
+    block = evm.blocks[block_number]
+
+    return "0x" + int_to_hex(block.get_nonce(address.decode('hex')))
 
 
 def eth_getTransactionByHash(h):
@@ -320,16 +323,7 @@ def eth_getTransactionByHash(h):
 
 
 def eth_getBlockByNumber(block_number, full_tx):
-    if block_number == "latest" or block_number == "pending":
-        block_number = len(evm.blocks) - 1
-    elif block_number == "earliest":
-        block_number = 0
-    else:
-        block_number = int(strip_0x(block_number), 16)
-
-    if block_number >= len(evm.blocks):
-        return None
-
+    block_number = format_block_number(block_number)
     block = evm.blocks[block_number]
 
     return {
@@ -376,6 +370,7 @@ server.register_function(eth_getCompilers, 'eth_getCompilers')
 server.register_function(eth_compileSolidity, 'eth_compileSolidity')
 server.register_function(eth_getCode, 'eth_getCode')
 server.register_function(eth_getBalance, 'eth_getBalance')
+server.register_function(eth_getTransactionCount, 'eth_getTransactionCount')
 server.register_function(eth_getTransactionByHash, 'eth_getTransactionByHash')
 server.register_function(eth_getBlockByNumber, 'eth_getBlockByNumber')
 server.register_function(web3_sha3, 'web3_sha3')
