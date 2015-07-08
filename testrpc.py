@@ -30,22 +30,58 @@ class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
         SimpleJSONRPCRequestHandler.end_headers(self)
 
 
+############ Default Values / Global Variables ############
+evm = None
+snapshots = None
+transaction_contract_addresses = {}
+latest_filter_id = 0
+filters = {}
 
-# Ensure tester.py uses the "official" gas limit.
 t.gas_limit = 3141592
+
+############ Snapshots ############
 
 Snapshot = namedtuple("Snapshot", ["block_number", "data"])
 
-evm = None
-snapshots = None
+
+############ Filters ############ 
+
+BlockFilter = namedtuple("BlockFilter", ["block_number"])
+
+
+############ Helper Functions ############
 
 def strip_0x(s):
     if s[0] == "0" and s[1] == "x":
         s = s[2:]
     return s
 
-# Special non-standard function to reset the evm
-# state. Useful for automated testing.
+def isContract(transaction):
+    if "to" not in transaction and "data" in transaction:
+        return True
+    else:
+        return False
+
+def int_to_hex(int_value):
+    encoded = format(int_value, 'x')
+    return encoded.zfill(len(encoded)*2 % 2)
+
+def format_block_number(block_number):
+    if block_number == "latest" or block_number == "pending":
+        block_number = len(evm.blocks) - 1
+    elif block_number == "earliest":
+        block_number = 0
+    else:
+        block_number = int(strip_0x(block_number), 16)
+
+    if block_number >= len(evm.blocks):
+        return None
+
+    return block_number
+
+
+############ Snapshotting Functions ############
+
 def evm_reset():
     global evm
     global snapshots
@@ -93,39 +129,8 @@ def evm_revert(index=None):
     del snapshots[index:len(snapshots)]
     return True
 
-# init state
-evm_reset()
 
-t.set_logging_level(2)
-#slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
-#slogging.configure(':info,eth.vm.exit:debug,eth.pb.tx:info')
-
-print "Ready!"
-
-
-def isContract(transaction):
-    if "to" not in transaction and "data" in transaction:
-        return True
-    else:
-        return False
-
-
-def int_to_hex(int_value):
-    encoded = format(int_value, 'x')
-    return encoded.zfill(len(encoded)*2 % 2)
-
-def format_block_number(block_number):
-    if block_number == "latest" or block_number == "pending":
-        block_number = len(evm.blocks) - 1
-    elif block_number == "earliest":
-        block_number = 0
-    else:
-        block_number = int(strip_0x(block_number), 16)
-
-    if block_number >= len(evm.blocks):
-        return None
-
-    return block_number
+############ Web3 Functions ############
 
 def eth_coinbase():
     print 'eth_coinbase'
@@ -198,15 +203,24 @@ def send(transaction):
 # instead of the return value of the transaction.
 def eth_sendTransaction(transaction):
     global evm
+    global transaction_contract_addresses
+
     print 'eth_sendTransaction'
     r = send(transaction)
 
-    if not isContract(transaction):
-        tx = evm.block.transaction_list[-1]
-        r = "0x" + tx.hash.encode("hex")
+    if isContract(transaction):
+        contract_address = r
+    else:
+        contract_address = None
+
+    tx = evm.block.transaction_list[-1]
+    tx_hash = "0x" + tx.hash.encode("hex")
+
+    if contract_address != None:
+        transaction_contract_addresses[tx_hash] = contract_address
 
     evm.mine()
-    return r
+    return tx_hash
 
 
 def eth_call(transaction, block_number):
@@ -350,14 +364,94 @@ def eth_getBlockByNumber(block_number, full_tx):
 	}
 
 
+def eth_getTransactionReceipt(tx_hash):
+    print "eth_getTransactionReceipt"
+
+    global transaction_contract_addresses
+
+    tx_data = eth_getTransactionByHash(tx_hash)
+    block_data = eth_getBlockByNumber(tx_data["blockNumber"], False)
+
+    return {
+        "transactionHash": tx_data["hash"],
+        "transactionIndex": tx_data["transactionIndex"],
+        "blockNumber": tx_data["blockNumber"],
+        "blockHash": tx_data["blockHash"],
+        "cumulativeGasUsed": "0x" + int_to_hex(0), #TODO: Make this right.
+        "gasUsed": block_data["gasUsed"],
+        "contractAddress": transaction_contract_addresses[tx_hash]
+    }
+
+def eth_newBlockFilter():
+    print "eth_newBlockFilter"
+
+    global filters
+    global latest_filter_id
+    global evm
+
+    latest_filter_id += 1
+
+    filters[latest_filter_id] = BlockFilter(evm.block.number)
+
+    return "0x" + int_to_hex(latest_filter_id)
+
+def eth_getFilterChanges(filter_id):
+    global filters
+    global evm
+
+    print "eth_getFilterChanges"
+
+    # Mine a block with every call to getFilterChanges just to 
+    # ensure block filters will work.
+    evm.mine()
+
+    filter_id = int(strip_0x(filter_id), 16)
+
+    block_filter = filters[filter_id]
+
+    old_block_number = block_filter.block_number
+    current_block_number = evm.block.number
+
+    block_hashes = []
+
+    for block_number in range(old_block_number, current_block_number):
+        block = evm.blocks[block_number]
+        block_hashes.append('0x' + block.hash.encode('hex'))
+
+    # Update the block filter with the current block
+    filters[filter_id] = BlockFilter(current_block_number)
+
+    return block_hashes
+
+def eth_uninstallFilter(filter_id):
+    print "eth_uninstallFilter"
+
+    global filters
+
+    filter_id = int(strip_0x(filter_id), 16)
+
+    del filters[filter_id]
+
+    return True
+
 def web3_sha3(argument):
     print 'web3_sha3'
     return '0x' + sha3(argument[2:].decode('hex')).encode('hex')
 
 
 def web3_clientVersion():
-    return "Consensys TestRPC/v0.0.1/python"
+    return "Consensys TestRPC/v0.0.2/python"
 
+
+############ Boot ############
+
+evm_reset()
+
+t.set_logging_level(2)
+#slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
+#slogging.configure(':info,eth.vm.exit:debug,eth.pb.tx:info')
+
+print "Ready!"
 
 server = SimpleJSONRPCServer(('localhost', 8545), SimpleJSONRPCRequestHandlerWithCORS)
 server.register_function(eth_coinbase, 'eth_coinbase')
@@ -372,7 +466,11 @@ server.register_function(eth_getCode, 'eth_getCode')
 server.register_function(eth_getBalance, 'eth_getBalance')
 server.register_function(eth_getTransactionCount, 'eth_getTransactionCount')
 server.register_function(eth_getTransactionByHash, 'eth_getTransactionByHash')
+server.register_function(eth_getTransactionReceipt, 'eth_getTransactionReceipt')
 server.register_function(eth_getBlockByNumber, 'eth_getBlockByNumber')
+server.register_function(eth_newBlockFilter, 'eth_newBlockFilter')
+server.register_function(eth_getFilterChanges, 'eth_getFilterChanges')
+server.register_function(eth_uninstallFilter, 'eth_uninstallFilter')
 server.register_function(web3_sha3, 'web3_sha3')
 server.register_function(web3_clientVersion, 'web3_clientVersion')
 server.register_function(evm_reset, 'evm_reset')

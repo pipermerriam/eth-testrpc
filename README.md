@@ -34,6 +34,10 @@ The RPC methods currently implemented are:
 * `eth_getBalance`
 * `eth_getTransactionCount`
 * `eth_getTransactionByHash`
+* `eth_getTransactionReceipt`
+* `eth_newBlockFilter`
+* `eth_getFilterChanges` (only supports block filters)
+* `eth_uninstallFilter`
 * `web3_sha3`
 * `web3_clientVersion`
 
