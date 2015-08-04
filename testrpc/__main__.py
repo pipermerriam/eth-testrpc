@@ -1,4 +1,5 @@
 from testrpc import *
+from ethereum.tester import accounts
 
 ############ Boot ############
 
@@ -8,7 +9,11 @@ t.set_logging_level(2)
 #slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
 #slogging.configure(':info,eth.vm.exit:debug,eth.pb.tx:info')
 
-print "Ready!"
+print "\nAvailable Accounts\n=================="
+for account in accounts:
+    print '0x%s' % account.encode("hex")
+
+print "\nReady!"
 
 server = SimpleJSONRPCServer(('localhost', 8545), SimpleJSONRPCRequestHandlerWithCORS)
 server.register_function(eth_coinbase, 'eth_coinbase')
