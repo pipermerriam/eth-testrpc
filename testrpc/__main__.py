@@ -13,9 +13,10 @@ print "\nAvailable Accounts\n=================="
 for account in accounts:
     print '0x%s' % account.encode("hex")
 
-print "\nReady!"
+PORT = 8545
+print "\nListening on port %s" % PORT
 
-server = SimpleJSONRPCServer(('localhost', 8545), SimpleJSONRPCRequestHandlerWithCORS)
+server = SimpleJSONRPCServer(('localhost', PORT), SimpleJSONRPCRequestHandlerWithCORS)
 server.register_function(eth_coinbase, 'eth_coinbase')
 server.register_function(eth_accounts, 'eth_accounts')
 server.register_function(eth_gasPrice, 'eth_gasPrice')
