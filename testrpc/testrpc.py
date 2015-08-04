@@ -44,7 +44,7 @@ t.gas_limit = 3141592
 Snapshot = namedtuple("Snapshot", ["block_number", "data"])
 
 
-############ Filters ############ 
+############ Filters ############
 
 BlockFilter = namedtuple("BlockFilter", ["block_number"])
 
@@ -167,7 +167,7 @@ def send(transaction):
     if "data" in transaction:
         data = strip_0x(transaction['data']).decode("hex")
     else:
-        data = None
+        data = ""
 
     if "gas" in transaction:
         gas = int(strip_0x(transaction['gas']), 16)
@@ -401,7 +401,7 @@ def eth_getFilterChanges(filter_id):
 
     print "eth_getFilterChanges"
 
-    # Mine a block with every call to getFilterChanges just to 
+    # Mine a block with every call to getFilterChanges just to
     # ensure block filters will work.
     evm.mine()
 
