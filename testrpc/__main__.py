@@ -1,5 +1,15 @@
+import argparse
 from testrpc import *
 from ethereum.tester import accounts
+
+parser = argparse.ArgumentParser(
+    description='Simulate an Ethereum blockchain JSON-RPC server.'
+)
+parser.add_argument('-p', '--port', dest='port', type=int,
+                    nargs='?', default=8545)
+parser.add_argument('-d', '--domain', dest='domain', type=str,
+                    nargs='?', default='localhost')
+args = parser.parse_args()
 
 ############ Boot ############
 
@@ -13,10 +23,9 @@ print "\nAvailable Accounts\n=================="
 for account in accounts:
     print '0x%s' % account.encode("hex")
 
-PORT = 8545
-print "\nListening on port %s" % PORT
+print "\nListening on %s:%s" % (args.domain, args.port)
 
-server = SimpleJSONRPCServer(('localhost', PORT), SimpleJSONRPCRequestHandlerWithCORS)
+server = SimpleJSONRPCServer((args.domain, args.port), SimpleJSONRPCRequestHandlerWithCORS)
 server.register_function(eth_coinbase, 'eth_coinbase')
 server.register_function(eth_accounts, 'eth_accounts')
 server.register_function(eth_gasPrice, 'eth_gasPrice')
