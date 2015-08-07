@@ -10,6 +10,12 @@ Installing is easy, through pip:
 $ pip install eth-testrpc
 ```
 
+Or, to upgrade:
+
+```
+pip install eth-testrpc --upgrade
+```
+
 ### Run
 
 Installing through pip will make the `testrpc` command available on your machine:
