@@ -42,5 +42,5 @@ setup(
         'console_scripts': [
             'testrpc=testrpc.__main__',
         ],
-    },
+    }
 )
