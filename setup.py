@@ -18,6 +18,7 @@ setup(
     description='An Ethereum simulator for aiding smart contract development.',
     long_description=long_description,
     url='https://github.com/ConsenSys/eth-testrpc',
+    download_url='https://github.com/Consensys/eth-testrpc/tarball/v0.1.1'
     author='ConsenSys',
     author_email='info@consensys.net',
     license='MIT',
