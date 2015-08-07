@@ -14,11 +14,11 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='eth-testrpc',
-    version='0.1.5',
+    version='0.1.6',
     description='An Ethereum simulator for aiding smart contract development.',
     long_description=long_description,
     url='https://github.com/ConsenSys/eth-testrpc',
-    download_url='https://github.com/Consensys/eth-testrpc/tarball/v0.1.5',
+    download_url='https://github.com/Consensys/eth-testrpc/archive/v0.1.6.tar.gz',
     author='ConsenSys',
     author_email='info@consensys.net',
     license='MIT',
