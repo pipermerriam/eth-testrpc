@@ -4,18 +4,18 @@ Limited RPC client intended for use with automated testing. Uses [pythereum](htt
 
 ### Install
 
-To install `testrpc`, follow these steps. It’s recommended you perform these within a virtualenv.
+Installing is easy, through pip:
 
-1. `$ git clone https://github.com/Consensys/testrpc` (clone this repository)
-2. `cd testrpc`
-3. `$ pip install -r requirements.txt`
+```
+$ pip install eth-testrpc
+```
 
 ### Run
 
-`cd` into your clone of this repository, then type:
+Installing through pip will make the `testrpc` command available on your machine:
 
 ```
-$ python testrpc.py
+$ testrpc
 ```
 
 ### Implemented methods
@@ -53,6 +53,30 @@ When calling `evm_reset`, the `testrpc` will revert the state of its internal ch
 * `evm_reset` : Run once at the beginning of your test suite.
 * `evm_snapshot` : Run at the beginning of each test, snapshotting the state of the evm.
 * `evm_revert` : Run at the end of each test, reverting back to a known clean state.
+
+### Releasing a new version (for eth-testrpc developers)
+
+So we don't forget. :)
+
+Install `seed` if you haven't already:
+
+```
+$ pip install seed
+```
+
+Commit any changes you've made first. Then, to make the release:
+
+```
+$ seed release
+```
+
+Afterward, commit the changes it made for you:
+
+```
+git push && git push --tags
+```
+
+All done! No need to update a version number.
 
 ### License
 
