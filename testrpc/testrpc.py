@@ -3,6 +3,7 @@
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCRequestHandler
 from ethereum import tester as t
+from rlp.sedes import big_endian_int, binary
 from rlp.utils import encode_hex
 from ethereum import blocks
 from ethereum import utils
@@ -57,6 +58,9 @@ def strip_0x(s):
     return s
 
 def isContract(transaction):
+    if type(transaction) is transactions.Transaction:
+        return transaction.to == None and transaction.data != None
+
     if "to" not in transaction and "data" in transaction:
         return True
     else:
@@ -214,6 +218,45 @@ def eth_sendTransaction(transaction):
         contract_address = None
 
     tx = evm.block.transaction_list[-1]
+    tx_hash = "0x" + tx.hash.encode("hex")
+
+    if contract_address != None:
+        transaction_contract_addresses[tx_hash] = contract_address
+
+    evm.mine()
+    return tx_hash
+
+
+def eth_sendRawTransaction(raw_tx):
+    global evm
+    global transaction_contract_addresses
+
+    print 'eth_sendRawTransaction'
+
+    # Get a transaction object from the raw hash.
+    tx = rlp.decode(strip_0x(raw_tx).decode("hex"), transactions.Transaction)
+
+    print ""
+    print "Raw Transaction Details:"
+    print "  "
+    print "  From:     " + "0x" + tx.sender.encode("hex")
+    print "  To:       " + "0x" + tx.to.encode("hex")
+    print "  Gas:      " + int_to_hex(tx.startgas)
+    print "  GasPrice: " + int_to_hex(tx.gasprice)
+    print "  Value:    " + int_to_hex(tx.value)
+    print "  Data:     " + "0x" + tx.data.encode("hex")
+    print ""
+
+    (s, r) = processblock.apply_transaction(evm.block, tx)
+
+    if not s:
+        raise Exception("Transaction failed")
+
+    if isContract(tx):
+        contract_address = r
+    else:
+        contract_address = None
+
     tx_hash = "0x" + tx.hash.encode("hex")
 
     if contract_address != None:
@@ -441,5 +484,3 @@ def web3_sha3(argument):
 
 def web3_clientVersion():
     return "Consensys TestRPC/v0.0.2/python"
-
-
