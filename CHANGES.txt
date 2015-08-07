@@ -1,5 +1,11 @@
 ----
 
+Version 0.1.10, Fri 07 Aug 2015
+================================
+
+552626a93b	Getting somewhere. (Tim Coulter)
+
+
 Version 0.1.9, Fri 07 Aug 2015
 ===============================
 
