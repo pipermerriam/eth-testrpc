@@ -1,5 +1,11 @@
 ----
 
+Version 0.1.14, Fri 07 Aug 2015
+================================
+
+c74f85338f	Update the readme, and ignore .pyc files. (Tim Coulter)
+
+
 Version 0.1.13, Fri 07 Aug 2015
 ================================
 
