@@ -24,6 +24,8 @@ Installing through pip will make the `testrpc` command available on your machine
 $ testrpc
 ```
 
+This will run testrpc on localhost:8545. You can pass through a different port (-p, --port) or domain (-d, --domain).
+
 ### Implemented methods
 
 The RPC methods currently implemented are:
