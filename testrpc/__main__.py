@@ -49,4 +49,10 @@ server.register_function(web3_clientVersion, 'web3_clientVersion')
 server.register_function(evm_reset, 'evm_reset')
 server.register_function(evm_snapshot, 'evm_snapshot')
 server.register_function(evm_revert, 'evm_revert')
-server.serve_forever()
+
+def main():
+    server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()
