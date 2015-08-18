@@ -1,5 +1,12 @@
 ----
 
+Version 0.1.16, Tue 18 Aug 2015
+================================
+
+2bbae08ad5	Version bump to 0.1.15 and updating CHANGES.txt (Tim Coulter)
+cce4d7bfcc	Version bump to 0.1.16 and updating CHANGES.txt (Tim Coulter)
+
+
 Version 0.1.15, Tue 18 Aug 2015
 ================================
 
