@@ -9,10 +9,9 @@ parser.add_argument('-p', '--port', dest='port', type=int,
                     nargs='?', default=8545)
 parser.add_argument('-d', '--domain', dest='domain', type=str,
                     nargs='?', default='localhost')
-args = parser.parse_args()
 
 
-def create_server(host="127.0.0.1", port='8545'):
+def create_server(host="127.0.0.1", port=8545):
     server = SimpleJSONRPCServer((host, port), SimpleJSONRPCRequestHandlerWithCORS)
     server.register_function(eth_coinbase, 'eth_coinbase')
     server.register_function(eth_accounts, 'eth_accounts')
@@ -42,6 +41,7 @@ def create_server(host="127.0.0.1", port='8545'):
 
 
 def main():
+    args = parser.parse_args()
     evm_reset()
 
     t.set_logging_level(2)
