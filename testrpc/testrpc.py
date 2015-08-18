@@ -422,7 +422,7 @@ def eth_getTransactionReceipt(tx_hash):
         "blockHash": tx_data["blockHash"],
         "cumulativeGasUsed": "0x" + int_to_hex(0), #TODO: Make this right.
         "gasUsed": block_data["gasUsed"],
-        "contractAddress": transaction_contract_addresses[tx_hash]
+        "contractAddress": transaction_contract_addresses.get(tx_hash, None)
     }
 
 def eth_newBlockFilter():
