@@ -40,7 +40,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'testrpc=testrpc.__main__',
+            'testrpc=testrpc.__main__:main',
         ],
     }
 )
