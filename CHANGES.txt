@@ -1,17 +1,18 @@
 ----
 
-Version 0.1.17, Tue 18 Aug 2015
+Version 0.1.15, Tue 18 Aug 2015
 ================================
 
+f368f18684	Version bump to 0.1.17 and updating CHANGES.txt (Tim Coulter)
 ac5ba3c572	Version bump to 0.1.16 and updating CHANGES.txt (Tim Coulter)
 2bbae08ad5	Version bump to 0.1.15 and updating CHANGES.txt (Tim Coulter)
-
-
-Version 0.1.16, Tue 18 Aug 2015
-================================
-
-2bbae08ad5	Version bump to 0.1.15 and updating CHANGES.txt (Tim Coulter)
 cce4d7bfcc	Version bump to 0.1.16 and updating CHANGES.txt (Tim Coulter)
+11da491fe9	Version bump to 0.1.15 and updating CHANGES.txt (Tim Coulter)
+712633f67f	Prevent getTransactionReciept from failing when no contract is created. (Tim Coulter)
+1564d65ece	Make the package installable (Piper Merriam)
+1acca823e7	Added info on ports & domains in README (Simon de la Rouviere)
+f387bbdfb5	Update README.md (Joseph Lubin)
+7c84e37773	Add upgrade instructions. (Tim Coulter)
 
 
 Version 0.1.15, Tue 18 Aug 2015
@@ -24,22 +25,6 @@ cce4d7bfcc	Version bump to 0.1.16 and updating CHANGES.txt (Tim Coulter)
 1acca823e7	Added info on ports & domains in README (Simon de la Rouviere)
 f387bbdfb5	Update README.md (Joseph Lubin)
 7c84e37773	Add upgrade instructions. (Tim Coulter)
-
-
-Version 0.1.16, Tue 18 Aug 2015
-================================
-
-
-
-Version 0.1.15, Tue 18 Aug 2015
-================================
-
-712633f67f	Prevent getTransactionReciept from failing when no contract is created. (Tim Coulter)
-1564d65ece	Make the package installable (Piper Merriam)
-1acca823e7	Added info on ports & domains in README (Simon de la Rouviere)
-f387bbdfb5	Update README.md (Joseph Lubin)
-7c84e37773	Add upgrade instructions. (Tim Coulter)
-
 
 Version 0.1.14, Fri 07 Aug 2015
 ================================
