@@ -1,5 +1,12 @@
 ----
 
+Version 0.1.16, Thu 20 Aug 2015
+================================
+
+b6e68d2ba7	Use integer (Piper Merriam)
+e3dff37ed5	Make the rpc server usable outside of the command line (Piper Merriam)
+
+
 Version 0.1.15, Tue 18 Aug 2015
 ================================
 
