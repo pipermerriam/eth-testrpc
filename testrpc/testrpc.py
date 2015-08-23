@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 from ethereum import tester as t
 from rlp.sedes import big_endian_int, binary
 from rlp.utils import encode_hex
@@ -74,7 +75,7 @@ def format_block_number(block_number):
 def evm_reset():
     global evm
     global snapshots
-    print "Resetting EVM state..."
+    print("Resetting EVM state...")
     evm = t.state()
     snapshots = []
     return True
@@ -82,7 +83,7 @@ def evm_reset():
 def evm_snapshot():
     global evm
     global snapshots
-    print "Creating snapshot #" + str(len(snapshots))
+    print("Creating snapshot #" + str(len(snapshots)))
     snapshots.append(Snapshot(block_number=evm.block.number, data=evm.snapshot()))
     return "0x" + int_to_hex(len(snapshots) - 1)
 
@@ -98,7 +99,7 @@ def evm_revert(index=None):
     else:
         index = len(snapshots) - 1
 
-    print "Reverting snapshot #" + str(index)
+    print("Reverting snapshot #" + str(index))
 
     if index >= len(snapshots):
         return False
@@ -122,17 +123,17 @@ def evm_revert(index=None):
 ############ Web3 Functions ############
 
 def eth_coinbase():
-    print 'eth_coinbase'
+    print('eth_coinbase')
     return '0x' + encode_hex(evm.block.coinbase)
 
 
 def eth_gasPrice():
-    print 'eth_gasPrice'
+    print('eth_gasPrice')
     return '0x' + int_to_hex(1)
 
 
 def eth_blockNumber():
-    print 'eth_blockNumber'
+    print('eth_blockNumber')
     return '0x' + int_to_hex(evm.block.number)
 
 
@@ -163,22 +164,22 @@ def send(transaction):
     else:
         gas = None
 
-    # print "value: " + value.encode("hex")
-    # print "to: " + to
-    # print "from: " + accounts[keys.index(sender)].encode("hex")
-    # print "data: " + data.encode("hex")
-    # print "gas: " + str(gas)
+    # print("value: " + value.encode("hex"))
+    # print("to: " + to)
+    # print("from: " + accounts[keys.index(sender)].encode("hex"))
+    # print("data: " + data.encode("hex"))
+    # print("gas: " + str(gas))
 
     if isContract(transaction):
         estimated_cost = len(data.encode("hex")) / 2 * 200
 
-        print "Adding contract..."
-        print "Estimated gas cost: " + str(estimated_cost)
+        print("Adding contract...")
+        print("Estimated gas cost: " + str(estimated_cost))
 
         if gas != None and estimated_cost > gas:
-            print "* "
-            print "* WARNING: Estimated cost higher than sent gas: " + str(estimated_cost) + " > " + str(gas)
-            print "* "
+            print("* ")
+            print("* WARNING: Estimated cost higher than sent gas: " + str(estimated_cost) + " > " + str(gas))
+            print("* ")
 
         r = evm.evm(data, sender, value, gas).encode("hex")
     else:
@@ -194,7 +195,7 @@ def eth_sendTransaction(transaction):
     global evm
     global transaction_contract_addresses
 
-    print 'eth_sendTransaction'
+    print('eth_sendTransaction')
     r = send(transaction)
 
     if isContract(transaction):
@@ -216,21 +217,21 @@ def eth_sendRawTransaction(raw_tx):
     global evm
     global transaction_contract_addresses
 
-    print 'eth_sendRawTransaction'
+    print('eth_sendRawTransaction')
 
     # Get a transaction object from the raw hash.
     tx = rlp.decode(strip_0x(raw_tx).decode("hex"), transactions.Transaction)
 
-    print ""
-    print "Raw Transaction Details:"
-    print "  "
-    print "  From:     " + "0x" + tx.sender.encode("hex")
-    print "  To:       " + "0x" + tx.to.encode("hex")
-    print "  Gas:      " + int_to_hex(tx.startgas)
-    print "  GasPrice: " + int_to_hex(tx.gasprice)
-    print "  Value:    " + int_to_hex(tx.value)
-    print "  Data:     " + "0x" + tx.data.encode("hex")
-    print ""
+    print("")
+    print("Raw Transaction Details:")
+    print("  ")
+    print("  From:     " + "0x" + tx.sender.encode("hex"))
+    print("  To:       " + "0x" + tx.to.encode("hex"))
+    print("  Gas:      " + int_to_hex(tx.startgas))
+    print("  GasPrice: " + int_to_hex(tx.gasprice))
+    print("  Value:    " + int_to_hex(tx.value))
+    print("  Data:     " + "0x" + tx.data.encode("hex"))
+    print("")
 
     (s, r) = processblock.apply_transaction(evm.block, tx)
 
@@ -252,7 +253,7 @@ def eth_sendRawTransaction(raw_tx):
 
 
 def eth_call(transaction, block_number):
-    print "eth_call"
+    print("eth_call")
     snapshot = evm.snapshot()
     r = send(transaction)
     evm.revert(snapshot)
@@ -366,6 +367,7 @@ def eth_getTransactionByHash(h):
 
 def eth_getBlockByNumber(block_number, full_tx):
     block_number = format_block_number(block_number)
+    #if block_number >= len(
     block = evm.blocks[block_number]
 
     return {
@@ -389,11 +391,11 @@ def eth_getBlockByNumber(block_number, full_tx):
         "timestamp": "0x" + int_to_hex(block.timestamp),
         "transactions": block.get_transactions() if full_tx else block.get_transaction_hashes(),
         "uncles": block.uncles
-	}
+    }
 
 
 def eth_getTransactionReceipt(tx_hash):
-    print "eth_getTransactionReceipt"
+    print("eth_getTransactionReceipt")
 
     global transaction_contract_addresses
 
@@ -411,7 +413,7 @@ def eth_getTransactionReceipt(tx_hash):
     }
 
 def eth_newBlockFilter():
-    print "eth_newBlockFilter"
+    print("eth_newBlockFilter")
 
     global filters
     global latest_filter_id
@@ -427,7 +429,7 @@ def eth_getFilterChanges(filter_id):
     global filters
     global evm
 
-    print "eth_getFilterChanges"
+    print("eth_getFilterChanges")
 
     # Mine a block with every call to getFilterChanges just to
     # ensure block filters will work.
@@ -452,7 +454,7 @@ def eth_getFilterChanges(filter_id):
     return block_hashes
 
 def eth_uninstallFilter(filter_id):
-    print "eth_uninstallFilter"
+    print("eth_uninstallFilter")
 
     global filters
 
@@ -463,7 +465,7 @@ def eth_uninstallFilter(filter_id):
     return True
 
 def web3_sha3(argument):
-    print 'web3_sha3'
+    print('web3_sha3')
     return '0x' + sha3(argument[2:].decode('hex')).encode('hex')
 
 

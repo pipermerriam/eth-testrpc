@@ -1,3 +1,4 @@
+from __future__ import print_function
 import argparse
 from testrpc import *
 from ethereum.tester import accounts
@@ -64,11 +65,11 @@ def main():
     #slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
     #slogging.configure(':info,eth.vm.exit:debug,eth.pb.tx:info')
 
-    print "\nAvailable Accounts\n=================="
+    print("\nAvailable Accounts\n==================")
     for account in accounts:
-        print '0x%s' % account.encode("hex")
+        print('0x%s' % account.encode("hex"))
 
-    print "\nListening on %s:%s" % (args.domain, args.port)
+    print("\nListening on %s:%s" % (args.domain, args.port))
 
     server = create_server(args.domain, args.port)
 
