@@ -69,6 +69,18 @@ def format_block_number(block_number):
 
     return block_number
 
+def jsonTxs(txs):
+    return [{
+        "from": "0x" + encode_hex(tx._sender),
+        "gas": tx.startgas,
+        "gasPrice": tx.gasprice,
+        "hash": "0x" + encode_hex(tx.hash),
+        "input": "0x" + encode_hex(tx.data),
+        "nonce": tx.nonce,
+        "to": "0x" + encode_hex(tx.to) if tx.to else None,
+        "transactionIndex": i,
+        "value": tx.value
+    } for i, tx in enumerate(txs)]
 
 ############ Snapshotting Functions ############
 
@@ -389,7 +401,7 @@ def eth_getBlockByNumber(block_number, full_tx):
         "gasLimit": "0x" + int_to_hex(block.gas_limit),
         "gasUsed": "0x" + int_to_hex(block.gas_used),
         "timestamp": "0x" + int_to_hex(block.timestamp),
-        "transactions": block.get_transactions() if full_tx else block.get_transaction_hashes(),
+        "transactions": jsonTxs(block.get_transactions()) if full_tx else [encode_hex(tx) for tx in block.get_transaction_hashes()],
         "uncles": block.uncles
     }
 
