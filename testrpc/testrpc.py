@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
-from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCRequestHandler
 from ethereum import tester as t
 from rlp.sedes import big_endian_int, binary
 from rlp.utils import encode_hex
@@ -16,19 +14,6 @@ from ethereum.tester import accounts
 from ethereum.tester import languages
 from collections import namedtuple
 from ethereum import slogging
-
-# Override the SimpleJSONRPCRequestHandler to support access control (*)
-class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.end_headers()
-
-    # Add these headers to all responses
-    def end_headers(self):
-        self.send_header("Access-Control-Allow-Headers",
-                         "Origin, X-Requested-With, Content-Type, Accept")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        SimpleJSONRPCRequestHandler.end_headers(self)
 
 
 ############ Default Values / Global Variables ############

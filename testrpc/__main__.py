@@ -1,6 +1,8 @@
 import argparse
 from testrpc import *
 from ethereum.tester import accounts
+from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
+from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCRequestHandler
 
 parser = argparse.ArgumentParser(
     description='Simulate an Ethereum blockchain JSON-RPC server.'
@@ -9,6 +11,20 @@ parser.add_argument('-p', '--port', dest='port', type=int,
                     nargs='?', default=8545)
 parser.add_argument('-d', '--domain', dest='domain', type=str,
                     nargs='?', default='localhost')
+
+
+# Override the SimpleJSONRPCRequestHandler to support access control (*)
+class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.end_headers()
+
+    # Add these headers to all responses
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Headers",
+                         "Origin, X-Requested-With, Content-Type, Accept")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        SimpleJSONRPCRequestHandler.end_headers(self)
 
 
 def create_server(host="127.0.0.1", port=8545):
