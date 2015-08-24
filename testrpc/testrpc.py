@@ -3,7 +3,7 @@
 from __future__ import print_function
 from ethereum import tester as t
 from rlp.sedes import big_endian_int, binary
-from rlp.utils import encode_hex
+from rlp.utils import encode_hex, decode_hex
 from ethereum import blocks
 from ethereum import utils
 from ethereum import transactions
@@ -151,7 +151,7 @@ def eth_blockNumber():
 
 def send(transaction):
     if "from" in transaction:
-        addr = strip_0x(transaction['from']).decode("hex")
+        addr = decode_hex(strip_0x(transaction['from']))
         sender = keys[accounts.index(addr)]
     else:
         sender = keys[0]
@@ -167,7 +167,7 @@ def send(transaction):
         to = None
 
     if "data" in transaction:
-        data = strip_0x(transaction['data']).decode("hex")
+        data = decode_hex(strip_0x(transaction['data']))
     else:
         data = ""
 
@@ -176,14 +176,14 @@ def send(transaction):
     else:
         gas = None
 
-    # print("value: " + value.encode("hex"))
+    # print("value: " + encode_hex(value))
     # print("to: " + to)
-    # print("from: " + accounts[keys.index(sender)].encode("hex"))
-    # print("data: " + data.encode("hex"))
+    # print("from: " + encode_hex(accounts[keys.index(sender)]))
+    # print("data: " + encode_hex(data))
     # print("gas: " + str(gas))
 
     if isContract(transaction):
-        estimated_cost = len(data.encode("hex")) / 2 * 200
+        estimated_cost = len(encode_hex(data)) / 2 * 200
 
         print("Adding contract...")
         print("Estimated gas cost: " + str(estimated_cost))
@@ -193,9 +193,9 @@ def send(transaction):
             print("* WARNING: Estimated cost higher than sent gas: " + str(estimated_cost) + " > " + str(gas))
             print("* ")
 
-        r = evm.evm(data, sender, value, gas).encode("hex")
+        r = encode_hex(evm.evm(data, sender, value, gas))
     else:
-        r = evm.send(sender, to, value, data, gas).encode("hex")
+        r = encode_hex(evm.send(sender, to, value, data, gas))
 
     r = "0x" + r
     return r
@@ -216,7 +216,7 @@ def eth_sendTransaction(transaction):
         contract_address = None
 
     tx = evm.block.transaction_list[-1]
-    tx_hash = "0x" + tx.hash.encode("hex")
+    tx_hash = "0x" + encode_hex(tx.hash)
 
     if contract_address != None:
         transaction_contract_addresses[tx_hash] = contract_address
@@ -232,17 +232,17 @@ def eth_sendRawTransaction(raw_tx):
     print('eth_sendRawTransaction')
 
     # Get a transaction object from the raw hash.
-    tx = rlp.decode(strip_0x(raw_tx).decode("hex"), transactions.Transaction)
+    tx = rlp.decode(decode_hex(strip_0x(raw_tx)), transactions.Transaction)
 
     print("")
     print("Raw Transaction Details:")
     print("  ")
-    print("  From:     " + "0x" + tx.sender.encode("hex"))
-    print("  To:       " + "0x" + tx.to.encode("hex"))
+    print("  From:     " + "0x" + encode_hex(tx.sender))
+    print("  To:       " + "0x" + encode_hex(tx.to))
     print("  Gas:      " + int_to_hex(tx.startgas))
     print("  GasPrice: " + int_to_hex(tx.gasprice))
     print("  Value:    " + int_to_hex(tx.value))
-    print("  Data:     " + "0x" + tx.data.encode("hex"))
+    print("  Data:     " + "0x" + encode_hex(tx.data))
     print("")
 
     (s, r) = processblock.apply_transaction(evm.block, tx)
@@ -255,7 +255,7 @@ def eth_sendRawTransaction(raw_tx):
     else:
         contract_address = None
 
-    tx_hash = "0x" + tx.hash.encode("hex")
+    tx_hash = "0x" + encode_hex(tx.hash)
 
     if contract_address != None:
         transaction_contract_addresses[tx_hash] = contract_address
@@ -275,7 +275,7 @@ def eth_call(transaction, block_number):
 def eth_accounts():
     r = []
     for index in range(len(accounts)):
-        r.append("0x" + accounts[index].encode("hex"))
+        r.append("0x" + encode_hex(accounts[index]))
     return r
 
 
@@ -314,7 +314,7 @@ def eth_getCode(address, block_number="latest"):
     block_number = format_block_number(block_number)
     block = evm.blocks[block_number]
 
-    return "0x" + block.get_code(address).encode("hex")
+    return "0x" + encode_hex(block.get_code(address))
 
 
 def eth_getBalance(address, block_number="latest"):
@@ -323,7 +323,7 @@ def eth_getBalance(address, block_number="latest"):
     block_number = format_block_number(block_number)
     block = evm.blocks[block_number]
 
-    return "0x" + int_to_hex(block.get_balance(address.decode('hex')))
+    return "0x" + int_to_hex(block.get_balance(decode_hex(address)))
 
 
 def eth_getTransactionCount(address, block_number="latest"):
@@ -332,11 +332,11 @@ def eth_getTransactionCount(address, block_number="latest"):
     block_number = format_block_number(block_number)
     block = evm.blocks[block_number]
 
-    return "0x" + int_to_hex(block.get_nonce(address.decode('hex')))
+    return "0x" + int_to_hex(block.get_nonce(decode_hex(address)))
 
 
 def eth_getTransactionByHash(h):
-    h = strip_0x(h).decode("hex")
+    h = decode_hex(strip_0x(h))
 
     total = len(evm.blocks)
     current = total - 1
@@ -359,21 +359,21 @@ def eth_getTransactionByHash(h):
     # We need to return an object with some things as null.
     if tx == None:
         return {
-            "hash": "0x" + h.encode("hex")
+            "hash": "0x" + encode_hex(h)
         }
 
     return {
-        "hash": "0x" + tx.hash.encode("hex"),
+        "hash": "0x" + encode_hex(tx.hash),
         "nonce": "0x" + int_to_hex(tx.nonce),
-        "blockHash": "0x" + block.hash.encode("hex"),
+        "blockHash": "0x" + encode_hex(block.hash),
         "blockNumber": "0x" + int_to_hex(block.number),
         "transactionIndex": "0x" + int_to_hex(tx_index),
-        "from": "0x" + tx.sender.encode("hex"),
-        "to": "0x" + tx.to.encode("hex"),
+        "from": "0x" + encode_hex(tx.sender),
+        "to": "0x" + encode_hex(tx.to),
         "value": "0x" + int_to_hex(tx.value),
         "gas": "0x" + int_to_hex(tx.startgas),
         "gasPrice": "0x" + int_to_hex(tx.gasprice),
-        "input": "0x" + tx.data.encode("hex")
+        "input": "0x" + encode_hex(tx.data)
     }
 
 
@@ -384,20 +384,20 @@ def eth_getBlockByNumber(block_number, full_tx):
 
     return {
         "number": "0x" + int_to_hex(block.number),
-        "hash": "0x" + block.hash.encode('hex'),
-        "parentHash": "0x" + block.prevhash.encode('hex'),
-        "nonce": "0x" + block.nonce.encode('hex'),
-        "sha3Uncles": "0x" + block.uncles_hash.encode('hex'),
+        "hash": "0x" + encode_hex(block.hash),
+        "parentHash": "0x" + encode_hex(block.prevhash),
+        "nonce": "0x" + encode_hex(block.nonce),
+        "sha3Uncles": "0x" + encode_hex(block.uncles_hash),
         # TODO logsBloom / padding
         "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-        "transactionsRoot": "0x" + block.tx_list_root.encode('hex'),
-        "stateRoot": "0x" + block.state_root.encode('hex'),
-        "miner": "0x" + block.coinbase.encode('hex'),
+        "transactionsRoot": "0x" + encode_hex(block.tx_list_root),
+        "stateRoot": "0x" + encode_hex(block.state_root),
+        "miner": "0x" + encode_hex(block.coinbase),
         "difficulty": "0x" + int_to_hex(block.difficulty),
         # https://github.com/ethereum/pyethereum/issues/266
         # "totalDifficulty": "0x" + int_to_hex(block.chain_difficulty()),
         "size": "0x" + int_to_hex(len(rlp.encode(block))),
-        "extraData": "0x" + block.extra_data.encode('hex'),
+        "extraData": "0x" + encode_hex(block.extra_data),
         "gasLimit": "0x" + int_to_hex(block.gas_limit),
         "gasUsed": "0x" + int_to_hex(block.gas_used),
         "timestamp": "0x" + int_to_hex(block.timestamp),
@@ -478,7 +478,7 @@ def eth_uninstallFilter(filter_id):
 
 def web3_sha3(argument):
     print('web3_sha3')
-    return '0x' + sha3(argument[2:].decode('hex')).encode('hex')
+    return '0x' + encode_hex(sha3(decode_hex(argument[2:])))
 
 
 def web3_clientVersion():
