@@ -1,21 +1,17 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from collections import Iterable
 from ethereum import tester as t
 from rlp.sedes import big_endian_int, binary
 from rlp.utils import encode_hex, decode_hex
 from ethereum import blocks
-from ethereum import utils
-from ethereum import transactions
-from ethereum import processblock
-from ethereum.utils import sha3
-from ethereum.utils import rlp
-from ethereum.tester import keys
-from ethereum.tester import accounts
-from ethereum.tester import languages
+from ethereum import utils, transactions, processblock
+from ethereum.utils import sha3, rlp, sha3rlp
+from ethereum.tester import keys, accounts, languages
 from collections import namedtuple
 from ethereum import slogging
-
+from .utils import decode_number, encode_loglist
 
 ############ Default Values / Global Variables ############
 evm = None
@@ -23,6 +19,7 @@ snapshots = None
 transaction_contract_addresses = {}
 latest_filter_id = 0
 filters = {}
+event_log = {}
 
 t.gas_limit = 3141592
 
@@ -33,7 +30,95 @@ Snapshot = namedtuple("Snapshot", ["block_number", "data"])
 
 ############ Filters ############
 
-BlockFilter = namedtuple("BlockFilter", ["block_number"])
+class BlockFilter(object):
+    def __init__(self, evm, from_block_number):
+        self.evm = evm
+        self._hash_log = []
+        self.last_check = from_block_number
+        if self.last_check in ['latest', 'pending', 'earliest']:
+            self.last_check = self.evm.block.number
+
+    @property
+    def logs(self):
+        self.getChanges()
+        return self._hash_log
+
+    def getChanges(self):
+        block_hashes = []
+        current_block_number = evm.block.number
+
+        for block_number in range(decode_number(self.last_check), current_block_number):
+            block = self.evm.blocks[block_number]
+            block_hashes.append('0x' + encode_hex(block.hash))
+
+            if block_number >= len(self._hash_log):
+                self._hash_log.append(block_hashes[-1])
+
+        self.last_check = current_block_number
+        return block_hashes 
+
+
+# Adapted from http://github.com/ethereum/pyethapp/
+class LogFilter(object):
+    def __init__(self, evm, filter_dict):
+        self.evm = evm
+        self.log_dict = {}
+        self.filter = filter_dict
+        self.topics = filter_dict.get("topics")
+        self.addresses = filter_dict.get("addresses")
+        self.last_check = filter_dict.get('from_block', 'earliest')
+
+        if self.last_check == 'earliest':
+            self.last_check = 0
+        elif self.last_check in ['latest', 'pending']:
+            self.last_check = self.evm.block.number
+
+    @property
+    def logs(self):
+        self.getChanges()
+        return self.log_dict.values()
+
+    def getChanges(self):
+        """Check for logs, return new ones.
+
+        This method walks through the blocks given by :attr:`first_block` and :attr:`last_block`,
+        looks at the contained logs, and collects the ones that match the filter.
+
+        :returns: dictionary of new the logs since the last time `getChanges` was called.
+        """
+        changes = {}
+        to_block = self.filter.get('to_block', evm.block.number)
+        if to_block in ['latest', 'pending']:
+            to_block = self.evm.block.number
+
+        for block_number, events in event_log.items():
+            if block_number < self.last_check:
+                continue
+
+            if block_number > to_block:
+                break
+
+            for event in events:
+                if self.topics is not None:
+                    topic_match = True
+                    if len(event['log'].topics) < len(self.topics):
+                        topic_match = False
+                    for filter_topic, log_topic in zip(self.topics, event['log'].topics):
+                        if filter_topic is not None and filter_topic != log_topic:
+                            topic_match = False
+                    if not topic_match:
+                        continue
+
+                # check for address
+                if self.addresses is not None and event['log'].address not in self.addresses:
+                    continue
+
+                #id_ = sha3rlp(event['log'])
+                changes[event['log_idx']] = event
+
+        self.last_check = self.evm.block.number
+        self.log_dict.update(changes)
+        return encode_loglist(changes.values())
 
 
 ############ Helper Functions ############
@@ -69,6 +154,30 @@ def format_block_number(block_number):
 
     return block_number
 
+class LogListener(object):
+    def __init__(self):
+        self.log_idx = 0
+
+    def __call__(self, log):
+        block = evm.block
+        if block.number not in event_log:
+            event_log[block.number] = []
+
+        event_log[block.number].append({
+            "log": log, "log_idx": self.log_idx,
+            "tx_idx": len(block.get_transactions()), "txhash": evm.last_tx.hash,
+            "pending": False, "block": block
+        })
+        self.log_idx += 1
+
+def mine(evm):
+    if evm.block.number == 0:
+        evm.block.log_listeners.append(LogListener())
+
+    listener = evm.block.log_listeners.pop(0)
+    evm.mine()
+    evm.block.log_listeners.append(listener)
+
 def jsonTxs(txs):
     return [{
         "from": "0x" + encode_hex(tx._sender),
@@ -81,6 +190,51 @@ def jsonTxs(txs):
         "transactionIndex": i,
         "value": tx.value
     } for i, tx in enumerate(txs)]
+
+# Adapted from http://github.com/ethereum/pyethapp/
+def decode_filter(filter_dict, block):
+    """Decodes a filter as expected by eth_newFilter or eth_getLogs to a :class:`Filter`."""
+    if not isinstance(filter_dict, dict):
+        raise Exception('Filter must be an object')
+    address = filter_dict.get('address', None)
+    if utils.is_string(address):
+        addresses = [decode_hex(strip_0x(address))]
+    elif isinstance(address, Iterable):
+        addresses = [decode_hex(strip_0x(addr)) for addr in address]
+    elif address is None:
+        addresses = None
+    else:
+        raise Exception('Parameter must be address or list of addresses')
+    if 'topics' in filter_dict:
+        topics = []
+        for topic in filter_dict['topics']:
+            if topic is not None:
+                topics.append(utils.big_endian_to_int(decode_hex(strip_0x(topic))))
+            else:
+                topics.append(None)
+    else:
+        topics = None
+
+    from_block = filter_dict.get('fromBlock') or 'latest'
+    to_block = filter_dict.get('toBlock') or 'latest'
+
+    if from_block not in ('earliest', 'latest', 'pending'):
+        from_block = decode_number(from_block)
+
+    if to_block not in ('earliest', 'latest', 'pending'):
+        to_block = decode_number(to_block)
+
+    # check order
+    block_id_dict = {
+        'earliest': 0,
+        'latest': block.number,
+        'pending': block.number+1
+    }
+    range_ = [b if utils.is_numeric(b) else block_id_dict[b] for b in (from_block, to_block)]
+    if range_[0] > range_[1]:
+        raise Exception('fromBlock must be newer or equal to toBlock')
+
+    return {"from_block": from_block, "to_block": to_block, "addresses": addresses, "topics": topics}
 
 ############ Snapshotting Functions ############
 
@@ -221,7 +375,7 @@ def eth_sendTransaction(transaction):
     if contract_address != None:
         transaction_contract_addresses[tx_hash] = contract_address
 
-    evm.mine()
+    mine(evm)
     return tx_hash
 
 
@@ -260,7 +414,7 @@ def eth_sendRawTransaction(raw_tx):
     if contract_address != None:
         transaction_contract_addresses[tx_hash] = contract_address
 
-    evm.mine()
+    mine(evm)
     return tx_hash
 
 
@@ -433,7 +587,24 @@ def eth_newBlockFilter():
 
     latest_filter_id += 1
 
-    filters[latest_filter_id] = BlockFilter(evm.block.number)
+    filters[latest_filter_id] = BlockFilter(evm, evm.block.number)
+
+    return "0x" + int_to_hex(latest_filter_id)
+
+def eth_newFilter(filter_dict):
+    print("eth_newFilter")
+
+    global filters
+    global latest_filter_id
+    global evm
+
+    latest_filter_id += 1
+    filters[latest_filter_id] = LogFilter(evm, decode_filter(filter_dict, evm.block))
+    int_to_hex(latest_filter_id)
+
+    for x in filters.values():
+        if not hasattr(x, 'topics'):
+            continue
 
     return "0x" + int_to_hex(latest_filter_id)
 
@@ -445,25 +616,18 @@ def eth_getFilterChanges(filter_id):
 
     # Mine a block with every call to getFilterChanges just to
     # ensure block filters will work.
-    evm.mine()
+    mine(evm)
 
     filter_id = int(strip_0x(filter_id), 16)
+    return filters[filter_id].getChanges()
 
-    block_filter = filters[filter_id]
+def eth_getFilterLogs(filter_id):
+    global filters
+    global evm
 
-    old_block_number = block_filter.block_number
-    current_block_number = evm.block.number
-
-    block_hashes = []
-
-    for block_number in range(old_block_number, current_block_number):
-        block = evm.blocks[block_number]
-        block_hashes.append('0x' + block.hash.encode('hex'))
-
-    # Update the block filter with the current block
-    filters[filter_id] = BlockFilter(current_block_number)
-
-    return block_hashes
+    print("eth_getFilterLogs")
+    filter_id = int(strip_0x(filter_id), 16)
+    return encode_loglist(filters[filter_id].logs)
 
 def eth_uninstallFilter(filter_id):
     print("eth_uninstallFilter")
