@@ -291,13 +291,13 @@ def eth_compileSolidity(code):
     contract = combined[len(combined) - 1][1]
     val = {}
     val[name] = {
-        "code": '0x' + contract['binary'],
+        "code": '0x' + contract['bin'],
         "info": {
             "source": code,
             "language": "Solidity",
             "languageVersion": "0",
             "compilerVersion": "0",
-            "abiDefinition": contract['json-abi'],
+            "abiDefinition": contract['abi'],
             "userDoc": {
               "methods": {}
             },
