@@ -1,5 +1,11 @@
 ----
 
+Version 0.1.17, Wed 09 Sep 2015
+================================
+
+7f2b59a50c	Add better version handling; update compile_solidity for new versions of solc. (Tim Coulter)
+
+
 Version 0.1.16, Thu 20 Aug 2015
 ================================
 
