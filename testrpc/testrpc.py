@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __init__ import VERSION
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCRequestHandler
 from ethereum import tester as t
@@ -290,14 +291,26 @@ def eth_compileSolidity(code):
     name = combined[len(combined) - 1][0]
     contract = combined[len(combined) - 1][1]
     val = {}
+
+    # Support old and new versions of solc
+    if "binary" in contract:
+        binary = contract['binary']
+    else:
+        binary = contract['bin']
+
+    if "json-abi" in contract:
+        abi = contract['json-abi']
+    else:
+        abi = contract['abi']
+
     val[name] = {
-        "code": '0x' + contract['binary'],
+        "code": '0x' + binary,
         "info": {
             "source": code,
             "language": "Solidity",
             "languageVersion": "0",
             "compilerVersion": "0",
-            "abiDefinition": contract['json-abi'],
+            "abiDefinition": abi,
             "userDoc": {
               "methods": {}
             },
@@ -483,4 +496,4 @@ def web3_sha3(argument):
 
 
 def web3_clientVersion():
-    return "Consensys TestRPC/v0.0.2/python"
+    return "Consensys TestRPC/" + VERSION + "/python"
