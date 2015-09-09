@@ -288,8 +288,8 @@ def eth_getCompilers():
 
 def eth_compileSolidity(code):
     combined = languages["solidity"].combined(code)
-    name = combined[len(combined) - 1][0]
-    contract = combined[len(combined) - 1][1]
+    name = combined.keys()[0]
+    contract = combined[name]
     val = {}
 
     # Support old and new versions of solc
