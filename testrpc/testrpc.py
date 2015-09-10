@@ -173,10 +173,7 @@ class LogListener(object):
 def mine(evm):
     if evm.block.number == 0:
         evm.block.log_listeners.append(LogListener())
-
-    listener = evm.block.log_listeners.pop(0)
     evm.mine()
-    evm.block.log_listeners.append(listener)
 
 def jsonTxs(txs):
     return [{
