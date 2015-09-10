@@ -251,7 +251,7 @@ def evm_snapshot():
     snapshots.append(Snapshot(block_number=evm.block.number, data=evm.snapshot()))
     return "0x" + int_to_hex(len(snapshots) - 1)
 
-def evm_revert(index=None):
+def evm_revert(index=None, reset_logs=False):
     global evm
     global snapshots
 
@@ -274,10 +274,18 @@ def evm_revert(index=None):
     # print str(len(evm.blocks))
 
     # Remove all blocks after our saved block number.
-    del evm.blocks[snapshot.block_number + 1:len(evm.blocks)]
+    num_blocks = len(evm.blocks)
+    del evm.blocks[snapshot.block_number + 1:num_blocks]
 
-    # Revert the evm
+    # Revert the evm, taking care to restore our listener
+    listener = evm.block.log_listeners.pop(0)
     evm.revert(snapshot.data)
+    evm.block.log_listeners.append(listener)
+
+    # Remove any logs from the snapshot block forward
+    if reset_logs:
+        for i in range(snapshot.block_number+1, num_blocks):
+            event_log.pop(i, None)
 
     # Remove all snapshots after and including this one.
     del snapshots[index:len(snapshots)]
@@ -418,9 +426,9 @@ def eth_sendRawTransaction(raw_tx):
 
 def eth_call(transaction, block_number):
     print("eth_call")
-    snapshot = evm.snapshot()
+    snapshot = evm_snapshot()
     r = send(transaction)
-    evm.revert(snapshot)
+    evm_revert(snapshot)
     return r
 
 
