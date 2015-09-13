@@ -1,12 +1,18 @@
 ----
 
-Version 0.1.17, Mon 24 Aug 2015
+Version 0.1.18, Sun 13 Sep 2015
 ===============================
 
 33a99c63c7	Implement event filter support (Ryan Casey)
 f0fa961fa4	Use Python 3 compatible print function
 244eaafc29	Fix getBlock (Ryan Casey)
 31f95a5630	Use decode_hex and encode_hex for forward-compatibility (Ryan Casey)
+
+
+Version 0.1.17, Wed 09 Sep 2015
+================================
+
+7f2b59a50c	Add better version handling; update compile_solidity for new versions of solc. (Tim Coulter)
 
 
 Version 0.1.16, Thu 20 Aug 2015

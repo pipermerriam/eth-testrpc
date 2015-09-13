@@ -61,6 +61,9 @@ def create_server(host="127.0.0.1", port=8545):
 
 def main():
     args = parser.parse_args()
+
+    print web3_clientVersion()
+
     evm_reset()
 
     t.set_logging_level(2)
