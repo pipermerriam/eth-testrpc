@@ -1,6 +1,9 @@
+from __future__ import print_function
 import argparse
 from testrpc import *
 from ethereum.tester import accounts
+from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
+from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCRequestHandler
 
 parser = argparse.ArgumentParser(
     description='Simulate an Ethereum blockchain JSON-RPC server.'
@@ -11,7 +14,21 @@ parser.add_argument('-d', '--domain', dest='domain', type=str,
                     nargs='?', default='localhost')
 
 
-def create_server(host="localhost", port=8545):
+# Override the SimpleJSONRPCRequestHandler to support access control (*)
+class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.end_headers()
+
+    # Add these headers to all responses
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Headers",
+                         "Origin, X-Requested-With, Content-Type, Accept")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        SimpleJSONRPCRequestHandler.end_headers(self)
+
+
+def create_server(host="127.0.0.1", port=8545):
     server = SimpleJSONRPCServer((host, port), SimpleJSONRPCRequestHandlerWithCORS)
     server.register_function(eth_coinbase, 'eth_coinbase')
     server.register_function(eth_accounts, 'eth_accounts')
@@ -29,7 +46,9 @@ def create_server(host="localhost", port=8545):
     server.register_function(eth_getTransactionReceipt, 'eth_getTransactionReceipt')
     server.register_function(eth_getBlockByNumber, 'eth_getBlockByNumber')
     server.register_function(eth_newBlockFilter, 'eth_newBlockFilter')
+    server.register_function(eth_newFilter, 'eth_newFilter')
     server.register_function(eth_getFilterChanges, 'eth_getFilterChanges')
+    server.register_function(eth_getFilterLogs, 'eth_getFilterLogs')
     server.register_function(eth_uninstallFilter, 'eth_uninstallFilter')
     server.register_function(web3_sha3, 'web3_sha3')
     server.register_function(web3_clientVersion, 'web3_clientVersion')
@@ -43,7 +62,7 @@ def create_server(host="localhost", port=8545):
 def main():
     args = parser.parse_args()
 
-    print web3_clientVersion()
+    print(web3_clientVersion())
 
     evm_reset()
 
@@ -51,11 +70,11 @@ def main():
     #slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
     #slogging.configure(':info,eth.vm.exit:debug,eth.pb.tx:info')
 
-    print "\nAvailable Accounts\n=================="
+    print("\nAvailable Accounts\n==================")
     for account in accounts:
-        print '0x%s' % account.encode("hex")
+        print('0x%s' % account.encode("hex"))
 
-    print "\nListening on %s:%s" % (args.domain, args.port)
+    print("\nListening on %s:%s" % (args.domain, args.port))
 
     server = create_server(args.domain, args.port)
 
