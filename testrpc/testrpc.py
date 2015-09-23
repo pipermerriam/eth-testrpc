@@ -12,7 +12,7 @@ from ethereum.utils import sha3, rlp, sha3rlp
 from ethereum.tester import keys, accounts, languages
 from collections import namedtuple
 from ethereum import slogging
-from .utils import decode_number, encode_loglist
+from utils import decode_number, encode_loglist
 
 ############ Default Values / Global Variables ############
 evm = None
@@ -56,7 +56,7 @@ class BlockFilter(object):
                 self._hash_log.append(block_hashes[-1])
 
         self.last_check = current_block_number
-        return block_hashes 
+        return block_hashes
 
 
 # Adapted from http://github.com/ethereum/pyethapp/
