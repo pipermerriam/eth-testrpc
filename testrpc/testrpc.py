@@ -13,6 +13,8 @@ from ethereum.tester import keys, accounts, languages
 from collections import namedtuple
 from ethereum import slogging
 from utils import decode_number, encode_loglist
+import simplejson as json
+import struct
 
 ############ Default Values / Global Variables ############
 evm = None
@@ -21,12 +23,13 @@ transaction_contract_addresses = {}
 latest_filter_id = 0
 filters = {}
 event_log = {}
+save_location = ''
 
 t.gas_limit = 3141592
 
 ############ Snapshots ############
 
-Snapshot = namedtuple("Snapshot", ["block_number", "data"])
+#Snapshot = [{"block_number"=, "data"=}]
 
 
 ############ Filters ############
@@ -124,9 +127,19 @@ class LogFilter(object):
 
 ############ Helper Functions ############
 
+def set_save_location(path):
+    global save_location
+    global snapshots
+    save_location = path
+
+    if save_location != '':
+        with open(save_location,"r") as f:
+            snapshots = json.load(f,encoding="latin-1")
+            print(snapshots)
+
 def strip_0x(s):
-    if s[0] == "0" and s[1] == "x":
-        s = s[2:]
+    if s.startswith("0x"):
+        return s[2:]
     return s
 
 def isContract(transaction):
@@ -239,21 +252,38 @@ def decode_filter(filter_dict, block):
 def evm_reset():
     global evm
     global snapshots
+    global save_location
+
     print("Resetting EVM state...")
     evm = t.state()
     snapshots = []
+
+    if save_location != '':
+        with open(save_location,"w") as f:
+            json.dump(snapshots, f)
+
+    ##TODO: retrun false if write failed
+
     return True
 
 def evm_snapshot():
     global evm
     global snapshots
+    global save_location
+
     print("Creating snapshot #" + str(len(snapshots)))
-    snapshots.append(Snapshot(block_number=evm.block.number, data=evm.snapshot()))
+    snapshots.append({"blockNumber":evm.block.number, "data":[struct.unpack('<B', x)[0] for x in evm.snapshot()]})
+
+    if save_location != '':
+        with open(save_location,"w") as f:
+            json.dump(snapshots, f)
+
     return "0x" + int_to_hex(len(snapshots) - 1)
 
 def evm_revert(index=None):
     global evm
     global snapshots
+    global save_location
 
     if len(snapshots) == 0:
         return False
@@ -270,17 +300,20 @@ def evm_revert(index=None):
 
     snapshot = snapshots[index]
 
-    # print str(snapshot.block_number + 1)
-    # print str(len(evm.blocks))
-
     # Remove all blocks after our saved block number.
-    del evm.blocks[snapshot.block_number + 1:len(evm.blocks)]
+    del evm.blocks[snapshot["blockNumber"] + 1:len(evm.blocks)]
 
     # Revert the evm
-    evm.revert(snapshot.data)
+    data = ''.join([struct.pack('<B', x) for x in snapshot["data"]])
+    evm.revert(data)
 
     # Remove all snapshots after and including this one.
     del snapshots[index:len(snapshots)]
+
+    if save_location != '':
+        with open(save_location,"w") as f:
+            json.dump(snapshots, f)
+
     return True
 
 
