@@ -12,6 +12,8 @@ parser.add_argument('-p', '--port', dest='port', type=int,
                     nargs='?', default=8545)
 parser.add_argument('-d', '--domain', dest='domain', type=str,
                     nargs='?', default='localhost')
+parser.add_argument('-s', '--save-evm', dest='save', type=str,
+                    nargs='?', default='localhost')
 
 
 # Override the SimpleJSONRPCRequestHandler to support access control (*)
@@ -61,7 +63,7 @@ def create_server(host="127.0.0.1", port=8545):
 
 def main():
     args = parser.parse_args()
-
+    
     print(web3_clientVersion())
 
     evm_reset()
@@ -69,6 +71,8 @@ def main():
     t.set_logging_level(2)
     #slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
     #slogging.configure(':info,eth.vm.exit:debug,eth.pb.tx:info')
+
+    set_save_location(args.save)
 
     print("\nAvailable Accounts\n==================")
     for account in accounts:
