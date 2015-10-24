@@ -1,5 +1,11 @@
 ----
 
+Version 0.1.24, Sat 24 Oct 2015
+================================
+
+8ef05254ec	Trying this yet again, with no way to test it but by pushing to pypi... (Tim Coulter)
+
+
 Version 0.1.23, Sat 24 Oct 2015
 ================================
 
