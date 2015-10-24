@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from __init__ import VERSION
 from collections import Iterable
 from ethereum import tester as t
 from rlp.sedes import big_endian_int, binary
@@ -13,6 +12,8 @@ from ethereum.tester import keys, accounts, languages
 from collections import namedtuple
 from ethereum import slogging
 from utils import decode_number, encode_loglist
+
+VERSION = open("../VERSION").read().strip()
 
 ############ Default Values / Global Variables ############
 evm = None

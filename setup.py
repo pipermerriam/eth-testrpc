@@ -7,7 +7,6 @@ https://github.com/ConsenSys/eth-testrpc
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
-from testrpc import __version__
 
 here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
@@ -15,7 +14,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='eth-testrpc',
-    version=__version__,
+    version=open("VERSION").read().strip(),
     description='An Ethereum simulator for aiding smart contract development.',
     long_description=long_description,
     url='https://github.com/ConsenSys/eth-testrpc',
