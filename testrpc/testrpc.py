@@ -12,8 +12,9 @@ from ethereum.tester import keys, accounts, languages
 from collections import namedtuple
 from ethereum import slogging
 from utils import decode_number, encode_loglist
+from os import path
 
-VERSION = open("../VERSION").read().strip()
+VERSION = open(path.join(path.dirname(__file__), "../VERSION")).read().strip()
 
 ############ Default Values / Global Variables ############
 evm = None
