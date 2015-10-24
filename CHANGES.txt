@@ -1,5 +1,21 @@
 ----
 
+Version 0.1.18, Sat 24 Oct 2015
+================================
+
+3112ff7d05	Support logs result in getTransactionReceipt (Tim Coulter)
+926e534a30	Dependency on .utils was failing for me. (Tim Coulter)
+f5d4d65706	Update README to show we support eth_newFilter now. (Ryan Casey)
+7edabfc97f	Update print statement to be cross-Python compatible. (Ryan Casey)
+aad0c44b01	Remove unnecessary and confusing manual listener management. (Ryan Casey)
+1ff362b5fa	Version bump to 0.1.17 and update changelog. (Ryan Casey)
+33a99c63c7	Implement filters. (Ryan Casey)
+31f95a5630	Switch to encode_hex and decode_hex, as they are Python 3 compatible. (Ryan Casey)
+244eaafc29	Fix getBlock failure caused by passing raw byte strings to jsonrpclib. (Ryan Casey)
+f0fa961fa4	Switch to future's print statement as a first step toward Python 2 and Python 3 cross-compatibility. (Ryan Casey)
+5fe7c3d248	Move server-specific code to __main__.py (Ryan Casey)
+
+
 Version 0.1.18, Sun 13 Sep 2015
 ===============================
 
