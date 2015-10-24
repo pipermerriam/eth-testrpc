@@ -1,5 +1,11 @@
 ----
 
+Version 0.1.23, Sat 24 Oct 2015
+================================
+
+54906a9ed5	Trying this relative path thing again. Python makes me eel like I'm bashing my head against a wall. (Tim Coulter)
+
+
 Version 0.1.22, Sat 24 Oct 2015
 ================================
 
