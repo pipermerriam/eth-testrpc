@@ -125,7 +125,7 @@ class LogFilter(object):
 ############ Helper Functions ############
 
 def strip_0x(s):
-    if s[0] == "0" and s[1] == "x":
+    if s != None and len(s) > 0 and s[0] == "0" and s[1] == "x":
         s = s[2:]
     return s
 
@@ -333,6 +333,9 @@ def send(transaction):
     # print("from: " + encode_hex(accounts[keys.index(sender)]))
     # print("data: " + encode_hex(data))
     # print("gas: " + str(gas))
+
+    # Record all logs
+    evm.block.log_listeners.append(LogListener())
 
     if isContract(transaction):
         estimated_cost = len(encode_hex(data)) / 2 * 200
@@ -577,6 +580,19 @@ def eth_getTransactionReceipt(tx_hash):
 
     tx_data = eth_getTransactionByHash(tx_hash)
     block_data = eth_getBlockByNumber(tx_data["blockNumber"], False)
+    block_number = int(strip_0x(tx_data["blockNumber"]), 16)
+
+    event_logs = {}
+
+    for current_number, events in event_log.items():
+        if current_number < block_number:
+            continue
+
+        if current_number > block_number:
+            break
+
+        for event in events:
+           event_logs[event['log_idx']] = event
 
     return {
         "transactionHash": tx_data["hash"],
@@ -585,7 +601,8 @@ def eth_getTransactionReceipt(tx_hash):
         "blockHash": tx_data["blockHash"],
         "cumulativeGasUsed": "0x" + int_to_hex(0), #TODO: Make this right.
         "gasUsed": block_data["gasUsed"],
-        "contractAddress": transaction_contract_addresses.get(tx_hash, None)
+        "contractAddress": transaction_contract_addresses.get(tx_hash, None),
+        "logs": encode_loglist(event_logs.values())
     }
 
 def eth_newBlockFilter():
