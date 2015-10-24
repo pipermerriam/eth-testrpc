@@ -1,5 +1,11 @@
 ----
 
+Version 0.1.27, Sat 24 Oct 2015
+================================
+
+6b350042b6	Finally something that'll probably work. (Tim Coulter)
+
+
 Version 0.1.26, Sat 24 Oct 2015
 ================================
 
