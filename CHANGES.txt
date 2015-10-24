@@ -1,5 +1,11 @@
 ----
 
+Version 0.1.26, Sat 24 Oct 2015
+================================
+
+fa538f7a05	Perhaps seed still updates this value, and it was all my fault. I'm going mad, so I wouldn't be surprised. (Tim Coulter)
+
+
 Version 0.1.25, Sat 24 Oct 2015
 ================================
 
