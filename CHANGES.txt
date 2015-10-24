@@ -1,5 +1,11 @@
 ----
 
+Version 0.1.22, Sat 24 Oct 2015
+================================
+
+459611ceca	Fix path to VERSION file. (Tim Coulter)
+
+
 Version 0.1.21, Sat 24 Oct 2015
 ================================
 
