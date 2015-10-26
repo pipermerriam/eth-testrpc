@@ -2,6 +2,7 @@ from __future__ import print_function
 import argparse
 from testrpc import *
 from ethereum.tester import accounts
+import SocketServer
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCRequestHandler
 
@@ -13,6 +14,8 @@ parser.add_argument('-p', '--port', dest='port', type=int,
 parser.add_argument('-d', '--domain', dest='domain', type=str,
                     nargs='?', default='localhost')
 
+class ThreadingJSONRPCServer(SocketServer.ThreadingMixIn, SimpleJSONRPCServer):
+    pass
 
 # Override the SimpleJSONRPCRequestHandler to support access control (*)
 class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
@@ -29,7 +32,7 @@ class SimpleJSONRPCRequestHandlerWithCORS(SimpleJSONRPCRequestHandler):
 
 
 def create_server(host="127.0.0.1", port=8545):
-    server = SimpleJSONRPCServer((host, port), SimpleJSONRPCRequestHandlerWithCORS)
+    server = ThreadingJSONRPCServer((host, port), SimpleJSONRPCRequestHandlerWithCORS)
     server.register_function(eth_coinbase, 'eth_coinbase')
     server.register_function(eth_accounts, 'eth_accounts')
     server.register_function(eth_gasPrice, 'eth_gasPrice')
