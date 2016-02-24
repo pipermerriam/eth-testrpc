@@ -1,3 +1,17 @@
+# DEPRECATED
+
+Attention: This project is no longer being maintained. I've focussed my effort on [ethereumjs-testrpc](https://github.com/ethereumjs/testrpc), which is more stable, has more features and is better supported. Please consider using [ethereumjs-testrpc](https://github.com/ethereumjs/testrpc) instead. Note that when switching to [ethereumjs-testrpc](https://github.com/ethereumjs/testrpc), you should uninstall this testrpc first, as they have conflicting binaries. Cheers!
+
+-- Tim Coulter, original dev (@tcoulter)
+
+-----------------------------------
+
+-----------------------------------
+
+-----------------------------------
+
+
+
 ## Ethereum Test RPC
 
 Limited RPC client intended for use with automated testing. Uses [pythereum](https://github.com/ethereum/pyethereum) to run an Ethereum client behind the scenes without the need for mining or networking. The result is an Ethereum client that provides instant results and quick feedback during development.
