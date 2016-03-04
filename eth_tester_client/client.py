@@ -12,6 +12,7 @@ import uuid
 
 from ethereum import utils as ethereum_utils
 from ethereum import tester as t
+from ethereum import abi
 
 
 def strip_0x(value):
@@ -80,7 +81,10 @@ def serialize_log(block, txn, txn_index, log, log_index):
         "blockNumber": int_to_hex(block.number),
         "address": encode_hex(log.address),
         "data": encode_hex(log.data),
-        "topics": [int_to_hex(topic) for topic in log.topics],
+        "topics": [
+            encode_hex(abi.encode_single(('uint', 256, []), topic))
+            for topic in log.topics
+        ],
     }
 
 
