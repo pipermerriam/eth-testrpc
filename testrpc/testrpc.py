@@ -2,17 +2,20 @@
 
 from __future__ import print_function
 from __init__ import VERSION
-from collections import Iterable
-from ethereum import tester as t
-from rlp.sedes import big_endian_int, binary
+from collections import (
+    Iterable,
+    namedtuple,
+)
+
 from rlp.utils import encode_hex, decode_hex
-from ethereum import blocks
+
+from ethereum import tester as t
 from ethereum import utils, transactions, processblock
-from ethereum.utils import sha3, rlp, sha3rlp
+from ethereum.utils import sha3, rlp
 from ethereum.tester import keys, accounts, languages
-from collections import namedtuple
-from ethereum import slogging
+
 from utils import decode_number, encode_loglist
+
 
 ############ Default Values / Global Variables ############
 evm = None
