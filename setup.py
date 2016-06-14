@@ -1,7 +1,7 @@
 """An Ethereum client simulator that provides instant results and quick
 feedback during development involving smart contracts.
 
-https://github.com/ConsenSys/eth-testrpc
+https://github.com/pipermerriam/eth-testrpc
 """
 
 from setuptools import setup, find_packages
@@ -17,9 +17,9 @@ setup(
     version=open("VERSION").read().strip(),
     description='An Ethereum simulator for aiding smart contract development.',
     long_description=long_description,
-    url='https://github.com/ConsenSys/eth-testrpc',
-    author='ConsenSys',
-    author_email='info@consensys.net',
+    url='https://github.com/pipermerriam/eth-testrpc',
+    author='Piper Merriam',
+    author_email='pipermerriam@gmail.com',
     license='MIT',
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -27,8 +27,10 @@ setup(
         'Topic :: Software Development :: Testing',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
     ],
     keywords='ethereum blockchain development testing',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
