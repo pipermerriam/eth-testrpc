@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from __init__ import VERSION
+from __init__ import __version__
 from collections import (
     Iterable,
     namedtuple,
@@ -684,4 +684,4 @@ def web3_sha3(argument):
 
 
 def web3_clientVersion():
-    return "Consensys TestRPC/" + VERSION + "/python"
+    return "Consensys TestRPC/" + __version__ + "/python"
