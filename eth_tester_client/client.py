@@ -4,25 +4,30 @@ the `eth-testrpc` project by ConsenSys
 
 https://github.com/ConsenSys/eth-testrpc
 """
+import sys
 import time
-import Queue
 import threading
 import uuid
-
 
 from ethereum import utils as ethereum_utils
 from ethereum import tester as t
 from ethereum import abi
 
 
+if sys.version_info.major == 2:
+    from Queue import Queue
+else:
+    from queue import Queue
+
+
 def strip_0x(value):
-    if value and value.startswith('0x'):
+    if value and value.startswith(b'0x'):
         return value[2:]
     return value
 
 
 def encode_hex(value):
-    return "0x" + ethereum_utils.encode_hex(value)
+    return b"0x" + ethereum_utils.encode_hex(value)
 
 
 def int_to_hex(value):
@@ -138,7 +143,7 @@ class EthTesterClient(object):
         self.async_timeout = async_timeout
 
         if self.is_async:
-            self.request_queue = Queue.Queue()
+            self.request_queue = Queue()
             self.results = {}
 
             self.request_thread = threading.Thread(target=self.process_requests)
@@ -172,11 +177,11 @@ class EthTesterClient(object):
         return t.gas_limit
 
     def get_coinbase(self):
-        return "0x" + ethereum_utils.encode_hex(self.evm.block.coinbase)
+        return b"0x" + ethereum_utils.encode_hex(self.evm.block.coinbase)
 
     def get_accounts(self):
         return [
-            "0x" + ethereum_utils.encode_hex(addr)
+            b"0x" + ethereum_utils.encode_hex(addr)
             for addr in t.accounts
         ]
 
@@ -185,7 +190,7 @@ class EthTesterClient(object):
         return ethereum_utils.encode_hex(block.get_code(strip_0x(address)))
 
     def _send_transaction(self, _from=None, to=None, gas=None, gas_price=None,
-                          value=0, data=''):
+                          value=0, data=b''):
         """
         The tester doesn't care about gas so we discard it.
         """
@@ -200,12 +205,12 @@ class EthTesterClient(object):
         sender = t.keys[t.accounts.index(_from)]
 
         if to is None:
-            to = ''
+            to = b''
 
         to = ethereum_utils.decode_hex(strip_0x(to))
 
         if data is None:
-            data = ''
+            data = b''
 
         data = ethereum_utils.decode_hex(strip_0x(data))
 
@@ -257,7 +262,7 @@ class EthTesterClient(object):
         elif block_number == "pending":
             raise ValueError("Fetching 'pending' block is unsupported")
         else:
-            if str(block_number).startswith("0x"):
+            if str(block_number).startswith(b"0x"):
                 block_number = int(block_number, 16)
             if block_number >= len(self.evm.blocks):
                 raise ValueError("Invalid block number")
