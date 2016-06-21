@@ -8,7 +8,7 @@ if sys.version_info.major == 2:
     str_to_bytes = str
 
     def is_any_string_type(value):
-        return isinstance(value, basestring)
+        return isinstance(value, basestring)  # NOQA  py3 doesn't have basestr
 
 else:
     def str_to_bytes(value):
