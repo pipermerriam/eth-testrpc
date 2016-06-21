@@ -4,31 +4,28 @@ the `eth-testrpc` project by ConsenSys
 
 https://github.com/ConsenSys/eth-testrpc
 """
+import sys
 import time
-import Queue
 import threading
 import uuid
-
 
 from ethereum import utils as ethereum_utils
 from ethereum import tester as t
 from ethereum import abi
 
-
-def strip_0x(value):
-    if value and value.startswith('0x'):
-        return value[2:]
-    return value
-
-
-def encode_hex(value):
-    return "0x" + ethereum_utils.encode_hex(value)
+from .utils import (
+    force_args_to_bytes,
+    strip_0x,
+    encode_hex,
+    int_to_hex,
+)
 
 
-def int_to_hex(value):
-    if value == 0:
-        return hex(0)
-    return ethereum_utils.int_to_hex(value)
+if sys.version_info.major == 2:
+    from Queue import Queue
+
+else:
+    from queue import Queue
 
 
 def serialize_txn_to_receipt(block, txn, txn_index):
@@ -102,20 +99,20 @@ def serialize_block(block, full_transactions):
 
     return {
         "number": int_to_hex(block.number),
-        "hash": "0x" + encode_hex(block.hash),
-        "parentHash": "0x" + encode_hex(block.prevhash),
-        "nonce": "0x" + encode_hex(block.nonce),
-        "sha3Uncles": "0x" + encode_hex(block.uncles_hash),
+        "hash": b"0x" + encode_hex(block.hash),
+        "parentHash": b"0x" + encode_hex(block.prevhash),
+        "nonce": b"0x" + encode_hex(block.nonce),
+        "sha3Uncles": b"0x" + encode_hex(block.uncles_hash),
         # TODO logsBloom / padding
         "logsBloom": logs_bloom,
-        "transactionsRoot": "0x" + encode_hex(block.tx_list_root),
-        "stateRoot": "0x" + encode_hex(block.state_root),
-        "miner": "0x" + encode_hex(block.coinbase),
+        "transactionsRoot": b"0x" + encode_hex(block.tx_list_root),
+        "stateRoot": b"0x" + encode_hex(block.state_root),
+        "miner": b"0x" + encode_hex(block.coinbase),
         "difficulty": int_to_hex(block.difficulty),
         # https://github.com/ethereum/pyethereum/issues/266
         # "totalDifficulty": int_to_hex(block.chain_difficulty()),
         "size": int_to_hex(len(ethereum_utils.rlp.encode(block))),
-        "extraData": "0x" + encode_hex(block.extra_data),
+        "extraData": b"0x" + encode_hex(block.extra_data),
         "gasLimit": int_to_hex(block.gas_limit),
         "gasUsed": int_to_hex(block.gas_used),
         "timestamp": int_to_hex(block.timestamp),
@@ -138,7 +135,7 @@ class EthTesterClient(object):
         self.async_timeout = async_timeout
 
         if self.is_async:
-            self.request_queue = Queue.Queue()
+            self.request_queue = Queue()
             self.results = {}
 
             self.request_thread = threading.Thread(target=self.process_requests)
@@ -172,11 +169,11 @@ class EthTesterClient(object):
         return t.gas_limit
 
     def get_coinbase(self):
-        return "0x" + ethereum_utils.encode_hex(self.evm.block.coinbase)
+        return b"0x" + ethereum_utils.encode_hex(self.evm.block.coinbase)
 
     def get_accounts(self):
         return [
-            "0x" + ethereum_utils.encode_hex(addr)
+            b"0x" + ethereum_utils.encode_hex(addr)
             for addr in t.accounts
         ]
 
@@ -184,8 +181,9 @@ class EthTesterClient(object):
         block = self._get_block_by_number(block_number)
         return ethereum_utils.encode_hex(block.get_code(strip_0x(address)))
 
+    @force_args_to_bytes
     def _send_transaction(self, _from=None, to=None, gas=None, gas_price=None,
-                          value=0, data=''):
+                          value=0, data=b''):
         """
         The tester doesn't care about gas so we discard it.
         """
@@ -200,12 +198,12 @@ class EthTesterClient(object):
         sender = t.keys[t.accounts.index(_from)]
 
         if to is None:
-            to = ''
+            to = b''
 
         to = ethereum_utils.decode_hex(strip_0x(to))
 
         if data is None:
-            data = ''
+            data = b''
 
         data = ethereum_utils.decode_hex(strip_0x(data))
 
@@ -257,7 +255,7 @@ class EthTesterClient(object):
         elif block_number == "pending":
             raise ValueError("Fetching 'pending' block is unsupported")
         else:
-            if str(block_number).startswith("0x"):
+            if str(block_number).startswith(b"0x"):
                 block_number = int(block_number, 16)
             if block_number >= len(self.evm.blocks):
                 raise ValueError("Invalid block number")
