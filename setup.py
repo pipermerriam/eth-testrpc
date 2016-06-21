@@ -22,7 +22,6 @@ setup(
     author_email='pipermerriam@gmail.com',
     license='MIT',
     classifiers=[
-        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
         'License :: OSI Approved :: MIT License',
@@ -35,9 +34,10 @@ setup(
     keywords='ethereum blockchain development testing',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=[
-        'jsonrpclib',
-        'serpent',
+        'Werkzeug>=0.11.10',
+        'json-rpc>=1.10.3',
         'ethereum',
+        'rlp>=0.4.4'
     ],
     entry_points={
         'console_scripts': [

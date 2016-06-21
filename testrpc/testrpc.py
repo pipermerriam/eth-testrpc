@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from __init__ import __version__
+import pkg_resources
 from collections import (
     Iterable,
     namedtuple,
@@ -14,7 +14,15 @@ from ethereum import utils, transactions, processblock
 from ethereum.utils import sha3, rlp
 from ethereum.tester import keys, accounts, languages
 
-from utils import decode_number, encode_loglist
+from .utils import (
+    decode_number,
+    encode_loglist,
+    strip_0x,
+    coerce_args_to_bytes,
+)
+
+
+__version__ = pkg_resources.get_distribution("eth-testrpc").version
 
 
 ############ Default Values / Global Variables ############
@@ -127,10 +135,6 @@ class LogFilter(object):
 
 ############ Helper Functions ############
 
-def strip_0x(s):
-    if s != None and len(s) > 0 and s[0] == "0" and s[1] == "x":
-        s = s[2:]
-    return s
 
 def isContract(transaction):
     if type(transaction) is transactions.Transaction:
@@ -312,8 +316,10 @@ def eth_blockNumber():
     return '0x' + int_to_hex(evm.block.number)
 
 
+@coerce_args_to_bytes
 def send(transaction):
     if "from" in transaction:
+        import ipdb; ipdb.set_trace()
         addr = decode_hex(strip_0x(transaction['from']))
         sender = keys[accounts.index(addr)]
     else:

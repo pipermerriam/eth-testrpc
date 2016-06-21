@@ -17,12 +17,13 @@ def eth_coinbase(accounts):
 
 @pytest.yield_fixture()
 def rpc_server():
-    from testrpc.__main__ import create_server
+    from wsgiref.simple_server import make_server
+    from testrpc.server import application
     from testrpc.testrpc import evm_reset
 
-    server = create_server('127.0.0.1', 8545)
-
     evm_reset()
+
+    server = make_server('127.0.0.1', 8545, application)
 
     thread = threading.Thread(target=server.serve_forever)
     thread.daemon = True
