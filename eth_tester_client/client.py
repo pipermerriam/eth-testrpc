@@ -14,7 +14,6 @@ from ethereum import tester as t
 from ethereum import abi
 
 from .utils import (
-    str_to_bytes,
     force_args_to_bytes,
     strip_0x,
     encode_hex,
