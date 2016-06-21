@@ -361,7 +361,7 @@ def send(transaction):
 
         r = encode_hex(evm.evm(data, sender, value, gas))
     else:
-        r = encode_hex(evm.send(sender, to, value, data, gas))
+        r = encode_hex(evm.send(sender, to, value, data))
 
     r = "0x" + r
     return r

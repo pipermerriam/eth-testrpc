@@ -4,9 +4,15 @@ import pytest
 
 
 @pytest.fixture(scope="session")
-def eth_coinbase():
+def accounts():
     from ethereum import tester
-    return tester.encode_hex(tester.accounts[0])
+    from ethereum import utils
+    return [utils.encode_hex(acct) for acct in tester.accounts]
+
+
+@pytest.fixture(scope="session")
+def eth_coinbase(accounts):
+    return accounts[0]
 
 
 @pytest.yield_fixture()
