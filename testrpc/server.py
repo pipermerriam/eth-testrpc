@@ -1,3 +1,4 @@
+import json
 import functools
 from threading import Lock
 
@@ -6,6 +7,9 @@ from werkzeug.wrappers import Request, Response
 from jsonrpc import JSONRPCResponseManager, dispatcher
 
 from . import testrpc
+from eth_tester_client.utils import (
+    force_obj_to_text,
+)
 
 
 RESPONSE_HEADERS = {
@@ -51,6 +55,7 @@ add_method_with_lock(testrpc.eth_getBalance, 'eth_getBalance')
 add_method_with_lock(testrpc.eth_getTransactionCount, 'eth_getTransactionCount')
 add_method_with_lock(testrpc.eth_getTransactionByHash, 'eth_getTransactionByHash')
 add_method_with_lock(testrpc.eth_getTransactionReceipt, 'eth_getTransactionReceipt')
+add_method_with_lock(testrpc.eth_getBlockByHash, 'eth_getBlockByHash')
 add_method_with_lock(testrpc.eth_getBlockByNumber, 'eth_getBlockByNumber')
 add_method_with_lock(testrpc.eth_newBlockFilter, 'eth_newBlockFilter')
 add_method_with_lock(testrpc.eth_newFilter, 'eth_newFilter')
@@ -71,7 +76,7 @@ def application(request):
         dispatcher,
     )
     response = Response(
-        response.json,
+        json.dumps(force_obj_to_text(response.data, True)),
         headers=RESPONSE_HEADERS,
         mimetype='application/json',
     )
