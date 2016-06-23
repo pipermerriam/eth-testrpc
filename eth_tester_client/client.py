@@ -9,15 +9,25 @@ import time
 import threading
 import uuid
 
-from ethereum import utils as ethereum_utils
+import rlp
+
+from ethereum import transactions
 from ethereum import tester as t
-from ethereum import abi
 
 from .utils import (
-    force_args_to_bytes,
+    coerce_args_to_bytes,
     strip_0x,
-    encode_hex,
-    int_to_hex,
+    encode_32bytes,
+    encode_address,
+    encode_data,
+    normalize_number,
+    normalize_address,
+    decode_hex,
+)
+from .serializers import (
+    serialize_txn,
+    serialize_txn_receipt,
+    serialize_block,
 )
 
 
@@ -28,97 +38,8 @@ else:
     from queue import Queue
 
 
-def serialize_txn_to_receipt(block, txn, txn_index):
-    txn_receipt = block.get_receipt(txn_index)
-    origin_gas = block.transaction_list[0].startgas
-
-    if txn.creates is not None:
-        contract_addr = encode_hex(txn.creates)
-    else:
-        contract_addr = None
-
-    return {
-        "transactionHash": encode_hex(txn.hash),
-        "transactionIndex": int_to_hex(txn_index),
-        "blockNumber": int_to_hex(block.number),
-        "blockHash": encode_hex(block.hash),
-        "cumulativeGasUsed": int_to_hex(origin_gas - txn.startgas + txn_receipt.gas_used),
-        "gasUsed": int_to_hex(txn_receipt.gas_used),
-        "contractAddress": contract_addr,
-        "logs": [
-            serialize_log(block, txn, txn_index, log, log_index)
-            for log_index, log in enumerate(txn_receipt.logs)
-        ],
-    }
-
-
-def serialize_txn(block, txn, txn_index):
-    return {
-        "hash": encode_hex(txn.hash),
-        "nonce": int_to_hex(txn.nonce),
-        "blockHash": encode_hex(block.hash),
-        "blockNumber": int_to_hex(block.number),
-        "transactionIndex": int_to_hex(txn_index),
-        "from": encode_hex(txn.sender),
-        "to": encode_hex(txn.to),
-        "value": int_to_hex(txn.value),
-        "gas": int_to_hex(txn.startgas),
-        "gasPrice": int_to_hex(txn.gasprice),
-        "input": encode_hex(txn.data)
-    }
-
-
-def serialize_log(block, txn, txn_index, log, log_index):
-    return {
-        "type": "mined",
-        "logIndex": int_to_hex(log_index),
-        "transactionIndex": int_to_hex(txn_index),
-        "transactionHash": encode_hex(txn.hash),
-        "blockHash": encode_hex(block.hash),
-        "blockNumber": int_to_hex(block.number),
-        "address": encode_hex(log.address),
-        "data": encode_hex(log.data),
-        "topics": [
-            encode_hex(abi.encode_single(('uint', 256, []), topic))
-            for topic in log.topics
-        ],
-    }
-
-
-def serialize_block(block, full_transactions):
-    if full_transactions:
-        transactions = [
-            serialize_txn(block, txn, txn_index)
-            for txn_index, txn in enumerate(block.transaction_list)
-        ]
-    else:
-        transactions = [encode_hex(txn.hash) for txn in block.transaction_list]
-
-    unpadded_logs_bloom = ethereum_utils.int_to_bytes(block.bloom)
-    logs_bloom = "\x00" * (256 - len(unpadded_logs_bloom)) + unpadded_logs_bloom
-
-    return {
-        "number": int_to_hex(block.number),
-        "hash": b"0x" + encode_hex(block.hash),
-        "parentHash": b"0x" + encode_hex(block.prevhash),
-        "nonce": b"0x" + encode_hex(block.nonce),
-        "sha3Uncles": b"0x" + encode_hex(block.uncles_hash),
-        # TODO logsBloom / padding
-        "logsBloom": logs_bloom,
-        "transactionsRoot": b"0x" + encode_hex(block.tx_list_root),
-        "stateRoot": b"0x" + encode_hex(block.state_root),
-        "miner": b"0x" + encode_hex(block.coinbase),
-        "difficulty": int_to_hex(block.difficulty),
-        # https://github.com/ethereum/pyethereum/issues/266
-        # "totalDifficulty": int_to_hex(block.chain_difficulty()),
-        "size": int_to_hex(len(ethereum_utils.rlp.encode(block))),
-        "extraData": b"0x" + encode_hex(block.extra_data),
-        "gasLimit": int_to_hex(block.gas_limit),
-        "gasUsed": int_to_hex(block.gas_used),
-        "timestamp": int_to_hex(block.timestamp),
-        "transactions": transactions,
-        "uncles": block.uncles
-    }
+# Set the gas
+DEFAULT_GAS_LIMIT = t.gas_limit = t.GAS_LIMIT = 3141592
 
 
 class EthTesterClient(object):
@@ -127,9 +48,9 @@ class EthTesterClient(object):
     `ethereum.tester` facilities.
     """
     def __init__(self, async=True, async_timeout=10):
-        self.evm = t.state()
-        self.evm.block.gas_limit = 3141592
-        self.evm.mine()
+        self.snapshots = []
+
+        self.reset_evm()
 
         self.is_async = async
         self.async_timeout = async_timeout
@@ -141,6 +62,31 @@ class EthTesterClient(object):
             self.request_thread = threading.Thread(target=self.process_requests)
             self.request_thread.daemon = True
             self.request_thread.start()
+
+    def reset_evm(self, snapshot_idx=None):
+        if snapshot_idx is not None:
+            self.revert_evm(snapshot_idx)
+        else:
+            self.evm = t.state()
+            self.evm.block.gas_limit = DEFAULT_GAS_LIMIT
+
+    def snapshot_evm(self):
+        self.snapshots.append((self.evm.block.number, self.evm.snapshot()))
+        return len(self.snapshots) - 1
+
+    def revert_evm(self, snapshot_idx=None, reset_logs=False):
+        if len(self.snapshots) == 0:
+            raise ValueError("No snapshots to revert to")
+
+        if snapshot_idx is not None:
+            block_number, snapshot = self.snapshots[snapshot_idx]
+        else:
+            block_number, snapshot = self.snapshots.pop()
+
+        # Remove all blocks after our saved block number.
+        del self.evm.blocks[block_number + 1:]
+
+        self.evm.revert(snapshot)
 
     def process_requests(self):
         while True:
@@ -168,20 +114,48 @@ class EthTesterClient(object):
     def get_max_gas(self):
         return t.gas_limit
 
-    def get_coinbase(self):
-        return b"0x" + ethereum_utils.encode_hex(self.evm.block.coinbase)
+    #
+    # Internal getters for EVM objects
+    #
+    def _get_transaction_by_hash(self, txn_hash):
+        txn_hash = strip_0x(txn_hash)
+        if len(txn_hash) == 64:
+            txn_hash = decode_hex(txn_hash)
+        for block in reversed(self.evm.blocks):
+            txn_hashes = block.get_transaction_hashes()
 
-    def get_accounts(self):
-        return [
-            b"0x" + ethereum_utils.encode_hex(addr)
-            for addr in t.accounts
-        ]
+            if txn_hash in txn_hashes:
+                txn_index = txn_hashes.index(txn_hash)
+                txn = block.transaction_list[txn_index]
+                break
+        else:
+            raise ValueError("Transaction not found")
+        return block, txn, txn_index
 
-    def get_code(self, address, block_number="latest"):
-        block = self._get_block_by_number(block_number)
-        return ethereum_utils.encode_hex(block.get_code(strip_0x(address)))
+    def _get_block_by_number(self, block_number="latest"):
+        if block_number == "latest":
+            return self.evm.block
+        elif block_number == "earliest":
+            return self.evm.blocks[0]
+        elif block_number == "pending":
+            raise ValueError("Fetching 'pending' block is unsupported")
+        else:
+            block_number = normalize_number(block_number)
 
-    @force_args_to_bytes
+            if block_number >= len(self.evm.blocks):
+                raise ValueError("Invalid block number")
+            return self.evm.blocks[block_number]
+
+    def _get_block_by_hash(self, block_hash):
+        if len(block_hash) > 32:
+            block_hash = decode_hex(strip_0x(block_hash))
+        for block in self.evm.blocks:
+            if block.hash == block_hash:
+                return block
+        else:
+            raise ValueError("Could not find block for provided hash")
+
+    @coerce_args_to_bytes
     def _send_transaction(self, _from=None, to=None, gas=None, gas_price=None,
                           value=0, data=b''):
         """
@@ -190,24 +164,37 @@ class EthTesterClient(object):
         if _from is None:
             _from = self.get_coinbase()
 
-        _from = strip_0x(_from)
-
-        if len(_from) == 40:
-            _from = ethereum_utils.decode_hex(strip_0x(_from))
+        _from = normalize_address(_from)
 
         sender = t.keys[t.accounts.index(_from)]
 
         if to is None:
             to = b''
 
-        to = ethereum_utils.decode_hex(strip_0x(to))
+        to = normalize_address(to, allow_blank=True)
 
         if data is None:
             data = b''
 
-        data = ethereum_utils.decode_hex(strip_0x(data))
+        data = decode_hex(data)
 
-        return self.evm.send(sender=sender, to=to, value=value, evmdata=data)
+        output = self.evm.send(sender=sender, to=to, value=value, evmdata=data)
+        return output
+
+    #
+    # Public API
+    #
+    def get_coinbase(self):
+        return encode_address(self.evm.block.coinbase)
+
+    def get_accounts(self):
+        return [
+            encode_32bytes(addr) for addr in t.accounts
+        ]
+
+    def get_code(self, address, block_number="latest"):
+        block = self._get_block_by_number(block_number)
+        return encode_32bytes(block.get_code(strip_0x(address)))
 
     def send_transaction(self, *args, **kwargs):
         if self.is_async:
@@ -220,60 +207,43 @@ class EthTesterClient(object):
                     result = self.results.pop(request_id)
                     if isinstance(result, Exception):
                         raise result
-                    return result
+                    return encode_data(result)
             raise ValueError("Timeout waiting for {0}".format(request_id))
         else:
             self._send_transaction(*args, **kwargs)
             self.evm.mine()
-            return self.evm.last_tx.hash
+            return encode_32bytes(self.evm.last_tx.hash)
 
-    def _get_transaction_by_hash(self, txn_hash):
-        txn_hash = strip_0x(txn_hash)
-        if len(txn_hash) == 64:
-            txn_hash = ethereum_utils.decode_hex(txn_hash)
-        for block in reversed(self.evm.blocks):
-            txn_hashes = block.get_transaction_hashes()
+    def send_raw_transaction(self, raw_tx):
+        tx = rlp.decode(decode_hex(strip_0x(raw_tx)), transactions.Transaction)
 
-            if txn_hash in txn_hashes:
-                txn_index = txn_hashes.index(txn_hash)
-                txn = block.transaction_list[txn_index]
-                break
-        else:
-            raise ValueError("Transaction not found")
-        return block, txn, txn_index
+        to = encode_address(tx.to) if tx.to else b''
+        _from = encode_address(tx.sender)
+        data = encode_data(tx.data)
+
+        return self.send_transaction(
+            _from=_from,
+            to=to,
+            gas=tx.gasprice,
+            value=tx.value,
+            data=data,
+        )
 
     def get_transaction_receipt(self, txn_hash):
         block, txn, txn_index = self._get_transaction_by_hash(txn_hash)
 
-        return serialize_txn_to_receipt(block, txn, txn_index)
+        return serialize_txn_receipt(block, txn, txn_index)
 
-    def _get_block_by_number(self, block_number="latest"):
-        if block_number == "latest":
-            return self.evm.block
-        elif block_number == "earliest":
-            return self.evm.blocks[0]
-        elif block_number == "pending":
-            raise ValueError("Fetching 'pending' block is unsupported")
-        else:
-            if str(block_number).startswith(b"0x"):
-                block_number = int(block_number, 16)
-            if block_number >= len(self.evm.blocks):
-                raise ValueError("Invalid block number")
-            return self.evm.blocks[block_number]
+    def get_transaction_count(self, address, block_number="latest"):
+        block = self._get_block_by_number(block_number)
+        address = normalize_address(address)
+
+        return block.get_nonce(address)
 
     def get_block_by_number(self, block_number, full_transactions=True):
         block = self._get_block_by_number(block_number)
 
         return serialize_block(block, full_transactions)
-
-    def _get_block_by_hash(self, block_hash):
-        if len(block_hash) > 32:
-            block_hash = ethereum_utils.decode_hex(strip_0x(block_hash))
-        for block in self.evm.blocks:
-            if block.hash == block_hash:
-                return block
-        else:
-            raise ValueError("Could not find block for provided hash")
 
     def get_block_by_hash(self, block_hash, full_transactions=True):
         block = self._get_block_by_hash(block_hash)
@@ -295,13 +265,11 @@ class EthTesterClient(object):
             raise ValueError("Using call on any block other than latest is unsupported")
         if kwargs.get('block', 'latest') != "latest":
             raise ValueError("Using call on any block other than latest is unsupported")
-        snapshot = self.evm.snapshot()
-        r = self._send_transaction(*args, **kwargs)
-        self.evm.revert(snapshot)
-        # Stop-gap solution for bug with a transaction that immediately follows
-        # a call.
-        self.evm.mine()
-        return encode_hex(r)
+        snapshot_idx = self.snapshot_evm()
+        output = self._send_transaction(*args, **kwargs)
+        self.revert_evm(snapshot_idx)
+
+        return encode_data(output)
 
     def get_transaction_by_hash(self, txn_hash):
         block, txn, txn_index = self._get_transaction_by_hash(txn_hash)
