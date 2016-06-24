@@ -16,8 +16,8 @@ from ethereum.utils import (
 
 if sys.version_info.major == 2:
     binary_types = (bytes, bytearray)
-    text_types = (unicode,)
-    string_types = (basestring, bytearray)
+    text_types = (unicode,)  # NOQA
+    string_types = (basestring, bytearray)  # NOQA
 else:
     binary_types = (bytes, bytearray)
     text_types = (str,)
@@ -49,7 +49,7 @@ if sys.version_info.major == 2:
         if is_text(value):
             return value
         elif is_binary(value):
-            return unicode(force_bytes(value), 'latin1')
+            return unicode(force_bytes(value), 'latin1')  # NOQA
         else:
             raise TypeError("Unsupported type: {0}".format(type(value)))
 else:
