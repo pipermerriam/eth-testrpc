@@ -7,6 +7,7 @@ from rlp.utils import (
 from ethereum.utils import sha3
 
 from eth_tester_client.utils import (
+    force_bytes,
     encode_data,
     decode_hex,
 )
@@ -73,4 +74,4 @@ def test_eth_getCode(rpc_client, accounts):
         params=[contract_address],
     )
 
-    assert contract_code == CONTRACT_BIN_RUNTIME
+    assert force_bytes(contract_code) == CONTRACT_BIN_RUNTIME

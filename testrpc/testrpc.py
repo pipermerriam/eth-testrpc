@@ -111,7 +111,6 @@ def eth_compileSolidity(code):
     raise NotImplementedError("This has not yet been implemented")
 
 
-# Warning: block.get_code() seems to ignore the block number.
 def eth_getCode(address, block_number="latest"):
     return tester_client.get_code(address, block_number)
 
