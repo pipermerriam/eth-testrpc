@@ -38,6 +38,8 @@ setup(
         'json-rpc>=1.10.3',
         'ethereum',
         'rlp>=0.4.4'
+        # TODO: uncomment when this is actually released.
+        #'ethereum-tester-client>=0.2.0',
     ],
     entry_points={
         'console_scripts': [
