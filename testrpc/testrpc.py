@@ -2,17 +2,12 @@
 
 from __future__ import print_function
 import pkg_resources
-from collections import (
-    Iterable,
-)
 import logging
 
 from rlp.utils import encode_hex, decode_hex
 
-from ethereum import utils
 from ethereum.utils import (
     sha3,
-    normalize_address,
 )
 from ethereum.tester import (
     accounts,

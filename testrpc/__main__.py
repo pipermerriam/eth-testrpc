@@ -32,8 +32,6 @@ def main():
     evm_reset()
 
     set_logging_level(2)
-    #slogging.configure(':info,eth.pb:debug,eth.vm.exit:trace')
-    #slogging.configure(':info,eth.vm.exit:debug,eth.pb.tx:info')
 
     print("\nAvailable Accounts\n==================")
     for account in accounts:
