@@ -38,7 +38,7 @@ setup(
         'json-rpc>=1.10.3',
         # TODO: bump this once the next version of pyethereum is released.
         'ethereum>=1.3.6',
-        'rlp>=0.4.4'
+        'rlp>=0.4.4',
         'ethereum-tester-client>=0.2.0',
     ],
     entry_points={
