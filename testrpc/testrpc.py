@@ -4,7 +4,7 @@ from __future__ import print_function
 import pkg_resources
 import logging
 
-from rlp.utils import encode_hex, decode_hex
+from rlp.utils import decode_hex
 
 from ethereum.utils import (
     sha3,
@@ -107,39 +107,8 @@ def eth_getCompilers():
 
 
 def eth_compileSolidity(code):
-    combined = languages["solidity"].combined(code)
-    name = combined[len(combined) - 1][0]
-    contract = combined[len(combined) - 1][1]
-    val = {}
-
-    # Support old and new versions of solc
-    if "binary" in contract:
-        binary = contract['binary']
-    else:
-        binary = contract['bin']
-
-    if "json-abi" in contract:
-        abi = contract['json-abi']
-    else:
-        abi = contract['abi']
-
-    val[name] = {
-        "code": add_0x(binary),
-        "info": {
-            "source": code,
-            "language": "Solidity",
-            "languageVersion": "0",
-            "compilerVersion": "0",
-            "abiDefinition": abi,
-            "userDoc": {
-                "methods": {}
-            },
-            "developerDoc": {
-                "methods": {}
-            }
-        }
-    }
-    return val
+    # TODO: convert to python-solidity lib once it exists
+    raise NotImplementedError("This has not yet been implemented")
 
 
 # Warning: block.get_code() seems to ignore the block number.
@@ -178,75 +147,28 @@ def eth_getTransactionReceipt(tx_hash):
 
 
 def eth_newBlockFilter():
-    # TODO: convert to tester_client
-    print("eth_newBlockFilter")
-
-    global filters
-    global latest_filter_id
-    global evm
-
-    latest_filter_id += 1
-
-    filters[latest_filter_id] = BlockFilter(evm, evm.block.number)
-
-    return "0x" + int_to_hex(latest_filter_id)
+    # TODO: convert to tester_client once filters implemented
+    raise NotImplementedError("This has not yet been implemented")
 
 
 def eth_newFilter(filter_dict):
-    # TODO: convert to tester_client
-    print("eth_newFilter")
-
-    global filters
-    global latest_filter_id
-    global evm
-
-    latest_filter_id += 1
-    filters[latest_filter_id] = LogFilter(evm, decode_filter(filter_dict, evm.block))
-    int_to_hex(latest_filter_id)
-
-    for x in filters.values():
-        if not hasattr(x, 'topics'):
-            continue
-
-    return "0x" + int_to_hex(latest_filter_id)
+    # TODO: convert to tester_client once filters implemented
+    raise NotImplementedError("This has not yet been implemented")
 
 
 def eth_getFilterChanges(filter_id):
-    # TODO: convert to tester_client
-    global filters
-    global evm
-
-    print("eth_getFilterChanges")
-
-    # Mine a block with every call to getFilterChanges just to
-    # ensure block filters will work.
-    mine(evm)
-
-    filter_id = int(strip_0x(filter_id), 16)
-    return filters[filter_id].getChanges()
+    # TODO: convert to tester_client once filters implemented
+    raise NotImplementedError("This has not yet been implemented")
 
 
 def eth_getFilterLogs(filter_id):
-    # TODO: convert to tester_client
-    global filters
-    global evm
-
-    print("eth_getFilterLogs")
-    filter_id = int(strip_0x(filter_id), 16)
-    return encode_loglist(filters[filter_id].logs)
+    # TODO: convert to tester_client once filters implemented
+    raise NotImplementedError("This has not yet been implemented")
 
 
 def eth_uninstallFilter(filter_id):
-    # TODO: convert to tester_client
-    print("eth_uninstallFilter")
-
-    global filters
-
-    filter_id = int(strip_0x(filter_id), 16)
-
-    del filters[filter_id]
-
-    return True
+    # TODO: convert to tester_client once filters implemented
+    raise NotImplementedError("This has not yet been implemented")
 
 
 def web3_sha3(value):
