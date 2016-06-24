@@ -19,6 +19,7 @@ from eth_tester_client.utils import (
     strip_0x,
     encode_number,
     encode_32bytes,
+    encode_address,
 )
 
 
@@ -90,16 +91,15 @@ def eth_sendRawTransaction(raw_tx):
     return tester_client.send_raw_transaction(raw_tx)
 
 
-def eth_call(transaction, block_number):
-    print("eth_call")
-    snapshot = evm_snapshot()
-    r = send(transaction)
-    evm_revert(snapshot)
-    return r
+def eth_call(transaction, block_number="latest"):
+    kwargs = {
+        TXN_KWARGS_MAP.get(k, k): v for k, v in transaction.items()
+    }
+    return tester_client.call(**kwargs)
 
 
 def eth_accounts():
-    return [add_0x(encode_hex(acct)) for acct in accounts]
+    return [encode_address(acct) for acct in accounts]
 
 
 def eth_getCompilers():
@@ -144,11 +144,11 @@ def eth_compileSolidity(code):
 
 # Warning: block.get_code() seems to ignore the block number.
 def eth_getCode(address, block_number="latest"):
-    return client.get_code(address, block_number)
+    return tester_client.get_code(address, block_number)
 
 
 def eth_getBalance(address, block_number="latest"):
-    return client.get_balance(address, block_number)
+    return tester_client.get_balance(address, block_number)
 
 
 def eth_getTransactionCount(address, block_number="latest"):
