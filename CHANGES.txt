@@ -1,5 +1,14 @@
 ----
 
+Version 0.2.0 24 Jun 2016
+================================
+
+8f4814d5d0  Python 3 Compatability.  
+
+Significant refactor of underlying library code to use
+`ethereum-tester-client`.  Breaking change in some ways, temporarily removing
+the filter functions until they are implemented in `ethereum-tester-client`.
+
 Version 0.1.27, Sat 24 Oct 2015
 ================================
 
