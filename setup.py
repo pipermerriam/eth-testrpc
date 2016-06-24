@@ -1,7 +1,7 @@
 """An Ethereum client simulator that provides instant results and quick
 feedback during development involving smart contracts.
 
-https://github.com/ConsenSys/eth-testrpc
+https://github.com/pipermerriam/eth-testrpc
 """
 
 from setuptools import setup, find_packages
@@ -14,28 +14,32 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='eth-testrpc',
-    version=open("VERSION").read().strip(),
+    version="0.2.0",
     description='An Ethereum simulator for aiding smart contract development.',
     long_description=long_description,
-    url='https://github.com/ConsenSys/eth-testrpc',
-    author='ConsenSys',
-    author_email='info@consensys.net',
+    url='https://github.com/pipermerriam/eth-testrpc',
+    author='Piper Merriam',
+    author_email='pipermerriam@gmail.com',
     license='MIT',
     classifiers=[
-        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
     ],
     keywords='ethereum blockchain development testing',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=[
-        'jsonrpclib',
-        'serpent',
-        'ethereum',
+        'Werkzeug>=0.11.10',
+        'json-rpc>=1.10.3',
+        # TODO: bump this once the next version of pyethereum is released.
+        'ethereum>=1.3.6',
+        'rlp>=0.4.4',
+        'ethereum-tester-client>=0.2.0',
     ],
     entry_points={
         'console_scripts': [

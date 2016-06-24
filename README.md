@@ -1,16 +1,4 @@
-# DEPRECATED
-
-Attention: This project is no longer being maintained. I've focussed my effort on [ethereumjs-testrpc](https://github.com/ethereumjs/testrpc), which is more stable, has more features and is better supported. Please consider using [ethereumjs-testrpc](https://github.com/ethereumjs/testrpc) instead. Note that when switching to [ethereumjs-testrpc](https://github.com/ethereumjs/testrpc), you should uninstall this testrpc first, as they have conflicting binaries. Cheers!
-
--- Tim Coulter, original dev (@tcoulter)
-
------------------------------------
-
------------------------------------
-
------------------------------------
-
-
+# Ethereum Test RPC server
 
 ## Ethereum Test RPC
 
@@ -104,3 +92,9 @@ All done! No need to update a version number.
 ### License
 
 MIT
+
+
+### Consensys
+
+This library was originally authored by Consensys and transferred later when it
+was no longer maintained.
