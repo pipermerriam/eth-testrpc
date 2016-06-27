@@ -2,7 +2,11 @@
 
 ## Ethereum Test RPC
 
-Limited RPC client intended for use with automated testing. Uses [pythereum](https://github.com/ethereum/pyethereum) to run an Ethereum client behind the scenes without the need for mining or networking. The result is an Ethereum client that provides instant results and quick feedback during development.
+Limited RPC client intended for use with automated testing. Uses
+[pythereum](https://github.com/ethereum/pyethereum) to run an Ethereum client
+behind the scenes without the need for mining or networking. The result is an
+Ethereum client that provides instant results and quick feedback during
+development.
 
 ### Install
 
@@ -46,10 +50,10 @@ The RPC methods currently implemented are:
 * `eth_getTransactionCount`
 * `eth_getTransactionByHash`
 * `eth_getTransactionReceipt`
-* `eth_newBlockFilter`
-* `eth_newFilter`
-* `eth_getFilterChanges`
-* `eth_uninstallFilter`
+* `eth_newBlockFilter`  (temporarily removed until implemented in underlying library)
+* `eth_newFilter`  (temporarily removed until implemented in underlying library)
+* `eth_getFilterChanges`  (temporarily removed until implemented in underlying library)
+* `eth_uninstallFilter`  (temporarily removed until implemented in underlying library)
 * `web3_sha3`
 * `web3_clientVersion`
 
@@ -65,29 +69,26 @@ When calling `evm_reset`, the `testrpc` will revert the state of its internal ch
 * `evm_snapshot` : Run at the beginning of each test, snapshotting the state of the evm.
 * `evm_revert` : Run at the end of each test, reverting back to a known clean state.
 
+
 ### Releasing a new version (for eth-testrpc developers)
 
-So we don't forget. :)
 
-Install `seed` if you haven't already:
-
-```
-$ pip install seed
-```
-
-Commit any changes you've made first. Then, to make the release:
+* Bump version number in `setup.py`
+* Add entry to `CHANGES.txt`
+* Tag the release.
 
 ```
-$ seed release
+git tag -s -m "X.X.X Release" vX.X.X
+git push --tags
 ```
 
-Afterward, commit the changes it made for you:
+* Go make the release on github for the tag you just pushed
+* Build and push release to PyPI
 
 ```
-git push && git push --tags
+make release
 ```
 
-All done! No need to update a version number.
 
 ### License
 
@@ -97,4 +98,5 @@ MIT
 ### Consensys
 
 This library was originally authored by Consensys and transferred later when it
-was no longer maintained.
+was no longer maintained.  A big thanks for them to creating this extremely
+useful library.

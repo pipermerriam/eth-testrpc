@@ -170,6 +170,14 @@ def eth_uninstallFilter(filter_id):
     raise NotImplementedError("This has not yet been implemented")
 
 
+def eth_protocolVersion():
+    return 63
+
+
+def eth_syncing():
+    return False
+
+
 def web3_sha3(value):
     print('web3_sha3')
     return encode_32bytes(sha3(decode_hex(strip_0x(value))))
@@ -177,3 +185,15 @@ def web3_sha3(value):
 
 def web3_clientVersion():
     return "TestRPC/" + __version__ + "/python"
+
+
+def net_version():
+    return 1
+
+
+def net_listening():
+    return False
+
+
+def net_peerCount():
+    return 0
