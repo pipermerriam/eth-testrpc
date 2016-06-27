@@ -188,7 +188,7 @@ def web3_clientVersion():
 
 
 def net_version():
-    return "1"
+    return 1
 
 
 def net_listening():
