@@ -39,7 +39,7 @@ setup(
         # TODO: bump this once the next version of pyethereum is released.
         'ethereum>=1.3.6',
         'rlp>=0.4.4',
-        'ethereum-tester-client>=0.2.0',
+        'ethereum-tester-client>=0.2.1',
     ],
     entry_points={
         'console_scripts': [

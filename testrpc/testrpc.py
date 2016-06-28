@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-from __future__ import print_function
 import pkg_resources
 import logging
 
@@ -10,7 +8,6 @@ from ethereum.utils import (
     sha3,
 )
 from ethereum.tester import (
-    accounts,
     languages,
 )
 
@@ -19,7 +16,6 @@ from eth_tester_client.utils import (
     strip_0x,
     encode_number,
     encode_32bytes,
-    encode_address,
 )
 
 
@@ -99,7 +95,7 @@ def eth_call(transaction, block_number="latest"):
 
 
 def eth_accounts():
-    return [encode_address(acct) for acct in accounts]
+    return tester_client.get_accounts()
 
 
 def eth_getCompilers():
@@ -179,7 +175,7 @@ def eth_syncing():
 
 
 def web3_sha3(value):
-    print('web3_sha3')
+    logger.info('web3_sha3')
     return encode_32bytes(sha3(decode_hex(strip_0x(value))))
 
 
