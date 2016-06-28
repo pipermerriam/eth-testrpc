@@ -189,7 +189,7 @@ class EthTesterClient(object):
 
     def get_accounts(self):
         return [
-            encode_32bytes(addr) for addr in t.accounts
+            encode_address(addr) for addr in t.accounts
         ]
 
     def get_code(self, address, block_number="latest"):
