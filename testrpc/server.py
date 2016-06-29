@@ -64,6 +64,7 @@ add_method_with_lock(testrpc.eth_getFilterLogs, 'eth_getFilterLogs')
 add_method_with_lock(testrpc.eth_uninstallFilter, 'eth_uninstallFilter')
 add_method_with_lock(testrpc.eth_protocolVersion, 'eth_protocolVersion')
 add_method_with_lock(testrpc.eth_syncing, 'eth_syncing')
+add_method_with_lock(testrpc.eth_mining, 'eth_mining')
 add_method_with_lock(testrpc.web3_sha3, 'web3_sha3')
 add_method_with_lock(testrpc.web3_clientVersion, 'web3_clientVersion')
 add_method_with_lock(testrpc.net_version, 'net_version')
@@ -72,6 +73,7 @@ add_method_with_lock(testrpc.net_peerCount, 'net_peerCount')
 add_method_with_lock(testrpc.evm_reset, 'evm_reset')
 add_method_with_lock(testrpc.evm_snapshot, 'evm_snapshot')
 add_method_with_lock(testrpc.evm_revert, 'evm_revert')
+add_method_with_lock(testrpc.rpc_configure, 'rpc_configure')
 
 
 @Request.application

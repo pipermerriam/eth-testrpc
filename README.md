@@ -54,8 +54,14 @@ The RPC methods currently implemented are:
 * `eth_newFilter`  (temporarily removed until implemented in underlying library)
 * `eth_getFilterChanges`  (temporarily removed until implemented in underlying library)
 * `eth_uninstallFilter`  (temporarily removed until implemented in underlying library)
+* `eth_protocolVersion` ( see `rpc_configure`)
+* `eth_syncing` ( see `rpc_configure`)
+* `eth_mining` ( see `rpc_configure`)
 * `web3_sha3`
 * `web3_clientVersion`
+* `net_version` (see `rpc_configure`)
+* `net_listening` (see `rpc_configure`)
+* `net_peerCount` (see `rpc_configure`)
 
 There’s also special non-standard methods that aren’t included within the original RPC specification:
 
@@ -68,6 +74,22 @@ When calling `evm_reset`, the `testrpc` will revert the state of its internal ch
 * `evm_reset` : Run once at the beginning of your test suite.
 * `evm_snapshot` : Run at the beginning of each test, snapshotting the state of the evm.
 * `evm_revert` : Run at the end of each test, reverting back to a known clean state.
+
+
+TestRPC exposes the `rpc_configure` method which can be used to modify the
+static values returned by the following endpoints.
+
+* `eth_protocolVersion` (default `63`)
+* `eth_syncing` (default `False`)
+* `eth_mining` (default `True`)
+* `net_version` (default `1`)
+* `net_listening` (default `False`)
+* `net_peerCount` (default `0`)
+
+The `rpc_configure` takes two parameters.
+
+* `key`: string representing the rpc method on which you want to change the return value.
+* `value`: the value that should be returned by the endpoint.
 
 
 ### Releasing a new version (for eth-testrpc developers)

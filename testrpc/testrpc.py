@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+import sys
 import pkg_resources
 import logging
 
@@ -166,12 +166,30 @@ def eth_uninstallFilter(filter_id):
     raise NotImplementedError("This has not yet been implemented")
 
 
+RPC_META = {
+    'eth_protocolVersion': 63,
+    'eth_syncing': False,
+    'eth_mining': True,
+    'net_version': 1,
+    'net_listening': False,
+    'net_peerCount': 0,
+}
+
+
+def rpc_configure(key, value):
+    RPC_META[key] = value
+
+
 def eth_protocolVersion():
-    return 63
+    return RPC_META['eth_protocolVersion']
 
 
 def eth_syncing():
-    return False
+    return RPC_META['eth_syncing']
+
+
+def eth_mining():
+    return RPC_META['eth_mining']
 
 
 def web3_sha3(value):
@@ -180,16 +198,18 @@ def web3_sha3(value):
 
 
 def web3_clientVersion():
-    return "TestRPC/" + __version__ + "/python"
+    return "TestRPC/" + __version__ + "/python/{v.major}.{v.minor}.{v.micro}".format(
+        v=sys.version_info
+    )
 
 
 def net_version():
-    return 1
+    return RPC_META['net_version']
 
 
 def net_listening():
-    return False
+    return RPC_META['net_listening']
 
 
 def net_peerCount():
-    return 0
+    return RPC_META['net_peerCount']
