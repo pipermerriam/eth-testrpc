@@ -53,6 +53,10 @@ def evm_revert(snapshot_idx=None):
         return True
 
 
+def evm_mine():
+    tester_client.mine_block()
+
+
 #
 #  Web3 Functions
 #
