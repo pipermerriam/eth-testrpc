@@ -1,5 +1,10 @@
 ----
-Version 0.2.3 27 Jun 2016
+Version 0.2.4 29 Jun 2016
+================================
+
+c95b0da1ff  Bugfix for `eth_getBlockByNumber` and `eth_getBlockByHash` methods.
+
+Version 0.2.3 29 Jun 2016
 ================================
 
 cdc2019e21  Add `eth_mining` and `rpc_configure` endpoints.
