@@ -127,11 +127,11 @@ def eth_getTransactionByHash(tx_hash):
 
 
 def eth_getBlockByHash(block_hash, full_tx=True):
-    return tester_client.get_block_hash(block_hash, full_tx)
+    return tester_client.get_block_by_hash(block_hash, full_tx)
 
 
 def eth_getBlockByNumber(block_number, full_tx=True):
-    return tester_client.get_block_number(block_number, full_tx)
+    return tester_client.get_block_by_number(block_number, full_tx)
 
 
 def eth_getTransactionReceipt(tx_hash):
