@@ -88,6 +88,9 @@ class EthTesterClient(object):
 
         self.evm.revert(snapshot)
 
+    def mine_block(self):
+        self.evm.mine()
+
     def process_requests(self):
         while True:
             id, args, kwargs = self.request_queue.get()
@@ -95,17 +98,17 @@ class EthTesterClient(object):
             try:
                 self._send_transaction(*args, **kwargs)
                 if mine:
-                    self.evm.mine()
+                    self.mine_block()
                 response = self.evm.last_tx.hash
             except Exception as e:
                 response = e
                 if mine:
-                    self.evm.mine()
+                    self.mine_block()
             self.results[id] = response
 
     def wait_for_block(self, block_number, max_wait=0):
         while self.evm.block.number < block_number:
-            self.evm.mine()
+            self.mine_block()
         return self.get_block_by_number(self.evm.block.number)
 
     def wait_for_transaction(self, txn_hash, max_wait=0):
@@ -211,7 +214,7 @@ class EthTesterClient(object):
             raise ValueError("Timeout waiting for {0}".format(request_id))
         else:
             self._send_transaction(*args, **kwargs)
-            self.evm.mine()
+            self.mine_block()
             return encode_32bytes(self.evm.last_tx.hash)
 
     def send_raw_transaction(self, raw_tx):
