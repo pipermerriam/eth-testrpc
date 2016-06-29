@@ -73,6 +73,7 @@ add_method_with_lock(testrpc.net_peerCount, 'net_peerCount')
 add_method_with_lock(testrpc.evm_reset, 'evm_reset')
 add_method_with_lock(testrpc.evm_snapshot, 'evm_snapshot')
 add_method_with_lock(testrpc.evm_revert, 'evm_revert')
+add_method_with_lock(testrpc.evm_mine, 'evm_mine')
 add_method_with_lock(testrpc.rpc_configure, 'rpc_configure')
 
 
