@@ -13,6 +13,10 @@ import rlp
 
 from ethereum import transactions
 from ethereum import tester as t
+from ethereum import keys
+from ethereum.utils import (
+    privtoaddr,
+)
 
 from .utils import (
     coerce_args_to_bytes,
@@ -23,6 +27,7 @@ from .utils import (
     normalize_number,
     normalize_address,
     decode_hex,
+    mk_random_privkey,
 )
 from .serializers import (
     serialize_txn,
@@ -47,6 +52,8 @@ class EthTesterClient(object):
     Stand-in replacement for the rpc client that speaks directly to the
     `ethereum.tester` facilities.
     """
+    locked_accounts = None
+
     def __init__(self, async=True, async_timeout=10):
         self.snapshots = []
 
@@ -62,6 +69,8 @@ class EthTesterClient(object):
             self.request_thread = threading.Thread(target=self.process_requests)
             self.request_thread.daemon = True
             self.request_thread.start()
+
+        self.locked_accounts = []
 
     def reset_evm(self, snapshot_idx=None):
         if snapshot_idx is not None:
@@ -169,7 +178,13 @@ class EthTesterClient(object):
 
         _from = normalize_address(_from)
 
-        sender = t.keys[t.accounts.index(_from)]
+        try:
+            sender = t.keys[t.accounts.index(_from)]
+        except ValueError:
+            if _from in self.unlocked_accounts:
+                sender = self.unlocked_accounts[_from]
+            else:
+                raise
 
         if to is None:
             to = b''
@@ -277,3 +292,13 @@ class EthTesterClient(object):
     def get_transaction_by_hash(self, txn_hash):
         block, txn, txn_index = self._get_transaction_by_hash(txn_hash)
         return serialize_txn(block, txn, txn_index)
+
+    def import_raw_key(self, key):
+        public_key = privtoaddr(key)
+        t.keys.append(key)
+        t.accounts.append(public_key)
+        return encode_address(public_key)
+
+    def new_account(self, password):
+        private_key = mk_random_privkey()
+        return k.decode('hex')

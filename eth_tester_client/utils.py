@@ -1,5 +1,6 @@
 import sys
 import functools
+import random
 
 from rlp.utils import (
     int_to_big_endian,
@@ -182,3 +183,7 @@ def encode_number(value, length=None):
 @coerce_args_to_bytes
 def decode_hex(value):
     return _decode_hex(strip_0x(value))
+
+
+def mk_random_privkey():
+    return decode_hex(hex(random.getrandbits(256)))
