@@ -1,16 +1,18 @@
 ----
+Version 0.2.3 27 Jun 2016
+================================
+
+cdc2019e21  Add `eth_mining` and `rpc_configure` endpoints.
+
 Version 0.2.2 27 Jun 2016
 ================================
 
 41d93328e2  Bugfix for `eth_accounts` to return 20 byte addresses
 
-
-
 Version 0.2.1 27 Jun 2016
 ================================
 
 P70bc7ba49  Add some missing minor meta endpoints
-
 
 Version 0.2.0 24 Jun 2016
 ================================
