@@ -31,6 +31,11 @@ logger = logging.getLogger(__name__)
 tester_client = EthTesterClient()
 
 
+def full_reset():
+    global tester_client
+    tester_client = EthTesterClient()
+
+
 #
 # Snapshot and Reset
 #
@@ -202,8 +207,9 @@ def web3_sha3(value):
 
 
 def web3_clientVersion():
-    return "TestRPC/" + __version__ + "/python/{v.major}.{v.minor}.{v.micro}".format(
-        v=sys.version_info
+    return "TestRPC/" + __version__ + "/{platform}/python{v.major}.{v.minor}.{v.micro}".format(
+        v=sys.version_info,
+        platform=sys.platform,
     )
 
 
@@ -217,3 +223,30 @@ def net_listening():
 
 def net_peerCount():
     return RPC_META['net_peerCount']
+
+
+def personal_listAccounts():
+    return eth_accounts()
+
+
+def personal_importRawKey(private_key, passphrase):
+    return tester_client.import_raw_key(private_key, passphrase)
+
+
+def personal_lockAccount(address):
+    return tester_client.lock_account(address)
+
+
+def personal_newAccount(passphrase=None):
+    return tester_client.new_account(passphrase)
+
+
+def personal_unlockAccount(address, passphrase, duration=None):
+    return tester_client.unlock_account(address, passphrase, duration)
+
+
+def personal_sendTransaction(transaction, passphrase):
+    txn_kwargs = {
+        TXN_KWARGS_MAP.get(k, k): v for k, v in transaction.items()
+    }
+    return tester_client.send_and_sign_transaction(passphrase, **txn_kwargs)
