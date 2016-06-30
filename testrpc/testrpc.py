@@ -16,7 +16,6 @@ from eth_tester_client.utils import (
     strip_0x,
     encode_number,
     encode_32bytes,
-    coerce_args_to_bytes,
 )
 
 
