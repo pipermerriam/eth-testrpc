@@ -3,25 +3,24 @@ from eth_tester_client.utils import mk_random_privkey
 
 
 def test_import_raw_key(client):
-    pk = mk_random_privkey
+    pk = mk_random_privkey()
 
-    assert pk not in tester.keys
+    initial_accounts = client.get_accounts()
 
-    client.import_raw_key(pk)
+    address = client.import_raw_key(pk, 'some-password')
 
-    assert pk in tester.keys
+    assert address not in initial_accounts
+    assert address in client.get_accounts()
 
 
 def test_new_account(client):
-    prev_account_list = client.accounts
+    initial_accounts = client.get_accounts()
 
     address = client.new_account("some-password")
 
-    updated_account_list = client.accounts
-
     assert address
-    assert address not in prev_account_list
-    assert address in updated_account_list
+    assert address not in initial_accounts
+    assert address in client.get_accounts()
 
     assert not client.unlocked_account(address, "wrong-password")
     assert client.unlocked_account(address, "some-password")

@@ -70,7 +70,9 @@ class EthTesterClient(object):
             self.request_thread.daemon = True
             self.request_thread.start()
 
-        self.locked_accounts = []
+        self.passphrase_accounts = {}
+        self.passphrase_account_keys = {}
+        self.unlocked_accounts = {}
 
     def reset_evm(self, snapshot_idx=None):
         if snapshot_idx is not None:
@@ -208,6 +210,8 @@ class EthTesterClient(object):
     def get_accounts(self):
         return [
             encode_address(addr) for addr in t.accounts
+        ] + [
+            encode_address(addr) for addr in self.passphrase_accounts.keys()
         ]
 
     def get_code(self, address, block_number="latest"):
@@ -293,12 +297,32 @@ class EthTesterClient(object):
         block, txn, txn_index = self._get_transaction_by_hash(txn_hash)
         return serialize_txn(block, txn, txn_index)
 
-    def import_raw_key(self, key):
-        public_key = privtoaddr(key)
-        t.keys.append(key)
-        t.accounts.append(public_key)
+    def lock_account(self, address):
+        address = normalize_address(address)
+        self.unlocked_accounts.pop(address, None)
+        return True
+
+    def unlocked_account(self, address, passphrase, duration=None):
+        address = normalize_address(address)
+        if address not in self.account_passphrases:
+            return False
+        if passphrase == self.account_passphrases[address]:
+            self.unlocked_accounts[address] = duration
+            return True
+        return False
+
+    def import_raw_key(self, private_key, passphrase):
+        if not passphrase:
+            raise ValueError("Cannot have empty passphrase")
+
+        public_key = privtoaddr(private_key)
+
+        self.passphrase_accounts[public_key] = passphrase
+        self.passphrase_account_keys[public_key] = private_key
+
         return encode_address(public_key)
 
-    def new_account(self, password):
+    def new_account(self, passphrase):
         private_key = mk_random_privkey()
-        return k.decode('hex')
+
+        return self.import_raw_key(private_key, passphrase)
