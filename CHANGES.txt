@@ -1,4 +1,9 @@
 ----
+Version 0.3.0 30 Jun 2016
+================================
+
+ce734e21c9  Added all `personal_*` account management APIs
+
 Version 0.2.5 29 Jun 2016
 ================================
 
