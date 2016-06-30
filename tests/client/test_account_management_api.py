@@ -25,8 +25,8 @@ def test_new_account(client):
     assert address not in initial_accounts
     assert address in client.get_accounts()
 
-    assert not client.unlocked_account(address, "wrong-password")
-    assert client.unlocked_account(address, "some-password")
+    assert not client.unlock_account(address, "wrong-password")
+    assert client.unlock_account(address, "some-password")
 
 
 def test_cannot_send_with_locked_account(client, accounts):
@@ -54,7 +54,7 @@ def test_send_with_unlocked_account(client, accounts):
     client.send_transaction(_from=accounts[0], to=sender, value=amt)
     assert client.get_balance(sender) >= amt
 
-    assert client.unlocked_account(sender, "some-password")
+    assert client.unlock_account(sender, "some-password")
 
     before_bal = client.get_balance(accounts[1])
 
@@ -73,7 +73,7 @@ def test_locking_an_unlocked_account(client, accounts):
     client.send_transaction(_from=accounts[0], to=sender, value=amt)
     assert client.get_balance(sender) >= amt
 
-    assert client.unlocked_account(sender, "some-password")
+    assert client.unlock_account(sender, "some-password")
 
     client.send_transaction(_from=sender, to=accounts[1], value=12345)
 
@@ -91,7 +91,7 @@ def test_unlock_with_duration(client, accounts):
     client.send_transaction(_from=accounts[0], to=sender, value=amt)
     assert client.get_balance(sender) >= amt
 
-    assert client.unlocked_account(sender, "some-password", 1)
+    assert client.unlock_account(sender, "some-password", 1)
 
     client.send_transaction(_from=sender, to=accounts[1], value=12345)
 

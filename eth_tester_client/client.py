@@ -27,6 +27,7 @@ from .utils import (
     normalize_address,
     decode_hex,
     mk_random_privkey,
+    coerce_args_to_bytes,
 )
 from .serializers import (
     serialize_txn,
@@ -305,6 +306,7 @@ class EthTesterClient(object):
         self.unlocked_accounts.pop(address, None)
         return True
 
+    @coerce_args_to_bytes
     def check_passphrase(self, address, passphrase):
         address = normalize_address(address)
         if address not in self.passphrase_accounts:
@@ -314,7 +316,8 @@ class EthTesterClient(object):
         else:
             return False
 
-    def unlocked_account(self, address, passphrase, duration=None):
+    @coerce_args_to_bytes
+    def unlock_account(self, address, passphrase, duration=None):
         address = normalize_address(address)
         if self.check_passphrase(address, passphrase):
             if duration is not None:
@@ -325,6 +328,7 @@ class EthTesterClient(object):
             return True
         return False
 
+    @coerce_args_to_bytes
     def import_raw_key(self, private_key, passphrase):
         if not passphrase:
             raise ValueError("Cannot have empty passphrase")
@@ -336,11 +340,13 @@ class EthTesterClient(object):
 
         return encode_address(public_key)
 
+    @coerce_args_to_bytes
     def new_account(self, passphrase):
         private_key = mk_random_privkey()
 
         return self.import_raw_key(private_key, passphrase)
 
+    @coerce_args_to_bytes
     def send_and_sign_transaction(self, passphrase, **txn_kwargs):
         try:
             _from = txn_kwargs['_from']
@@ -350,7 +356,7 @@ class EthTesterClient(object):
         _from = normalize_address(_from)
 
         try:
-            self.unlocked_account(_from, passphrase)
+            self.unlock_account(_from, passphrase)
             return self.send_transaction(**txn_kwargs)
         finally:
             self.lock_account(_from)
