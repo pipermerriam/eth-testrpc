@@ -13,7 +13,6 @@ import rlp
 
 from ethereum import transactions
 from ethereum import tester as t
-from ethereum import keys
 from ethereum.utils import (
     privtoaddr,
 )
