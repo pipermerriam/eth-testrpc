@@ -13,6 +13,9 @@ import rlp
 
 from ethereum import transactions
 from ethereum import tester as t
+from ethereum.utils import (
+    privtoaddr,
+)
 
 from .utils import (
     coerce_args_to_bytes,
@@ -23,6 +26,7 @@ from .utils import (
     normalize_number,
     normalize_address,
     decode_hex,
+    mk_random_privkey,
 )
 from .serializers import (
     serialize_txn,
@@ -47,6 +51,8 @@ class EthTesterClient(object):
     Stand-in replacement for the rpc client that speaks directly to the
     `ethereum.tester` facilities.
     """
+    locked_accounts = None
+
     def __init__(self, async=True, async_timeout=10):
         self.snapshots = []
 
@@ -62,6 +68,10 @@ class EthTesterClient(object):
             self.request_thread = threading.Thread(target=self.process_requests)
             self.request_thread.daemon = True
             self.request_thread.start()
+
+        self.passphrase_accounts = {}
+        self.passphrase_account_keys = {}
+        self.unlocked_accounts = {}
 
     def reset_evm(self, snapshot_idx=None):
         if snapshot_idx is not None:
@@ -169,7 +179,17 @@ class EthTesterClient(object):
 
         _from = normalize_address(_from)
 
-        sender = t.keys[t.accounts.index(_from)]
+        try:
+            sender = t.keys[t.accounts.index(_from)]
+        except ValueError:
+            if _from in self.unlocked_accounts:
+                unlock_expiration = self.unlocked_accounts[_from]
+                if unlock_expiration is None or unlock_expiration > time.time():
+                    sender = self.passphrase_account_keys[_from]
+                else:
+                    raise ValueError("Account locked.  Unlock before sending tx")
+            else:
+                raise
 
         if to is None:
             to = b''
@@ -193,6 +213,8 @@ class EthTesterClient(object):
     def get_accounts(self):
         return [
             encode_address(addr) for addr in t.accounts
+        ] + [
+            encode_address(addr) for addr in self.passphrase_accounts.keys()
         ]
 
     def get_code(self, address, block_number="latest"):
@@ -277,3 +299,63 @@ class EthTesterClient(object):
     def get_transaction_by_hash(self, txn_hash):
         block, txn, txn_index = self._get_transaction_by_hash(txn_hash)
         return serialize_txn(block, txn, txn_index)
+
+    def lock_account(self, address):
+        address = normalize_address(address)
+        self.unlocked_accounts.pop(address, None)
+        return True
+
+    @coerce_args_to_bytes
+    def check_passphrase(self, address, passphrase):
+        address = normalize_address(address)
+        if address not in self.passphrase_accounts:
+            return False
+        elif passphrase == self.passphrase_accounts[address]:
+            return True
+        else:
+            return False
+
+    @coerce_args_to_bytes
+    def unlock_account(self, address, passphrase, duration=None):
+        address = normalize_address(address)
+        if self.check_passphrase(address, passphrase):
+            if duration is not None:
+                unlock_expiration = time.time() + duration
+            else:
+                unlock_expiration = None
+            self.unlocked_accounts[address] = unlock_expiration
+            return True
+        return False
+
+    @coerce_args_to_bytes
+    def import_raw_key(self, private_key, passphrase):
+        if not passphrase:
+            raise ValueError("Cannot have empty passphrase")
+
+        public_key = privtoaddr(private_key)
+
+        self.passphrase_accounts[public_key] = passphrase
+        self.passphrase_account_keys[public_key] = private_key
+
+        return encode_address(public_key)
+
+    @coerce_args_to_bytes
+    def new_account(self, passphrase):
+        private_key = mk_random_privkey()
+
+        return self.import_raw_key(private_key, passphrase)
+
+    @coerce_args_to_bytes
+    def send_and_sign_transaction(self, passphrase, **txn_kwargs):
+        try:
+            _from = txn_kwargs['_from']
+        except KeyError:
+            raise KeyError("`send_and_sign_transaction` requires a `_from` address to be specified")  # NOQa
+
+        _from = normalize_address(_from)
+
+        try:
+            self.unlock_account(_from, passphrase)
+            return self.send_transaction(**txn_kwargs)
+        finally:
+            self.lock_account(_from)
