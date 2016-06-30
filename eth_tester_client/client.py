@@ -184,7 +184,11 @@ class EthTesterClient(object):
             sender = t.keys[t.accounts.index(_from)]
         except ValueError:
             if _from in self.unlocked_accounts:
-                sender = self.unlocked_accounts[_from]
+                unlock_expiration = self.unlocked_accounts[_from]
+                if unlock_expiration is None or unlock_expiration > time.time():
+                    sender = self.passphrase_account_keys[_from]
+                else:
+                    raise ValueError("Account locked.  Unlock before sending tx")
             else:
                 raise
 
@@ -302,12 +306,23 @@ class EthTesterClient(object):
         self.unlocked_accounts.pop(address, None)
         return True
 
+    def check_passphrase(self, address, passphrase):
+        address = normalize_address(address)
+        if address not in self.passphrase_accounts:
+            return False
+        elif passphrase == self.passphrase_accounts[address]:
+            return True
+        else:
+            return False
+
     def unlocked_account(self, address, passphrase, duration=None):
         address = normalize_address(address)
-        if address not in self.account_passphrases:
-            return False
-        if passphrase == self.account_passphrases[address]:
-            self.unlocked_accounts[address] = duration
+        if self.check_passphrase(address, passphrase):
+            if duration is not None:
+                unlock_expiration = time.time() + duration
+            else:
+                unlock_expiration = None
+            self.unlocked_accounts[address] = unlock_expiration
             return True
         return False
 
@@ -326,3 +341,17 @@ class EthTesterClient(object):
         private_key = mk_random_privkey()
 
         return self.import_raw_key(private_key, passphrase)
+
+    def send_and_sign_transaction(self, passphrase, **txn_kwargs):
+        try:
+            _from = txn_kwargs['_from']
+        except KeyError:
+            raise KeyError("`send_and_sign_transaction` requires a `_from` address to be specified")  # NOQa
+
+        _from = normalize_address(_from)
+
+        try:
+            self.unlocked_account(_from, passphrase)
+            return self.send_transaction(**txn_kwargs)
+        finally:
+            self.lock_account(_from)

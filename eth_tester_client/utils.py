@@ -186,4 +186,4 @@ def decode_hex(value):
 
 
 def mk_random_privkey():
-    return decode_hex(hex(random.getrandbits(256)))
+    return decode_hex(encode_number(random.getrandbits(256), 32))
