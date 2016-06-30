@@ -28,8 +28,6 @@ def test_async_requests():
     for i in range(5):
         thread = gevent.spawn(spam_block_number)
 
-    [thread.start() for thread in threads]
-
     [thread.join() for thread in threads]
 
     assert not errors

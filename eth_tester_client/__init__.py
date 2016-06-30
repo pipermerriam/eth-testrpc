@@ -1,5 +1,8 @@
 import pkg_resources
 
+from gevent import monkey
+monkey.patch_all()
+
 from .client import EthTesterClient  # NOQA
 
 
