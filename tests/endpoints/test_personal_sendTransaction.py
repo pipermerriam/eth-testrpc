@@ -1,5 +1,6 @@
 import pytest
 
+
 def test_personal_sendTransaction(accounts, rpc_client, password_account, account_password):
     initial_balance = rpc_client('eth_getBalance', [accounts[1]])
 
