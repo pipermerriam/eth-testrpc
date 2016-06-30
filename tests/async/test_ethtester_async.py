@@ -1,5 +1,5 @@
 import pytest
-import threading
+import gevent
 
 from ethereum import tester
 from ethereum import utils
@@ -26,11 +26,7 @@ def test_async_requests():
                 pytest.fail(''.join(e.args))
 
     for i in range(5):
-        thread = threading.Thread(target=spam_block_number)
-        thread.daemon = True
-        threads.append(thread)
-
-    [thread.start() for thread in threads]
+        thread = gevent.spawn(spam_block_number)
 
     [thread.join() for thread in threads]
 
