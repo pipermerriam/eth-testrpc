@@ -75,6 +75,12 @@ add_method_with_lock(testrpc.evm_snapshot, 'evm_snapshot')
 add_method_with_lock(testrpc.evm_revert, 'evm_revert')
 add_method_with_lock(testrpc.evm_mine, 'evm_mine')
 add_method_with_lock(testrpc.rpc_configure, 'rpc_configure')
+add_method_with_lock(testrpc.personal_importRawKey, 'personal_importRawKey')
+add_method_with_lock(testrpc.personal_listAccounts, 'personal_listAccounts')
+add_method_with_lock(testrpc.personal_lockAccount, 'personal_lockAccount')
+add_method_with_lock(testrpc.personal_newAccount, 'personal_newAccount')
+add_method_with_lock(testrpc.personal_unlockAccount, 'personal_unlockAccount')
+add_method_with_lock(testrpc.personal_sendTransaction, 'personal_sendTransaction')
 
 
 @Request.application

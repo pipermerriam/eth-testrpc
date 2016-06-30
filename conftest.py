@@ -18,17 +18,17 @@ def get_open_port():
 @pytest.fixture(scope="session")
 def accounts():
     from ethereum import tester
-    from ethereum import utils
-    return [utils.encode_hex(acct) for acct in tester.accounts]
+    from eth_tester_client.utils import normalize_address
+    return [normalize_address(acct) for acct in tester.accounts]
 
 
 @pytest.yield_fixture()
 def rpc_server():
     from wsgiref.simple_server import make_server
     from testrpc.server import application
-    from testrpc.testrpc import evm_reset
+    from testrpc.testrpc import full_reset
 
-    evm_reset()
+    full_reset()
 
     port = get_open_port()
 
