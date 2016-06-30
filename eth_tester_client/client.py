@@ -6,8 +6,9 @@ https://github.com/ConsenSys/eth-testrpc
 """
 import sys
 import time
-import threading
 import uuid
+
+import gevent
 
 import rlp
 
@@ -65,9 +66,7 @@ class EthTesterClient(object):
             self.request_queue = Queue()
             self.results = {}
 
-            self.request_thread = threading.Thread(target=self.process_requests)
-            self.request_thread.daemon = True
-            self.request_thread.start()
+            self.request_thread = gevent.spawn(self.process_requests)
 
         self.passphrase_accounts = {}
         self.passphrase_account_keys = {}
@@ -233,6 +232,7 @@ class EthTesterClient(object):
                     if isinstance(result, Exception):
                         raise result
                     return encode_data(result)
+                gevent.sleep(0.1)
             raise ValueError("Timeout waiting for {0}".format(request_id))
         else:
             self._send_transaction(*args, **kwargs)
