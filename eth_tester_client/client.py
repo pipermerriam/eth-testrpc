@@ -27,7 +27,6 @@ from .utils import (
     normalize_address,
     decode_hex,
     mk_random_privkey,
-    coerce_args_to_bytes,
 )
 from .serializers import (
     serialize_txn,
