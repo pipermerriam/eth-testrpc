@@ -94,8 +94,7 @@ def serialize_block(block, full_transactions):
         "stateRoot": encode_32bytes(block.state_root),
         "miner": encode_address(block.coinbase),
         "difficulty": encode_number(block.difficulty),
-        # https://github.com/ethereum/pyethereum/issues/266
-        # "totalDifficulty": encode_number(block.chain_difficulty()),
+        "totalDifficulty": encode_number(block.chain_difficulty()),
         "size": encode_number(len(rlp.encode(block))),
         "extraData": encode_32bytes(block.extra_data),
         "gasLimit": encode_number(block.gas_limit),
