@@ -13,7 +13,6 @@ from ethereum.tester import (
 
 from eth_tester_client import EthTesterClient
 from eth_tester_client.utils import (
-    strip_0x,
     encode_number,
     encode_32bytes,
 )
@@ -201,9 +200,13 @@ def eth_mining():
     return RPC_META['eth_mining']
 
 
-def web3_sha3(value):
+def web3_sha3(value, encoding=None):
     logger.info('web3_sha3')
-    return encode_32bytes(sha3(decode_hex(strip_0x(value))))
+    if encoding == 'hex':
+        value = decode_hex(value)
+    elif encoding is not None:
+        raise ValueError("Unsupported encoding")
+    return encode_32bytes(sha3(value))
 
 
 def web3_clientVersion():
@@ -245,7 +248,7 @@ def personal_unlockAccount(address, passphrase, duration=None):
     return tester_client.unlock_account(address, passphrase, duration)
 
 
-def personal_sendTransaction(transaction, passphrase):
+def personal_signAndSendTransaction(transaction, passphrase):
     txn_kwargs = {
         TXN_KWARGS_MAP.get(k, k): v for k, v in transaction.items()
     }
