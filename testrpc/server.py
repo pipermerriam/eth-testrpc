@@ -80,7 +80,8 @@ add_method_with_lock(testrpc.personal_listAccounts, 'personal_listAccounts')
 add_method_with_lock(testrpc.personal_lockAccount, 'personal_lockAccount')
 add_method_with_lock(testrpc.personal_newAccount, 'personal_newAccount')
 add_method_with_lock(testrpc.personal_unlockAccount, 'personal_unlockAccount')
-add_method_with_lock(testrpc.personal_sendTransaction, 'personal_sendTransaction')
+add_method_with_lock(testrpc.personal_signAndSendTransaction,
+                     'personal_signAndSendTransaction')
 
 
 @Request.application
