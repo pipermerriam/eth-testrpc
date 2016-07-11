@@ -200,12 +200,10 @@ def eth_mining():
     return RPC_META['eth_mining']
 
 
-def web3_sha3(value, encoding=None):
+def web3_sha3(value, encoding='hex'):
     logger.info('web3_sha3')
     if encoding == 'hex':
         value = decode_hex(value)
-    elif encoding is not None:
-        raise ValueError("Unsupported encoding")
     return encode_32bytes(sha3(value))
 
 
