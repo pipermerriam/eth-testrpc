@@ -1,15 +1,20 @@
 ----
-Version 0.4.1 30 Jun 2016
+Version 0.4.2
+================================
+
+1e2b488237  Fix broken `web_sha3` implementation
+
+Version 0.4.1
 ================================
 
 8db2f400e6  Fix `web_sha3` to comply with spec.
 
-Version 0.4.0 30 Jun 2016
+Version 0.4.0
 ================================
 
 17e69088cf  Fix `personal_signAndSendTransaction`
 
-Version 0.3.1 30 Jun 2016
+Version 0.3.1
 ================================
 
 ce734e21c9  Update `ethereum-tester-client` dependency version to 0.3.1
