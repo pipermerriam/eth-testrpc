@@ -2,17 +2,16 @@ import sys
 import pkg_resources
 import logging
 
-from rlp.utils import decode_hex
+from sha3 import sha3_256
 
-from ethereum.utils import (
-    sha3,
-)
 from ethereum.tester import (
     languages,
 )
 
 from eth_tester_client import EthTesterClient
 from eth_tester_client.utils import (
+    force_bytes,
+    decode_hex,
     encode_number,
     encode_32bytes,
 )
@@ -204,7 +203,9 @@ def web3_sha3(value, encoding='hex'):
     logger.info('web3_sha3')
     if encoding == 'hex':
         value = decode_hex(value)
-    return encode_32bytes(sha3(value))
+    else:
+        value = force_bytes(value)
+    return encode_32bytes(sha3_256(value).digest())
 
 
 def web3_clientVersion():
