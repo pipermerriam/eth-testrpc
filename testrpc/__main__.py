@@ -3,10 +3,8 @@ import argparse
 from wsgiref.simple_server import make_server
 import threading
 
-from ethereum.tester import (
-    accounts,
-    set_logging_level,
-)
+from ethereum.tester import accounts
+from ethereum.slogging import set_level
 
 from .server import application
 from .testrpc import (
@@ -31,7 +29,7 @@ def main():
 
     evm_reset()
 
-    set_logging_level(2)
+    set_level('eth-testrpc', 2)
 
     print("\nAvailable Accounts\n==================")
     for account in accounts:
