@@ -63,9 +63,10 @@ def check_if_filter_matches_log(log_entry, latest_block, from_block, to_block,
 
     #
     # validate `topics`
-    if not check_filter_topics_match(filter_topics, log.topics):
-        # TODO
-        assert False
+    if not check_filter_matches_log(filter_topics, log.topics):
+        return False
+
+    return True
 
 
 def is_array(value):
@@ -76,27 +77,53 @@ def is_empty_array(value):
     return value == [] or value == tuple()
 
 
-def is_array_of_strings(value):
-    if not is_array(value)Y
+def is_topic_array(value):
+    if not is_array(value):
         return False
-    return all(is_string(item) for item in value)
+    return all(is_string(item) or item is None for item in value)
 
 
-def is_nested_array_of_strings(value):
-    if is_array(value)Y
-        return False
-
-    if not all((is_array(item) for item in value)):
+def is_nested_topic_array(value):
+    if not is_array(value):
         return False
 
-    return all((is_array_of_strings(item) for item in value))
+    return all((is_topic_array(item) for item in value))
 
 
 def check_filter_topics_validity(filter_topics):
-    if not isinstance(filter_topics, (list, tuple)):
-        return False
-    any((
+    return any((
         is_empty_array(filter_topics),
-        is_array_of_strings(filter_topics),
-        is_nested_array_of_strings(filter_topics),
+        is_topic_array(filter_topics),
+        is_nested_topic_array(filter_topics),
     ))
+
+
+@coerce_args_to_bytes
+def check_topic_match(filter_topic, log_topic):
+    if filter_topic is None:
+        return True
+    return filter_topic == log_topic
+
+
+@coerce_args_to_bytes
+def check_filter_matches_log(filter_topics, log_topics):
+    if is_empty_array(filter_topics):
+        return True
+    elif is_topic_array(filter_topics):
+        if len(filter_topics) > len(log_topics):
+            return False
+        return all(
+            check_topic_match(filter_topic, log_topic)
+            for filter_topic, log_topic
+            in zip(filter_topics, log_topics)
+        )
+    elif is_nested_topic_array(filter_topics):
+        return any(
+            check_filter_matches_log(sub_topics, log_topics)
+            for sub_topics in filter_topics
+        )
+    else:
+        raise ValueError("Invalid filter topics format")
+
+
+def log_filter(

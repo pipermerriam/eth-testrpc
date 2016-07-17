@@ -359,3 +359,6 @@ class EthTesterClient(object):
             return self.send_transaction(**txn_kwargs)
         finally:
             self.lock_account(_from)
+
+    def new_filter(self, from_block="latest", to_block="latest", address=None, topics=None):
+        raise NotImplementedError("TODO")
