@@ -62,7 +62,7 @@ def serialize_log(block, txn, txn_index, log, log_index):
         "blockHash": encode_32bytes(block.hash),
         "blockNumber": encode_number(block.number),
         "address": encode_32bytes(log.address),
-        "data": encode_32bytes(log.data),
+        "data": encode_data(log.data),
         "topics": [
             encode_number(topic, 32) for topic in log.topics
             for topic in log.topics

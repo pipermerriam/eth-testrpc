@@ -7,6 +7,7 @@ https://github.com/ConsenSys/eth-testrpc
 import sys
 import time
 import uuid
+import itertools
 
 import gevent
 
@@ -19,6 +20,7 @@ from ethereum.utils import (
 )
 
 from .utils import (
+    is_string,
     coerce_args_to_bytes,
     strip_0x,
     encode_32bytes,
@@ -28,11 +30,16 @@ from .utils import (
     normalize_address,
     decode_hex,
     mk_random_privkey,
+    is_valid_block_identifier,
+    is_array,
 )
 from .serializers import (
     serialize_txn,
     serialize_txn_receipt,
     serialize_block,
+)
+from .filters import (
+    check_filter_topics_validity,
 )
 
 
@@ -71,6 +78,9 @@ class EthTesterClient(object):
         self.passphrase_accounts = {}
         self.passphrase_account_keys = {}
         self.unlocked_accounts = {}
+
+        self.log_filters = {}
+        self.log_filters_id_generator = itertools.count()
 
     def reset_evm(self, snapshot_idx=None):
         if snapshot_idx is not None:
@@ -360,5 +370,50 @@ class EthTesterClient(object):
         finally:
             self.lock_account(_from)
 
+    log_filters = None
+
     def new_filter(self, from_block="latest", to_block="latest", address=None, topics=None):
+        if topics is None:
+            topics = []
+
+        if address is None:
+            address = []
+
+        if not is_valid_block_identifier(from_block):
+            raise ValueError("Invalid filter parameter for `from_block`")
+
+        if not is_valid_block_identifier(to_block):
+            raise ValueError("Invalid filter parameter for `to_block`")
+
+        if is_string(address):
+            addresses = [encode_32bytes(normalize_address(address))]
+        elif is_array(address):
+            if not address:
+                addresses = []
+            elif all(is_string(addr) for addr in address):
+                addresses = [encode_32bytes(normalize_address(addr)) for addr in address]
+            else:
+                raise ValueError(
+                    "Address must be either a single address or an array of addresses"
+                )
+        else:
+            raise ValueError(
+                "Address must be either a single address or an array of addresses"
+            )
+
+        if not check_filter_topics_validity(topics):
+            raise ValueError("Invalid topics")
+
+        log_filter = {
+            'from_block': from_block,
+            'to_block': to_block,
+            'addresses': addresses,
+            'topics': topics,
+            'current_block': None,
+        }
+        filter_id = next(self.log_filters_id_generator)
+        self.log_filters[filter_id] = log_filter
+        return filter_id
+
+    def get_filter_changes(self, filter_id):
         raise NotImplementedError("TODO")

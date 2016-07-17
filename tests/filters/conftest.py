@@ -2,6 +2,15 @@ import pytest
 import json
 import textwrap
 
+from ethereum.utils import sha3
+
+from eth_tester_client.utils import (
+    encode_number,
+    encode_hex,
+    encode_data,
+    strip_0x,
+)
+
 
 CONTRACT_EMITTER_SOURCE = textwrap.dedent(("""
 contract Emitter {
@@ -88,3 +97,34 @@ def EMITTER_RUNTIME():
 @pytest.fixture()
 def EMITTER_ABI():
     return CONTRACT_EMITTER_ABI
+
+
+@pytest.fixture()
+def emitter_contract_address(client, accounts, EMITTER_CODE):
+    client.is_async = False
+    txn_hash = client.send_transaction(
+        _from=accounts[0],
+        data=EMITTER_CODE,
+    )
+    txn_receipt = client.get_transaction_receipt(txn_hash)
+    contract_address = txn_receipt['contractAddress']
+    assert contract_address
+
+    return contract_address
+
+
+@pytest.fixture()
+def call_emitter_contract(client, accounts, emitter_contract_address):
+    client.is_async = False
+
+    def _call_emitter_contract(method_signature, arguments):
+        function_sig = encode_data(sha3(method_signature)[:4])
+        data = function_sig + ''.join((strip_0x(encode_hex(encode_number(arg, 32))) for arg in arguments))
+        assert len(data) == 2 + 8 + 64 * len(arguments)
+
+        txn_hash = client.send_transaction(
+            _from=accounts[0],
+            data=data,
+        )
+        return txn_hash
+    return _call_emitter_contract
