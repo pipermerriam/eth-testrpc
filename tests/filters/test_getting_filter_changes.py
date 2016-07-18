@@ -23,7 +23,7 @@ class Events(object):
 
 
 def mk_topic(fn_sig):
-    return force_bytes("0x" + sha3_256(force_bytes(fn_sig)).hexdigest())
+    return "0x" + sha3_256(force_bytes(fn_sig)).hexdigest()
 
 
 class Topics(object):
