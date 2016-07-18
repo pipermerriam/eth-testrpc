@@ -16,10 +16,12 @@ from ethereum.utils import (
 
 
 if sys.version_info.major == 2:
+    integer_types = (int, long)  # NOQA
     binary_types = (bytes, bytearray)
     text_types = (unicode,)  # NOQA
     string_types = (basestring, bytearray)  # NOQA
 else:
+    integer_types = (int,)  # NOQA
     binary_types = (bytes, bytearray)
     text_types = (str,)
     string_types = (bytes, str, bytearray)
@@ -35,6 +37,14 @@ def is_text(value):
 
 def is_string(value):
     return isinstance(value, string_types)
+
+
+def is_integer(value):
+    return isinstance(value, integer_types)
+
+
+def is_array(value):
+    return isinstance(value, (list, tuple))
 
 
 if sys.version_info.major == 2:
@@ -187,3 +197,12 @@ def decode_hex(value):
 
 def mk_random_privkey():
     return decode_hex(encode_number(random.getrandbits(256), 32))
+
+
+def is_valid_block_identifier(block_identifier):
+    if is_integer(block_identifier):
+        return True
+    elif is_string(block_identifier):
+        return force_text(block_identifier) in {"latest", "pending", "earliest"}
+    else:
+        raise TypeError("invalid type")
