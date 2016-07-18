@@ -6,6 +6,9 @@ from .utils import (
     is_array,
     coerce_args_to_bytes,
 )
+from .serializers import (
+    serialize_log,
+)
 
 
 def is_empty_array(value):
@@ -68,7 +71,7 @@ def check_if_log_matches(log_entry, from_block, to_block,
     # validate `from_block` (left bound)
     #
     if is_string(from_block):
-        raise NotImplementedError("not implemented")
+        pass
     elif is_numeric(from_block):
         if from_block > log_entry['blockNumber']:
             return False
@@ -79,12 +82,18 @@ def check_if_log_matches(log_entry, from_block, to_block,
     # validate `to_block` (left bound)
     #
     if is_string(to_block):
-        raise NotImplementedError("not implemented")
+        pass
     elif is_numeric(to_block):
         if to_block < log_entry['blockNumber']:
             return False
     else:
         raise TypeError("Invalid `to_block`")
+
+    if log_entry['type'] == "pending":
+        if to_block != "pending":
+            return False
+    elif from_block == "pending":
+        return False
 
     #
     # validate `addresses`
@@ -101,14 +110,24 @@ def check_if_log_matches(log_entry, from_block, to_block,
 
 
 def process_block(block, from_block, to_block, addresses, filter_topics):
-    log_match_fn = functools.partial(
+    is_filter_match_fn = functools.partial(
         check_if_log_matches,
         from_block=from_block,
         to_block=to_block,
         addresses=addresses,
         filter_topics=filter_topics,
     )
-    import pdb; pdb.set_trac()
-    for raw_log in block.logs:
-        pass
-        #log_entry =
+
+    # TODO: this is really inneficient since many of the early exit conditions
+    # can be identified prior to serializing the log entry.  Revamp this so
+    # that the functionality in `check_if_log_matches` is more granular and
+    # each piece can be checked at the earliers entry point.
+
+    for txn_index, txn in enumerate(block.transaction_list):
+        txn_receipt = block.get_receipt(txn_index)
+        for log_index, log in enumerate(txn_receipt.logs):
+            log_entry = serialize_log(block, txn, txn_index, log, log_index)
+            if is_filter_match_fn(log_entry):
+                yield log_entry
+            else:
+                import pdb; pdb.set_trace()

@@ -28,16 +28,16 @@ contract Emitter {
     event LogQuadrupleWithIndex(uint arg0, uint arg1, uint indexed arg2, uint indexed arg3);
 
     enum WhichEvent {
-        LogAnonymous,
-        LogNoArguments,
-        LogSingleArg,
-        LogDoubleArg,
-        LogTripleArg,
-        LogQuadrupleArg,
-        LogSingleWithIndex,
-        LogDoubleWithIndex,
-        LogTripleWithIndex,
-        LogQuadrupleWithIndex
+        LogAnonymous,          # 0
+        LogNoArguments,        # 1
+        LogSingleArg,          # 2
+        LogDoubleArg,          # 3
+        LogTripleArg,          # 4
+        LogQuadrupleArg,       # 5
+        LogSingleWithIndex,    # 6
+        LogDoubleWithIndex,    # 7
+        LogTripleWithIndex,    # 8
+        LogQuadrupleWithIndex  # 9
     }
 
     function logNoArgs(WhichEvent which) public {
@@ -117,14 +117,18 @@ def emitter_contract_address(client, accounts, EMITTER_CODE):
 def call_emitter_contract(client, accounts, emitter_contract_address):
     client.is_async = False
 
-    def _call_emitter_contract(method_signature, arguments):
+    def _call_emitter_contract(method_signature, arguments=None):
+        if arguments is None:
+            arguments = []
         function_sig = encode_data(sha3(method_signature)[:4])
-        data = function_sig + ''.join((strip_0x(encode_hex(encode_number(arg, 32))) for arg in arguments))
+        data = function_sig + b''.join((strip_0x(encode_number(arg, 32)) for arg in arguments))
         assert len(data) == 2 + 8 + 64 * len(arguments)
 
         txn_hash = client.send_transaction(
             _from=accounts[0],
+            to=emitter_contract_address,
             data=data,
+            gas=200000,
         )
         return txn_hash
     return _call_emitter_contract

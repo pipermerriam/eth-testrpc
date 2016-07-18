@@ -8,6 +8,7 @@ import sys
 import time
 import uuid
 import itertools
+import functools
 
 import gevent
 
@@ -40,6 +41,7 @@ from .serializers import (
 )
 from .filters import (
     check_filter_topics_validity,
+    process_block,
 )
 
 
@@ -416,7 +418,7 @@ class EthTesterClient(object):
 
     def get_filter_changes(self, filter_id):
         try:
-            log_filter = self.log_filter[filter_id]
+            log_filter = self.log_filters[filter_id]
         except KeyError:
             raise ValueError("Filter not found for id: {0}".format(filter_id))
 
@@ -428,4 +430,14 @@ class EthTesterClient(object):
         if is_string(right_bound):
             right_bound = len(self.evm.blocks)
 
-        raise ValueError("TODO")
+        block_processor_fn = functools.partial(
+            process_block,
+            from_block=log_filter['from_block'],
+            to_block=log_filter['to_block'],
+            addresses=log_filter['addresses'],
+            filter_topics=log_filter['topics'],
+        )
+
+        return list(itertools.chain.from_iterable((
+            block_processor_fn(block) for block in self.evm.blocks[left_bound:right_bound]
+        )))

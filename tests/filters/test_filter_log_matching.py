@@ -2,6 +2,7 @@ import pytest
 
 from eth_tester_client.utils import (
     encode_number,
+    encode_data,
 )
 from eth_tester_client.filters import (
     check_if_log_matches,
