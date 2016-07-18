@@ -4,7 +4,7 @@ from eth_tester_client.utils import (
     encode_number,
 )
 from eth_tester_client.filters import (
-    check_if_filter_matches_log,
+    check_if_log_matches,
 )
 
 
@@ -54,4 +54,6 @@ def make_log_entry(block_number=1,
         (make_log_filter(), make_log_entry(topics=['a']), True),
     ),
 )
-def test_check_if_filter_matches_log(log_filter, log, expected):
+def test_check_if_filter_matches_log(log_filter, log_entry, expected):
+    actual = check_if_log_matches(log_entry, **log_filter)
+    assert actual is expected

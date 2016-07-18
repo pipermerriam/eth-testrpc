@@ -1,25 +1,13 @@
-"""
-def serialize_log(block, txn, txn_index, log, log_index):
-    return {
-        "type": "mined",
-        "logIndex": encode_number(log_index),
-        "transactionIndex": encode_number(txn_index),
-        "transactionHash": encode_32bytes(txn.hash),
-        "blockHash": encode_32bytes(block.hash),
-        "blockNumber": encode_number(block.number),
-        "address": encode_32bytes(log.address),
-        "data": encode_32bytes(log.data),
-        "topics": [
-            encode_number(topic, 32) for topic in log.topics
-            for topic in log.topics
-        ],
-    }
-"""
+import functools
 
 from .utils import (
     is_string,
+    is_numeric,
+    is_array,
     coerce_args_to_bytes,
 )
+
+
 def is_empty_array(value):
     return value == [] or value == tuple()
 
@@ -53,7 +41,7 @@ def check_topic_match(filter_topic, log_topic):
 
 
 @coerce_args_to_bytes
-def check_filter_topics_match(filter_topics, log_topics):
+def check_if_topics_match(filter_topics, log_topics):
     if is_empty_array(filter_topics):
         return True
     elif is_topic_array(filter_topics):
@@ -66,7 +54,7 @@ def check_filter_topics_match(filter_topics, log_topics):
         )
     elif is_nested_topic_array(filter_topics):
         return any(
-            check_filter_matches_log(sub_topics, log_topics)
+            check_if_topics_match(sub_topics, log_topics)
             for sub_topics in filter_topics
         )
     else:
@@ -74,53 +62,53 @@ def check_filter_topics_match(filter_topics, log_topics):
 
 
 @coerce_args_to_bytes
-def check_if_filter_matches_log(log_entry, from_block, to_block,
-                                addresses, filter_topics):
+def check_if_log_matches(log_entry, from_block, to_block,
+                         addresses, filter_topics):
     #
     # validate `from_block` (left bound)
     #
     if is_string(from_block):
-        if from_block == "latest":
-            if log_entry.number != latest_block.number:
-                return False
-        else:
-            raise NotImplementedError(
-                "Filters not implemented for any block identifier other than 'latest'"
-            )
-    else:
-        if from_block > block.number:
+        raise NotImplementedError("not implemented")
+    elif is_numeric(from_block):
+        if from_block > log_entry['blockNumber']:
             return False
+    else:
+        raise TypeError("Invalid `from_block`")
 
     #
     # validate `to_block` (left bound)
     #
     if is_string(to_block):
-        if to_block == "latest":
-            if log_entry.number != latest_block.number:
-                return False
-        else:
-            raise NotImplementedError(
-                "Filters not implemented for any block identifier other than 'latest'"
-            )
-    else:
-        if to_block > block.number:
+        raise NotImplementedError("not implemented")
+    elif is_numeric(to_block):
+        if to_block < log_entry['blockNumber']:
             return False
+    else:
+        raise TypeError("Invalid `to_block`")
 
     #
     # validate `addresses`
     #
-    if addresses and log.address not in addresses:
+    if addresses and log_entry['address'] not in addresses:
         return False
 
     #
     # validate `topics`
-    if not check_filter_matches_log(filter_topics, log.topics):
+    if not check_if_topics_match(filter_topics, log_entry['topics']):
         return False
 
     return True
 
 
-
-
-def process_filter(evm, start_block, from_block, to_block, addresses, filter_topics):
-    match_fn = check_filter_matches_log(
+def process_block(block, from_block, to_block, addresses, filter_topics):
+    log_match_fn = functools.partial(
+        check_if_log_matches,
+        from_block=from_block,
+        to_block=to_block,
+        addresses=addresses,
+        filter_topics=filter_topics,
+    )
+    import pdb; pdb.set_trac()
+    for raw_log in block.logs:
+        pass
+        #log_entry =

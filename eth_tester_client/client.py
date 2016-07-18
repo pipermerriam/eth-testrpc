@@ -409,11 +409,23 @@ class EthTesterClient(object):
             'to_block': to_block,
             'addresses': addresses,
             'topics': topics,
-            'current_block': None,
         }
         filter_id = next(self.log_filters_id_generator)
         self.log_filters[filter_id] = log_filter
         return filter_id
 
     def get_filter_changes(self, filter_id):
-        raise NotImplementedError("TODO")
+        try:
+            log_filter = self.log_filter[filter_id]
+        except KeyError:
+            raise ValueError("Filter not found for id: {0}".format(filter_id))
+
+        left_bound = log_filter.get('bookmark', log_filter['from_block'])
+        if is_string(left_bound):
+            left_bound = 0
+
+        right_bound = log_filter['to_block']
+        if is_string(right_bound):
+            right_bound = len(self.evm.blocks)
+
+        raise ValueError("TODO")
