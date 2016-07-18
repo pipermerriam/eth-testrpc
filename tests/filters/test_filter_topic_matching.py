@@ -1,6 +1,6 @@
 import pytest
 
-from eth_tester_client.filters import check_filter_topics_match
+from eth_tester_client.filters import check_if_topics_match
 
 
 @pytest.mark.parametrize(
@@ -31,5 +31,5 @@ from eth_tester_client.filters import check_filter_topics_match
     ),
 )
 def test_matching(filter_topics, log_topics, expected):
-    actual = check_filter_topics_match(filter_topics, log_topics)
+    actual = check_if_topics_match(filter_topics, log_topics)
     assert actual is expected

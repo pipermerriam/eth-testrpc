@@ -42,6 +42,7 @@ from .serializers import (
 from .filters import (
     check_filter_topics_validity,
     process_block,
+    get_filter_bounds,
 )
 
 
@@ -416,19 +417,58 @@ class EthTesterClient(object):
         self.log_filters[filter_id] = log_filter
         return filter_id
 
+    def new_block_filter(self, *args, **kwargs):
+        raise NotImplementedError("TODO")
+
+    def new_pending_transaction_filter(self, *args, **kwargs):
+        raise NotImplementedError("TODO")
+
+    def uninstall_filter(self, filter_id):
+        try:
+            self.log_filters.pop(filter_id)
+        except KeyError:
+            return False
+        else:
+            return True
+
     def get_filter_changes(self, filter_id):
         try:
             log_filter = self.log_filters[filter_id]
         except KeyError:
             raise ValueError("Filter not found for id: {0}".format(filter_id))
 
-        left_bound = log_filter.get('bookmark', log_filter['from_block'])
-        if is_string(left_bound):
-            left_bound = 0
+        bookmark = log_filter.get('bookmark', None)
+        block_slice = get_filter_bounds(
+            log_filter['from_block'],
+            log_filter['to_block'],
+            bookmark,
+        )
 
-        right_bound = log_filter['to_block']
-        if is_string(right_bound):
-            right_bound = len(self.evm.blocks)
+        block_processor_fn = functools.partial(
+            process_block,
+            from_block=log_filter['from_block'],
+            to_block=log_filter['to_block'],
+            addresses=log_filter['addresses'],
+            filter_topics=log_filter['topics'],
+        )
+
+        log_changes = list(itertools.chain.from_iterable((
+            block_processor_fn(block) for block in self.evm.blocks[block_slice]
+        )))
+
+        self.log_filters[filter_id]['bookmark'] = self.evm.blocks[-1].number
+        return log_changes
+
+    def get_filter_logs(self, filter_id):
+        try:
+            log_filter = self.log_filters[filter_id]
+        except KeyError:
+            raise ValueError("Filter not found for id: {0}".format(filter_id))
+
+        block_slice = get_filter_bounds(
+            log_filter['from_block'],
+            log_filter['to_block'],
+        )
 
         block_processor_fn = functools.partial(
             process_block,
@@ -439,5 +479,5 @@ class EthTesterClient(object):
         )
 
         return list(itertools.chain.from_iterable((
-            block_processor_fn(block) for block in self.evm.blocks[left_bound:right_bound]
+            block_processor_fn(block) for block in self.evm.blocks[block_slice]
         )))

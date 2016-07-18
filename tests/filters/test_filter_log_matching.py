@@ -3,6 +3,7 @@ import pytest
 from eth_tester_client.utils import (
     encode_number,
     encode_data,
+    coerce_args_to_bytes,
 )
 from eth_tester_client.filters import (
     check_if_log_matches,
@@ -11,6 +12,7 @@ from eth_tester_client.filters import (
 
 
 
+@coerce_args_to_bytes
 def make_log_filter(from_block="latest", to_block="latest", addresses=None, topics=None):
     if addresses is None:
         addresses = []
@@ -21,16 +23,17 @@ def make_log_filter(from_block="latest", to_block="latest", addresses=None, topi
         'from_block': from_block,
         'to_block': to_block,
         'addresses': addresses,
-        'topics': topics,
+        'filter_topics': topics,
     }
     return log_filter
 
 
+@coerce_args_to_bytes
 def make_log_entry(block_number=1,
-             type="mined",
-             address="0xd3cda913deb6f67967b99d67acdfa1712c293601",
-             topics=None,
-             data=""):
+                   type=b"mined",
+                   address=b"0xd3cda913deb6f67967b99d67acdfa1712c293601",
+                   topics=None,
+                   data=b""):
     if topics is None:
         topics = []
 

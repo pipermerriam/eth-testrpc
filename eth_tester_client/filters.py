@@ -129,5 +129,27 @@ def process_block(block, from_block, to_block, addresses, filter_topics):
             log_entry = serialize_log(block, txn, txn_index, log, log_index)
             if is_filter_match_fn(log_entry):
                 yield log_entry
-            else:
-                import pdb; pdb.set_trace()
+
+
+def get_filter_bounds(from_block, to_block, bookmark=None):
+    if bookmark is not None:
+        left_bound = bookmark
+    elif from_block == "latest":
+        left_bound = -1
+    elif from_block == "earliest":
+        left_bound = None
+    elif from_block == "pending":
+        left_bound = None
+    else:
+        left_bound = from_block
+
+    if to_block == "latest":
+        right_bound = None
+    elif to_block == "earliest":
+        right_bound = 1
+    elif to_block == "pending":
+        right_bound = None
+    else:
+        right_bound = to_block
+
+    return slice(left_bound, right_bound)
