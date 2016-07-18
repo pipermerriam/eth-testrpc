@@ -58,6 +58,8 @@ add_method_with_lock(testrpc.eth_getTransactionReceipt, 'eth_getTransactionRecei
 add_method_with_lock(testrpc.eth_getBlockByHash, 'eth_getBlockByHash')
 add_method_with_lock(testrpc.eth_getBlockByNumber, 'eth_getBlockByNumber')
 add_method_with_lock(testrpc.eth_newBlockFilter, 'eth_newBlockFilter')
+add_method_with_lock(testrpc.eth_newPendingTransactionFilter,
+                     'eth_newPendingTransactionFilter')
 add_method_with_lock(testrpc.eth_newFilter, 'eth_newFilter')
 add_method_with_lock(testrpc.eth_getFilterChanges, 'eth_getFilterChanges')
 add_method_with_lock(testrpc.eth_getFilterLogs, 'eth_getFilterLogs')
