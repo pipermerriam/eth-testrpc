@@ -231,7 +231,7 @@ class EthTesterClient(object):
 
     def get_code(self, address, block_number="latest"):
         block = self._get_block_by_number(block_number)
-        return encode_32bytes(block.get_code(strip_0x(address)))
+        return encode_data(block.get_code(strip_0x(address)))
 
     def send_transaction(self, *args, **kwargs):
         if self.is_async:
