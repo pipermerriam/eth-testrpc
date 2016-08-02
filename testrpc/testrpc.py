@@ -90,6 +90,13 @@ def eth_sendTransaction(transaction):
     return tester_client.send_transaction(**kwargs)
 
 
+def eth_estimateGas(transaction, block_number="latest"):
+    kwargs = {
+        TXN_KWARGS_MAP.get(k, k): v for k, v in transaction.items()
+    }
+    return tester_client.estimate_gas(**kwargs)
+
+
 def eth_sendRawTransaction(raw_tx):
     return tester_client.send_raw_transaction(raw_tx)
 
