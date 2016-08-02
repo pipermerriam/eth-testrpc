@@ -148,29 +148,30 @@ def eth_getTransactionReceipt(tx_hash):
         return None
 
 
-def eth_newBlockFilter():
+def eth_newBlockFilter(*args, **kwargs):
+    # TODO: convert to tester_client once filters implemented
+    raise NotImplementedError("This has not yet been implemented")
+
+
+def eth_newPendingTransactionFilter(*args, **kwargs):
     # TODO: convert to tester_client once filters implemented
     raise NotImplementedError("This has not yet been implemented")
 
 
 def eth_newFilter(filter_dict):
-    # TODO: convert to tester_client once filters implemented
-    raise NotImplementedError("This has not yet been implemented")
+    return tester_client.new_filter(**filter_dict)
 
 
 def eth_getFilterChanges(filter_id):
-    # TODO: convert to tester_client once filters implemented
-    raise NotImplementedError("This has not yet been implemented")
+    return tester_client.get_filter_changes(filter_id)
 
 
 def eth_getFilterLogs(filter_id):
-    # TODO: convert to tester_client once filters implemented
-    raise NotImplementedError("This has not yet been implemented")
+    return tester_client.get_filter_logs(filter_id)
 
 
 def eth_uninstallFilter(filter_id):
-    # TODO: convert to tester_client once filters implemented
-    raise NotImplementedError("This has not yet been implemented")
+    return tester_client.uninstall_filter(filter_id)
 
 
 RPC_META = {
