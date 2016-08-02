@@ -233,6 +233,18 @@ class EthTesterClient(object):
         block = self._get_block_by_number(block_number)
         return encode_data(block.get_code(strip_0x(address)))
 
+    def estimate_gas(self, *args, **kwargs):
+        snapshot_idx = self.snapshot_evm()
+
+        try:
+            txn_hash = self.send_transaction(*args, **kwargs)
+            txn_receipt = self.get_transaction_receipt(txn_hash)
+            gas_used = txn_receipt['gasUsed']
+        finally:
+            self.revert_evm(snapshot_idx)
+
+        return gas_used
+
     def send_transaction(self, *args, **kwargs):
         if self.is_async:
             kwargs['_mine'] = True
