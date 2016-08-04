@@ -101,14 +101,15 @@ class EthTesterClient(object):
             raise ValueError("No snapshots to revert to")
 
         if snapshot_idx is not None:
-            block_number, snapshot = self.snapshots[snapshot_idx]
+            block_number, snapshot = self.snapshots.pop(snapshot_idx)
         else:
             block_number, snapshot = self.snapshots.pop()
 
         # Remove all blocks after our saved block number.
-        del self.evm.blocks[block_number + 1:]
+        del self.evm.blocks[block_number:]
 
         self.evm.revert(snapshot)
+        self.evm.blocks.append(self.evm.block)
 
     def mine_block(self):
         self.evm.mine()
