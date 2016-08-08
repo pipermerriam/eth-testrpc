@@ -188,11 +188,18 @@ RPC_META = {
     'net_version': 1,
     'net_listening': False,
     'net_peerCount': 0,
+    'homestead_block_number': tester_client.evm.block.config['HOMESTEAD_FORK_BLKNUM'],
+    'dao_fork_block_number': tester_client.evm.block.config['DAO_FORK_BLKNUM'],
 }
 
 
 def rpc_configure(key, value):
     RPC_META[key] = value
+
+    if key == 'homestead_block_number':
+        tester_client.evm.block.config['HOMESTEAD_FORK_BLKNUM'] = value
+    elif key == 'dao_fork_block_number':
+        tester_client.evm.block.config['DAO_FORK_BLKNUM'] = value
 
 
 def eth_protocolVersion():

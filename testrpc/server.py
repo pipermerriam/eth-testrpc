@@ -99,3 +99,6 @@ def application(request):
         mimetype='application/json',
     )
     return response
+
+
+application.testrpc = testrpc
