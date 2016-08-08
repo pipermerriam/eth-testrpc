@@ -11,5 +11,5 @@ def test_estimate_gas(client, accounts):
         data=CONTRACT_BIN,
         value=1234,
     )
-    gas_estimate == int(hex_gas_estimate, 16)
+    gas_estimate = int(hex_gas_estimate, 16)
     assert gas_estimate > 50000
