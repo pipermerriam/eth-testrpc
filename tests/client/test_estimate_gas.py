@@ -6,9 +6,10 @@ CONTRACT_BIN = b'0x6060604052610114806100126000396000f360606040526000357c0100000
 
 
 def test_estimate_gas(client, accounts):
-    gas_estimate = client.estimate_gas(
+    hex_gas_estimate = client.estimate_gas(
         _from=accounts[0],
         data=CONTRACT_BIN,
         value=1234,
     )
-    assert gas_estimate == b'0x16c11'
+    gas_estimate = int(hex_gas_estimate, 16)
+    assert gas_estimate > 50000

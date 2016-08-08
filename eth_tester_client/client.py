@@ -63,11 +63,17 @@ class EthTesterClient(object):
     `ethereum.tester` facilities.
     """
     locked_accounts = None
+    homestead_block_number = 0
+    dao_fork_block_number = 0
+    dao_fork_support = True
 
     def __init__(self, async=True, async_timeout=10):
         self.snapshots = []
 
         self.reset_evm()
+
+        self.evm.block.config['HOMESTEAD_FORK_BLKNUM'] = self.homestead_block_number  # noqa
+        self.evm.block.config['DAO_FORK_BLKNUM'] = self.dao_fork_block_number
 
         self.is_async = async
         self.async_timeout = async_timeout
