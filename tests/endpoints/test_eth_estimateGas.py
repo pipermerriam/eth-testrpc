@@ -2,7 +2,7 @@ CONTRACT_BIN = b'0x6060604052610114806100126000396000f360606040526000357c0100000
 
 
 def test_eth_estimate_gas(rpc_client, accounts):
-    gas_estimate = rpc_client(
+    hex_gas_estimate = rpc_client(
         method="eth_estimateGas",
         params=[{
             "from": accounts[0],
@@ -10,4 +10,5 @@ def test_eth_estimate_gas(rpc_client, accounts):
             "value": 1234,
         }],
     )
-    assert gas_estimate == '0x16c11'
+    gas_estimate = int(hex_gas_estimate, 16)
+    assert gas_estimate > 50000
