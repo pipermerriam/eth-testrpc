@@ -77,4 +77,6 @@ def rpc_client(rpc_server):
             assert set(result.keys()) == {"id", "jsonrpc", "result"}
         return response.json()['result']
 
+    make_request.server = rpc_server
+
     return make_request

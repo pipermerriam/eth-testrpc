@@ -36,10 +36,9 @@ setup(
     install_requires=[
         'Werkzeug>=0.11.10',
         'json-rpc>=1.10.3',
-        # TODO: bump this once the next version of pyethereum is released.
-        'ethereum>1.3.6',
+        'ethereum>=1.5.2',
         'rlp>=0.4.4',
-        'ethereum-tester-client>=0.7.0',
+        'ethereum-tester-client>=0.9.0',
     ],
     entry_points={
         'console_scripts': [

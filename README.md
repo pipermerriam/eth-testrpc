@@ -93,11 +93,16 @@ static values returned by the following endpoints.
 * `net_version` (default `1`)
 * `net_listening` (default `False`)
 * `net_peerCount` (default `0`)
+* `homestead_block_number` (default `0`)
+* `dao_fork_block_number` (default `0`)
 
 The `rpc_configure` takes two parameters.
 
 * `key`: string representing the rpc method on which you want to change the return value.
 * `value`: the value that should be returned by the endpoint.
+
+The `homestead` and `dao` fork configurations determine which block number the
+fork rules should come into effect.  Both default to `0`.
 
 
 ### Releasing a new version (for eth-testrpc developers)
