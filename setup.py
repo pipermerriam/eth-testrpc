@@ -39,6 +39,7 @@ setup(
         'ethereum>=1.5.2',
         'rlp>=0.4.4',
         'ethereum-tester-client>=0.9.0',
+        'click>=6.6',
     ],
     entry_points={
         'console_scripts': [
