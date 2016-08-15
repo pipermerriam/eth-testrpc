@@ -38,7 +38,7 @@ def main(host, port):
 
     print("\nAvailable Accounts\n==================")
     for account in accounts:
-        print('0x' + codecs.encode(account, 'hex'))
+        print('0x' + codecs.decode(codecs.encode(account, 'hex'), 'utf8'))
 
     print("\nListening on %s:%s" % (host, port))
 
