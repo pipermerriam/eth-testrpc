@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import time
 import threading
+import codecs
 
 from wsgiref.simple_server import make_server
 import click
@@ -37,7 +38,7 @@ def main(host, port):
 
     print("\nAvailable Accounts\n==================")
     for account in accounts:
-        print('0x%s' % account.encode("hex"))
+        print('0x' + codecs.encode(account, 'hex'))
 
     print("\nListening on %s:%s" % (host, port))
 
