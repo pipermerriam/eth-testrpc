@@ -1,4 +1,9 @@
 ----
+Version 0.8.0
+================================
+
+8a453f48bf  Make library compliant with gevent needs.
+
 Version 0.7.0
 ================================
 
