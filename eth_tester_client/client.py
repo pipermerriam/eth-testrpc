@@ -252,12 +252,13 @@ class EthTesterClient(object):
 
             self.request_queue.put((request_id, args, kwargs))
             with gevent.Timeout(self.async_timeout):
-                if request_id in self.results:
-                    result = self.results.pop(request_id)
-                    if isinstance(result, Exception):
-                        raise result
-                    return encode_data(result)
-                gevent.sleep(0)
+                while True:
+                    if request_id in self.results:
+                        result = self.results.pop(request_id)
+                        if isinstance(result, Exception):
+                            raise result
+                        return encode_data(result)
+                    gevent.sleep(0)
             raise ValueError("Timeout waiting for {0}".format(request_id))
         else:
             self._send_transaction(*args, **kwargs)
