@@ -1,6 +1,11 @@
-import threading
-import socket
 import json
+
+import gevent
+from gevent import socket
+from gevent.pywsgi import (
+    WSGIServer,
+)
+
 import requests
 
 import pytest
@@ -24,7 +29,6 @@ def accounts():
 
 @pytest.yield_fixture()
 def rpc_server():
-    from wsgiref.simple_server import make_server
     from testrpc.server import application
     from testrpc.testrpc import full_reset
 
@@ -32,16 +36,15 @@ def rpc_server():
 
     port = get_open_port()
 
-    server = make_server('127.0.0.1', port, application)
-
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
-    thread.start()
+    server = WSGIServer(
+        ('127.0.0.1', port),
+        application,
+    )
+    gevent.spawn(server.serve_forever)
 
     yield server
 
-    server.shutdown()
-    server.server_close()
+    server.stop()
 
 
 nonce = 0
@@ -51,7 +54,7 @@ nonce = 0
 def rpc_client(rpc_server):
     from eth_tester_client.utils import force_obj_to_text
 
-    host, port = rpc_server.server_address
+    host, port = rpc_server.address
     endpoint = "http://{host}:{port}".format(host=host, port=port)
 
     def make_request(method, params=None, raise_on_error=True):
