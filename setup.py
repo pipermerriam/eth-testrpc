@@ -34,12 +34,13 @@ setup(
     keywords='ethereum blockchain development testing',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=[
-        'Werkzeug>=0.11.10',
-        'json-rpc>=1.10.3',
-        'ethereum>=1.5.2',
-        'rlp>=0.4.4',
-        'ethereum-tester-client>=1.0.0',
+        "gevent>=1.1.2",
         'click>=6.6',
+        'ethereum-tester-client>=1.0.0',
+        'ethereum>=1.5.2',
+        'json-rpc>=1.10.3',
+        'rlp>=0.4.4',
+        'Werkzeug>=0.11.10',
     ],
     entry_points={
         'console_scripts': [
