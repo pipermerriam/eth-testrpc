@@ -4,13 +4,13 @@ the `eth-testrpc` project by ConsenSys
 
 https://github.com/ConsenSys/eth-testrpc
 """
-import sys
 import time
 import uuid
 import itertools
 import functools
 
 import gevent
+from gevent.queue import Queue
 
 import rlp
 
@@ -44,13 +44,6 @@ from .filters import (
     process_block,
     get_filter_bounds,
 )
-
-
-if sys.version_info.major == 2:
-    from Queue import Queue
-
-else:
-    from queue import Queue
 
 
 # Set the gas
@@ -256,15 +249,16 @@ class EthTesterClient(object):
         if self.is_async:
             kwargs['_mine'] = True
             request_id = uuid.uuid4()
+
             self.request_queue.put((request_id, args, kwargs))
-            start = time.time()
-            while time.time() - start < self.async_timeout:
-                gevent.sleep(0.1)
-                if request_id in self.results:
-                    result = self.results.pop(request_id)
-                    if isinstance(result, Exception):
-                        raise result
-                    return encode_data(result)
+            with gevent.Timeout(self.async_timeout):
+                while True:
+                    if request_id in self.results:
+                        result = self.results.pop(request_id)
+                        if isinstance(result, Exception):
+                            raise result
+                        return encode_data(result)
+                    gevent.sleep(0)
             raise ValueError("Timeout waiting for {0}".format(request_id))
         else:
             self._send_transaction(*args, **kwargs)
