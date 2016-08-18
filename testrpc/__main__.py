@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import random
-import time
 import codecs
 
 import gevent
@@ -55,7 +54,7 @@ def main(host, port):
 
     try:
         while True:
-            time.sleep(random.random())
+            gevent.sleep(random.random())
     except KeyboardInterrupt:
         server.stop()
 

@@ -1,12 +1,14 @@
 import os
 import signal
 
+import gevent
+
 from click.testing import CliRunner
 
 from testrpc.testrpc import (
     web3_clientVersion,
 )
-import gevent
+
 from testrpc.__main__ import main
 
 
