@@ -1,6 +1,7 @@
 import json
 import functools
-from threading import Lock
+
+from gevent.threading import Lock
 
 from werkzeug.wrappers import Request, Response
 

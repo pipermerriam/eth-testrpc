@@ -1,10 +1,13 @@
 from __future__ import print_function
 
-import time
-import threading
+import random
 import codecs
 
-from wsgiref.simple_server import make_server
+import gevent
+from gevent.pywsgi import (
+    WSGIServer,
+)
+
 import click
 
 from ethereum.tester import (
@@ -42,18 +45,18 @@ def main(host, port):
 
     print("\nListening on %s:%s" % (host, port))
 
-    server = make_server(host, port, application)
+    server = WSGIServer(
+        (host, port),
+        application,
+    )
 
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
-    thread.start()
+    gevent.spawn(server.serve_forever)
 
     try:
         while True:
-            time.sleep(0.1)
+            gevent.sleep(random.random())
     except KeyboardInterrupt:
-        server.shutdown()
-        server.server_close()
+        server.stop()
 
 
 if __name__ == "__main__":
