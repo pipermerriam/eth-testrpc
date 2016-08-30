@@ -8,7 +8,7 @@ from eth_tester_client import EthTesterClient
 
 
 def test_async_requests():
-    client = EthTesterClient(async=True, async_timeout=60)
+    client = EthTesterClient()
 
     threads = []
     errors = []

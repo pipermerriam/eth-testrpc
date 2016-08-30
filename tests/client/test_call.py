@@ -52,7 +52,6 @@ CONTRACT_SOURCE = (
 
 
 def test_eth_call(client, accounts):
-    client.is_async = False
     txn_hash = client.send_transaction(
         _from=accounts[0],
         data=CONTRACT_BIN,

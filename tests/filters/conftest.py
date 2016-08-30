@@ -101,7 +101,6 @@ def EMITTER_ABI():
 
 @pytest.fixture()
 def emitter_contract_address(client, accounts, EMITTER_CODE):
-    client.is_async = False
     txn_hash = client.send_transaction(
         _from=accounts[0],
         data=EMITTER_CODE,
@@ -115,8 +114,6 @@ def emitter_contract_address(client, accounts, EMITTER_CODE):
 
 @pytest.fixture()
 def call_emitter_contract(client, accounts, emitter_contract_address):
-    client.is_async = False
-
     def _call_emitter_contract(method_signature, arguments=None):
         if arguments is None:
             arguments = []
