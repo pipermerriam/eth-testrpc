@@ -26,12 +26,33 @@ logger = logging.getLogger(__name__)
 #
 # Global Client
 #
-tester_client = EthTesterClient()
+
+tester_client = None
+
+RPC_META = None
 
 
 def full_reset():
+    """Initial/reset global tester client instance and chain metadata.
+
+    As this EthTesterClient depends on gevent, we cannot do this
+    during import time, or any software without explicit gevent support
+    will crash.
+    """
     global tester_client
+    global RPC_META
     tester_client = EthTesterClient()
+
+    RPC_META = {
+        'eth_protocolVersion': 63,
+        'eth_syncing': False,
+        'eth_mining': True,
+        'net_version': 1,
+        'net_listening': False,
+        'net_peerCount': 0,
+        'homestead_block_number': tester_client.evm.block.config['HOMESTEAD_FORK_BLKNUM'],
+        'dao_fork_block_number': tester_client.evm.block.config['DAO_FORK_BLKNUM'],
+    }
 
 
 #
@@ -180,17 +201,6 @@ def eth_getFilterLogs(filter_id):
 def eth_uninstallFilter(filter_id):
     return tester_client.uninstall_filter(filter_id)
 
-
-RPC_META = {
-    'eth_protocolVersion': 63,
-    'eth_syncing': False,
-    'eth_mining': True,
-    'net_version': 1,
-    'net_listening': False,
-    'net_peerCount': 0,
-    'homestead_block_number': tester_client.evm.block.config['HOMESTEAD_FORK_BLKNUM'],
-    'dao_fork_block_number': tester_client.evm.block.config['DAO_FORK_BLKNUM'],
-}
 
 
 def rpc_configure(key, value):
