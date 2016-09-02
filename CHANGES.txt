@@ -1,4 +1,9 @@
-----
+Version 0.8.1
+================================
+
+- Bugfix for kwargs being passed down into new_filter method on
+  ethereum-tester-client
+
 Version 0.8.0
 ================================
 
