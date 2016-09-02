@@ -1,3 +1,8 @@
+Version 0.8.3
+================================
+
+- Upstream bugfix for transaction logs.
+
 Version 0.8.2
 ================================
 
