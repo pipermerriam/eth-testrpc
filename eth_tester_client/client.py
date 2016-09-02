@@ -469,6 +469,8 @@ class EthTesterClient(object):
             filter_topics=log_filter['topics'],
         )
 
-        return list(itertools.chain.from_iterable((
+        all_log_entries = list(itertools.chain.from_iterable((
             block_processor_fn(block) for block in self.evm.blocks[block_slice]
         )))
+
+        return all_log_entries

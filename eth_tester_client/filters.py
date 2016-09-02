@@ -67,13 +67,15 @@ def check_if_topics_match(filter_topics, log_topics):
 @coerce_args_to_bytes
 def check_if_log_matches(log_entry, from_block, to_block,
                          addresses, filter_topics):
+    log_block_number = int(log_entry['blockNumber'], 16)
+
     #
     # validate `from_block` (left bound)
     #
     if is_string(from_block):
         pass
     elif is_numeric(from_block):
-        if from_block > log_entry['blockNumber']:
+        if from_block > log_block_number:
             return False
     else:
         raise TypeError("Invalid `from_block`")
@@ -84,7 +86,7 @@ def check_if_log_matches(log_entry, from_block, to_block,
     if is_string(to_block):
         pass
     elif is_numeric(to_block):
-        if to_block < log_entry['blockNumber']:
+        if to_block < log_block_number:
             return False
     else:
         raise TypeError("Invalid `to_block`")
@@ -150,6 +152,6 @@ def get_filter_bounds(from_block, to_block, bookmark=None):
     elif to_block == "pending":
         right_bound = None
     else:
-        right_bound = to_block
+        right_bound = to_block + 1
 
     return slice(left_bound, right_bound)
