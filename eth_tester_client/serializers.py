@@ -65,7 +65,6 @@ def serialize_log(block, txn, txn_index, log, log_index):
         "data": encode_data(log.data),
         "topics": [
             encode_number(topic, 32) for topic in log.topics
-            for topic in log.topics
         ],
     }
 
