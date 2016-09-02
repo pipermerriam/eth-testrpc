@@ -56,6 +56,9 @@ def make_log_entry(block_number=1,
     (
         (make_log_filter(), make_log_entry(), True),
         (make_log_filter(), make_log_entry(topics=['a']), True),
+        (make_log_filter(from_block=1, to_block=2), make_log_entry(block_number=1), True),
+        (make_log_filter(from_block=1, to_block=2), make_log_entry(block_number=2), True),
+        (make_log_filter(from_block=1, to_block=2), make_log_entry(block_number=3), False),
     ),
 )
 def test_check_if_filter_matches_log(log_filter, log_entry, expected):
