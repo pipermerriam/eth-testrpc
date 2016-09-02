@@ -14,7 +14,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='eth-testrpc',
-    version="0.8.1",
+    version="0.8.2",
     description='An Ethereum simulator for aiding smart contract development.',
     long_description=long_description,
     url='https://github.com/pipermerriam/eth-testrpc',
@@ -35,12 +35,12 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=[
         "gevent>=1.1.2",
+        'Werkzeug>=0.11.10',
         'click>=6.6',
         'ethereum-tester-client>=1.1.1',
         'ethereum>=1.5.2',
         'json-rpc>=1.10.3',
         'rlp>=0.4.4',
-        'Werkzeug>=0.11.10',
     ],
     entry_points={
         'console_scripts': [
