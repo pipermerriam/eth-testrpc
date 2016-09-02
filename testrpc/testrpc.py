@@ -165,8 +165,17 @@ def eth_newPendingTransactionFilter(*args, **kwargs):
     raise NotImplementedError("This has not yet been implemented")
 
 
+FILTER_KWARGS_MAP = {
+    'fromBlock': 'from_block',
+    'toBlock': 'to_block',
+}
+
+
 def eth_newFilter(filter_dict):
-    return tester_client.new_filter(**filter_dict)
+    kwargs = {
+        FILTER_KWARGS_MAP.get(k, k): v for k, v in filter_dict.items()
+    }
+    return tester_client.new_filter(**kwargs)
 
 
 def eth_getFilterChanges(filter_id):
