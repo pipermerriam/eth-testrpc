@@ -366,7 +366,7 @@ class EthTesterClient(object):
 
     log_filters = None
 
-    def new_filter(self, from_block="latest", to_block="latest", address=None, topics=None):
+    def new_filter(self, from_block=None, to_block=None, address=None, topics=None):
         if topics is None:
             topics = []
 

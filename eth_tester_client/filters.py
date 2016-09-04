@@ -72,7 +72,7 @@ def check_if_log_matches(log_entry, from_block, to_block,
     #
     # validate `from_block` (left bound)
     #
-    if is_string(from_block):
+    if from_block is None or is_string(from_block):
         pass
     elif is_numeric(from_block):
         if from_block > log_block_number:
@@ -83,7 +83,7 @@ def check_if_log_matches(log_entry, from_block, to_block,
     #
     # validate `to_block` (left bound)
     #
-    if is_string(to_block):
+    if to_block is None or is_string(to_block):
         pass
     elif is_numeric(to_block):
         if to_block < log_block_number:
@@ -136,6 +136,8 @@ def process_block(block, from_block, to_block, addresses, filter_topics):
 def get_filter_bounds(from_block, to_block, bookmark=None):
     if bookmark is not None:
         left_bound = bookmark
+    elif from_block is None:
+        left_bound = None
     elif from_block == "latest":
         left_bound = -1
     elif from_block == "earliest":
@@ -145,7 +147,9 @@ def get_filter_bounds(from_block, to_block, bookmark=None):
     else:
         left_bound = from_block
 
-    if to_block == "latest":
+    if to_block is None:
+        right_bound = None
+    elif to_block == "latest":
         right_bound = None
     elif to_block == "earliest":
         right_bound = 1

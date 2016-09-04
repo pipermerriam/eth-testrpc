@@ -200,7 +200,9 @@ def mk_random_privkey():
 
 
 def is_valid_block_identifier(block_identifier):
-    if is_integer(block_identifier):
+    if block_identifier is None:
+        return True
+    elif is_integer(block_identifier):
         return True
     elif is_string(block_identifier):
         return force_text(block_identifier) in {"latest", "pending", "earliest"}
