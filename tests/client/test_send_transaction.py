@@ -1,5 +1,7 @@
 import pytest
 
+from ethereum import tester
+
 
 CONTRACT_BIN = b'0x6060604052610114806100126000396000f360606040526000357c01000000000000000000000000000000000000000000000000000000009004806316216f391461004f578063a5f3c23b14610072578063dcf537b1146100a75761004d565b005b61005c60048050506100d3565b6040518082815260200191505060405180910390f35b61009160048080359060200190919080359060200190919050506100e6565b6040518082815260200191505060405180910390f35b6100bd60048080359060200190919050506100fd565b6040518082815260200191505060405180910390f35b6000600d905080508090506100e3565b90565b6000818301905080508090506100f7565b92915050565b6000600782029050805080905061010f565b91905056'
 
@@ -25,6 +27,40 @@ def test_send_transaction(client, txn_kwargs):
 
     txn_hash = client.send_transaction(**kwargs)
     assert txn_hash
+
+
+def test_default_gas_is_full_gas_limit(client):
+    kwargs = {
+        '_from': b'0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1',
+        'to': b'0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1',
+        'value': 1,
+    }
+
+    txn_hash = client.send_transaction(**kwargs)
+    assert txn_hash
+
+    txn = client.get_transaction_by_hash(txn_hash)
+    txn_gas = int(txn['gas'], 16)
+    assert txn_gas == tester.gas_limit
+
+
+def test_can_specify_gas(client):
+    kwargs = {
+        '_from': b'0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1',
+        'to': b'0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1',
+        'value': 1,
+        'gas': 123456,
+    }
+    initial_tester_gas_limit = tester.gas_limit
+
+    txn_hash = client.send_transaction(**kwargs)
+    assert txn_hash
+
+    txn = client.get_transaction_by_hash(txn_hash)
+    txn_gas = int(txn['gas'], 16)
+    assert txn_gas != tester.gas_limit
+    assert txn_gas == 123456
+    assert tester.gas_limit == initial_tester_gas_limit
 
 
 def test_deploying_contract(client, accounts):

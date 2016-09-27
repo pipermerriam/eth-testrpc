@@ -206,7 +206,13 @@ class EthTesterClient(object):
 
         data = decode_hex(data)
 
-        output = self.evm.send(sender=sender, to=to, value=value, evmdata=data)
+        try:
+            if gas is not None:
+                t.gas_limit = gas
+            output = self.evm.send(sender=sender, to=to, value=value, evmdata=data)
+        finally:
+            t.gas_limit = t.GAS_LIMIT
+
         return output
 
     #
@@ -253,7 +259,8 @@ class EthTesterClient(object):
         return self.send_transaction(
             _from=_from,
             to=to,
-            gas=tx.gasprice,
+            gas_price=tx.gasprice,
+            gas=tx.startgas,
             value=tx.value,
             data=data,
         )
