@@ -80,6 +80,7 @@ def eth_blockNumber():
 
 TXN_KWARGS_MAP = {
     'from': '_from',
+    'gasPrice': 'gas_price',
 }
 
 
