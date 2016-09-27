@@ -206,7 +206,15 @@ class EthTesterClient(object):
 
         data = decode_hex(data)
 
-        output = self.evm.send(sender=sender, to=to, value=value, evmdata=data)
+        try:
+            if gas is not None:
+                saved_gas_limit = t.gas_limit
+                t.gas_limit = gas
+            output = self.evm.send(sender=sender, to=to, value=value, evmdata=data)
+        finally:
+            if gas is not None:
+                t.gas_limit = saved_gas_limit
+
         return output
 
     #
