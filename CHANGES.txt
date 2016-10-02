@@ -1,3 +1,8 @@
+Version 0.8.5
+================================
+
+- Conform to RPC api and accept hex values as inputs to transaction endpoints
+
 Version 0.8.4
 ================================
 
