@@ -37,7 +37,7 @@ setup(
         "gevent>=1.1.2",
         'Werkzeug>=0.11.10',
         'click>=6.6',
-        'ethereum-tester-client>=1.2.1',
+        'ethereum-tester-client>=1.2.3',
         'ethereum>=1.5.2',
         'json-rpc>=1.10.3',
         'rlp>=0.4.4',

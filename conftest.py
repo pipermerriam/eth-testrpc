@@ -30,6 +30,15 @@ def accounts():
     return [normalize_address(acct) for acct in tester.accounts]
 
 
+@pytest.fixture(scope="session")
+def hex_accounts(accounts):
+    from eth_tester_client.utils import (
+        encode_address,
+        force_text,
+    )
+    return [force_text(encode_address(acct)) for acct in accounts]
+
+
 @pytest.yield_fixture()
 def rpc_server():
     from testrpc.server import application
