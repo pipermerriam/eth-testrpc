@@ -16,6 +16,8 @@ from eth_tester_client.utils import (
     encode_32bytes,
 )
 
+from .utils import input_transaction_formatter
+
 
 __version__ = pkg_resources.get_distribution("eth-testrpc").version
 
@@ -78,23 +80,14 @@ def eth_blockNumber():
     return encode_number(tester_client.get_block_number())
 
 
-TXN_KWARGS_MAP = {
-    'from': '_from',
-}
-
-
 def eth_sendTransaction(transaction):
-    kwargs = {
-        TXN_KWARGS_MAP.get(k, k): v for k, v in transaction.items()
-    }
-    return tester_client.send_transaction(**kwargs)
+    formatted_transaction = input_transaction_formatter(transaction)
+    return tester_client.send_transaction(**formatted_transaction)
 
 
 def eth_estimateGas(transaction, block_number="latest"):
-    kwargs = {
-        TXN_KWARGS_MAP.get(k, k): v for k, v in transaction.items()
-    }
-    return tester_client.estimate_gas(**kwargs)
+    formatted_transaction = input_transaction_formatter(transaction)
+    return tester_client.estimate_gas(**formatted_transaction)
 
 
 def eth_sendRawTransaction(raw_tx):
@@ -102,10 +95,8 @@ def eth_sendRawTransaction(raw_tx):
 
 
 def eth_call(transaction, block_number="latest"):
-    kwargs = {
-        TXN_KWARGS_MAP.get(k, k): v for k, v in transaction.items()
-    }
-    return tester_client.call(**kwargs)
+    formatted_transaction = input_transaction_formatter(transaction)
+    return tester_client.call(**formatted_transaction)
 
 
 def eth_accounts():
@@ -272,7 +263,5 @@ def personal_unlockAccount(address, passphrase, duration=None):
 
 
 def personal_signAndSendTransaction(transaction, passphrase):
-    txn_kwargs = {
-        TXN_KWARGS_MAP.get(k, k): v for k, v in transaction.items()
-    }
-    return tester_client.send_and_sign_transaction(passphrase, **txn_kwargs)
+    formatted_transaction = input_transaction_formatter(transaction)
+    return tester_client.send_and_sign_transaction(passphrase, **formatted_transaction)
