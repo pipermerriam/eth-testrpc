@@ -63,6 +63,25 @@ def test_can_specify_gas(client):
     assert tester.gas_limit == initial_tester_gas_limit
 
 
+def test_can_specify_gas_price(client):
+    kwargs = {
+        '_from': b'0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1',
+        'to': b'0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1',
+        'value': 1,
+        'gas_price': 1234,
+    }
+    initial_tester_gas_price = tester.gas_price
+
+    txn_hash = client.send_transaction(**kwargs)
+    assert txn_hash
+
+    txn = client.get_transaction_by_hash(txn_hash)
+    txn_gas_price = int(txn['gasPrice'], 16)
+    assert txn_gas_price != tester.gas_price
+    assert txn_gas_price == 1234
+    assert tester.gas_price == initial_tester_gas_price
+
+
 def test_deploying_contract(client, accounts):
     txn_hash = client.send_transaction(
         _from=accounts[0],
