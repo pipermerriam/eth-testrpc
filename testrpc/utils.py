@@ -5,6 +5,13 @@ def normalize_number(value):
         return int(value)
 
 
+def normalize_block_number(value):
+    try:
+        return normalize_number(value)
+    except ValueError:
+        return value
+
+
 def noop(value):
     return value
 
