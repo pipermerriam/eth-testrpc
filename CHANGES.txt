@@ -1,3 +1,8 @@
+Version 0.8.6
+================================
+
+- Conform to RPC api and accept hex values as block numbers
+
 Version 0.8.5
 ================================
 
