@@ -16,7 +16,10 @@ from eth_tester_client.utils import (
     encode_32bytes,
 )
 
-from .utils import input_transaction_formatter
+from .utils import (
+    input_transaction_formatter,
+    normalize_block_number,
+)
 
 
 __version__ = pkg_resources.get_distribution("eth-testrpc").version
@@ -113,15 +116,18 @@ def eth_compileSolidity(code):
 
 
 def eth_getCode(address, block_number="latest"):
-    return tester_client.get_code(address, block_number)
+    return tester_client.get_code(address, normalize_block_number(block_number))
 
 
 def eth_getBalance(address, block_number="latest"):
-    return tester_client.get_balance(address, block_number)
+    return tester_client.get_balance(address, normalize_block_number(block_number))
 
 
 def eth_getTransactionCount(address, block_number="latest"):
-    return encode_number(tester_client.get_transaction_count(address, block_number))
+    return encode_number(tester_client.get_transaction_count(
+        address,
+        normalize_block_number(block_number),
+    ))
 
 
 def eth_getTransactionByHash(tx_hash):
@@ -136,7 +142,7 @@ def eth_getBlockByHash(block_hash, full_tx=True):
 
 
 def eth_getBlockByNumber(block_number, full_tx=True):
-    return tester_client.get_block_by_number(block_number, full_tx)
+    return tester_client.get_block_by_number(normalize_block_number(block_number), full_tx)
 
 
 def eth_getTransactionReceipt(tx_hash):
