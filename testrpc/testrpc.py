@@ -18,6 +18,7 @@ from eth_tester_client.utils import (
 
 from .utils import (
     input_transaction_formatter,
+    input_filter_params_formatter,
     normalize_block_number,
 )
 
@@ -168,11 +169,9 @@ FILTER_KWARGS_MAP = {
 }
 
 
-def eth_newFilter(filter_dict):
-    kwargs = {
-        FILTER_KWARGS_MAP.get(k, k): v for k, v in filter_dict.items()
-    }
-    return tester_client.new_filter(**kwargs)
+def eth_newFilter(filter_params):
+    formatted_filter_params = input_filter_params_formatter(filter_params)
+    return tester_client.new_filter(**formatted_filter_params)
 
 
 def eth_getFilterChanges(filter_id):
