@@ -199,12 +199,10 @@ def mk_random_privkey():
     return decode_hex(encode_number(random.getrandbits(256), 32))
 
 
-def is_valid_block_identifier(block_identifier):
+def normalize_block_identifier(block_identifier):
     if block_identifier is None:
-        return True
-    elif is_integer(block_identifier):
-        return True
-    elif is_string(block_identifier):
-        return force_text(block_identifier) in {"latest", "pending", "earliest"}
+        return None
+    elif block_identifier in ["latest", "earliest", "pending"]:
+        return block_identifier
     else:
-        raise TypeError("invalid type")
+        return normalize_number(block_identifier)

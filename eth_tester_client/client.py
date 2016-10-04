@@ -29,9 +29,8 @@ from .utils import (
     normalize_address,
     decode_hex,
     mk_random_privkey,
-    is_valid_block_identifier,
     is_array,
-)
+    normalize_block_identifier)
 from .serializers import (
     serialize_txn,
     serialize_txn_receipt,
@@ -383,10 +382,14 @@ class EthTesterClient(object):
         if address is None:
             address = []
 
-        if not is_valid_block_identifier(from_block):
+        try:
+            from_block = normalize_block_identifier(from_block)
+        except ValueError:
             raise ValueError("Invalid filter parameter for `from_block`")
 
-        if not is_valid_block_identifier(to_block):
+        try:
+            to_block = normalize_block_identifier(to_block)
+        except ValueError:
             raise ValueError("Invalid filter parameter for `to_block`")
 
         if is_string(address):
