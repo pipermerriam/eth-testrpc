@@ -25,6 +25,19 @@ def test_new_filter_with_single_no_args_event(client, call_emitter_contract,
     assert LogTopics.LogNoArguments in log_entry['topics']
 
 
+def test_new_filter_block_numbers_hex(client, call_emitter_contract,
+                                      Events, LogFunctions, LogTopics):
+    filter_id = client.new_filter(from_block="0x0", to_block="0x1", address=[], topics=[])
+
+    txn_hash = call_emitter_contract(LogFunctions.logNoArgs, [Events.LogNoArguments])
+
+    changes = client.get_filter_changes(filter_id)
+
+    assert len(changes) == 1
+    log_entry = changes[0]
+    assert LogTopics.LogNoArguments in log_entry['topics']
+
+
 def test_new_filter_with_anonymous_event(client, call_emitter_contract,
                                          LogFunctions, Events):
     filter_id = client.new_filter(from_block="earliest", to_block="latest", address=[], topics=[])
