@@ -247,8 +247,10 @@ class EthTesterClient(object):
         return gas_used
 
     def send_transaction(self, *args, **kwargs):
-        self._send_transaction(*args, **kwargs)
-        self.mine_block()
+        try:
+            self._send_transaction(*args, **kwargs)
+        finally:
+            self.mine_block()
         return encode_32bytes(self.evm.last_tx.hash)
 
     def send_raw_transaction(self, raw_tx):
