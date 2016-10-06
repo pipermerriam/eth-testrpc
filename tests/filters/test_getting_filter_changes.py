@@ -4,7 +4,7 @@ from sha3 import sha3_256
 assert sha3_256(b'').hexdigest() == 'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
 
-from eth_tester_client.utils import (
+from testrpc.client.utils import (
     force_bytes,
 )
 

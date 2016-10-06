@@ -1,7 +1,7 @@
 import pytest
 
-from eth_tester_client.filters import *
-from eth_tester_client.filters import (
+from testrpc.client.filters import *
+from testrpc.client.filters import (
     check_filter_topics_validity,
 )
 

@@ -1,6 +1,6 @@
 import pytest
 
-from eth_tester_client.filters import check_if_topics_match
+from testrpc.client.filters import check_if_topics_match
 
 
 @pytest.mark.parametrize(

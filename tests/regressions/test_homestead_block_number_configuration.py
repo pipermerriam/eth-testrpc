@@ -1,4 +1,4 @@
-from eth_tester_client import EthTesterClient
+from testrpc.client import EthTesterClient
 
 
 def test_homestead_block_defaults_to_0():

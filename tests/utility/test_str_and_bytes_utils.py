@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import pytest
-from eth_tester_client.utils import (
+from testrpc.client.utils import (
     is_text,
     is_binary,
     force_text,

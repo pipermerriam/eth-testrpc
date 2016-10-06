@@ -6,7 +6,7 @@ from rlp.utils import (
 
 from ethereum.utils import sha3
 
-from eth_tester_client.utils import (
+from testrpc.client.utils import (
     force_bytes,
     encode_data,
     decode_hex,

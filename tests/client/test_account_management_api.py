@@ -2,7 +2,7 @@ import time
 import pytest
 
 from ethereum import tester
-from eth_tester_client.utils import mk_random_privkey
+from testrpc.client.utils import mk_random_privkey
 
 
 def test_import_raw_key(client):

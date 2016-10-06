@@ -14,7 +14,7 @@ import textwrap
 
 from ethereum.utils import sha3
 
-from eth_tester_client.utils import (
+from testrpc.client.utils import (
     encode_number,
     encode_hex,
     encode_data,
@@ -34,14 +34,14 @@ def get_open_port():
 @pytest.fixture(scope="session")
 def accounts():
     from ethereum import tester
-    from eth_tester_client.utils import normalize_address
+    from testrpc.client.utils import normalize_address
     return [normalize_address(acct) for acct in tester.accounts]
     #  return [b"0x" + encode_hex(acct) for acct in tester.accounts]
 
 
 @pytest.fixture(scope="session")
 def hex_accounts(accounts):
-    from eth_tester_client.utils import (
+    from testrpc.client.utils import (
         encode_address,
         force_text,
     )
@@ -73,7 +73,7 @@ nonce = 0
 
 @pytest.fixture()
 def rpc_client(rpc_server):
-    from eth_tester_client.utils import force_obj_to_text
+    from testrpc.client.utils import force_obj_to_text
 
     host, port = rpc_server.address
     endpoint = "http://{host}:{port}".format(host=host, port=port)
@@ -108,7 +108,7 @@ def rpc_client(rpc_server):
 
 @pytest.fixture
 def client():
-    from eth_tester_client import EthTesterClient
+    from testrpc.client import EthTesterClient
     return EthTesterClient()
 
 

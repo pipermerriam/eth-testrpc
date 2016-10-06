@@ -1,11 +1,11 @@
 import pytest
 
-from eth_tester_client.utils import (
+from testrpc.client.utils import (
     encode_number,
     encode_data,
     coerce_args_to_bytes,
 )
-from eth_tester_client.filters import (
+from testrpc.client.filters import (
     check_if_log_matches,
 )
 

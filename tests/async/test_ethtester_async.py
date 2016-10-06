@@ -4,7 +4,7 @@ import gevent
 from ethereum import tester
 from ethereum import utils
 
-from eth_tester_client import EthTesterClient
+from testrpc.client import EthTesterClient
 
 
 def test_async_requests():

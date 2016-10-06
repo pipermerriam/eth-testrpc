@@ -8,7 +8,7 @@ from werkzeug.wrappers import Request, Response
 from jsonrpc import JSONRPCResponseManager, dispatcher
 
 from . import testrpc
-from eth_tester_client.utils import (
+from .client.utils import (
     force_obj_to_text,
 )
 

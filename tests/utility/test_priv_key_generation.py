@@ -1,4 +1,4 @@
-from eth_tester_client.utils import mk_random_privkey
+from testrpc.client.utils import mk_random_privkey
 
 
 def test_priv_key_generation():
