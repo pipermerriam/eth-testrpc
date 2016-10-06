@@ -1,5 +1,7 @@
 # Ethereum Test RPC server
 
+[![Join the chat at https://gitter.im/pipermerriam/eth-testrpc](https://badges.gitter.im/pipermerriam/eth-testrpc.svg)](https://gitter.im/pipermerriam/eth-testrpc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Ethereum Test RPC
 
 Limited RPC client intended for use with automated testing. Uses
