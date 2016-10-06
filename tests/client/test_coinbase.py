@@ -1,2 +1,2 @@
-def test_coinbase(client, accounts):
-    assert client.get_coinbase() == accounts[0]
+def test_coinbase(client, hex_accounts):
+    assert client.get_coinbase() == hex_accounts[0]

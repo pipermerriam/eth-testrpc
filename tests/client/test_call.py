@@ -51,9 +51,9 @@ CONTRACT_SOURCE = (
 }""")
 
 
-def test_eth_call(client, accounts):
+def test_eth_call(client, hex_accounts):
     txn_hash = client.send_transaction(
-        _from=accounts[0],
+        _from=hex_accounts[0],
         data=CONTRACT_BIN,
         value=1234,
     )
@@ -65,7 +65,7 @@ def test_eth_call(client, accounts):
     function_sig = encode_data(sha3("return13()")[:4])
 
     should_be_13 = client.call(
-        _from=accounts[0],
+        _from=hex_accounts[0],
         to=contract_address,
         data=function_sig,
     )

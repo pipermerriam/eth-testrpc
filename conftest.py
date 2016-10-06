@@ -45,7 +45,7 @@ def hex_accounts(accounts):
         encode_address,
         force_text,
     )
-    return [force_text(encode_address(acct)) for acct in accounts]
+    return [encode_address(acct) for acct in accounts]
 
 
 @pytest.yield_fixture()

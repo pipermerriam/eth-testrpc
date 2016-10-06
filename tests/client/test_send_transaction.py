@@ -82,9 +82,9 @@ def test_can_specify_gas_price(client):
     assert tester.gas_price == initial_tester_gas_price
 
 
-def test_deploying_contract(client, accounts):
+def test_deploying_contract(client, hex_accounts):
     txn_hash = client.send_transaction(
-        _from=accounts[0],
+        _from=hex_accounts[0],
         data=CONTRACT_BIN,
         value=1234,
     )

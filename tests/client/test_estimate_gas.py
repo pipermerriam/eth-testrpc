@@ -5,9 +5,9 @@ CONTRACT_BIN = b'0x6060604052610114806100126000396000f360606040526000357c0100000
 
 
 
-def test_estimate_gas(client, accounts):
+def test_estimate_gas(client, hex_accounts):
     hex_gas_estimate = client.estimate_gas(
-        _from=accounts[0],
+        _from=hex_accounts[0],
         data=CONTRACT_BIN,
         value=1234,
     )

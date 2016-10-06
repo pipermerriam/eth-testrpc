@@ -42,9 +42,9 @@ CONTRACT_SOURCE = (
 }""")
 
 
-def test_get_code(client, accounts):
+def test_get_code(client, hex_accounts):
     txn_hash = client.send_transaction(
-        _from=accounts[0],
+        _from=hex_accounts[0],
         data=CONTRACT_BIN,
         value=1234,
     )
@@ -57,6 +57,6 @@ def test_get_code(client, accounts):
     assert force_bytes(code) == force_bytes(CONTRACT_BIN_RUNTIME)
 
 
-def test_get_code_non_contract(client, accounts):
+def test_get_code_non_contract(client, hex_accounts):
     code = client.get_code('0xd3cda913deb6f67967b99d67acdfa1712c293601')
     assert force_bytes(code) == b'0x'

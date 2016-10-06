@@ -1,7 +1,7 @@
-def test_get_block_by_hash(client, accounts):
+def test_get_block_by_hash(client, hex_accounts):
     tx_hash = client.send_transaction(
-        _from=accounts[0],
-        to=accounts[1],
+        _from=hex_accounts[0],
+        to=hex_accounts[1],
         value=1234,
         data="0x1234",
         gas=100000,

@@ -1,17 +1,17 @@
-def test_get_block_with_no_transactions(client, accounts):
+def test_get_block_with_no_transactions(client, hex_accounts):
     client.wait_for_block(1)
 
     block = client.get_block_by_number(1)
 
     assert block['number'] == b"0x1"
-    assert block['miner'] == accounts[0]
+    assert block['miner'] == hex_accounts[0]
     assert len(block['transactions']) == 0
 
 
-def test_get_block_with_transactions(client, accounts):
+def test_get_block_with_transactions(client, hex_accounts):
     tx_hash = client.send_transaction(
-        _from=accounts[0],
-        to=accounts[1],
+        _from=hex_accounts[0],
+        to=hex_accounts[1],
         value=1234,
         data="0x1234",
         gas=100000,

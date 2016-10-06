@@ -1,3 +1,4 @@
+from testrpc.client.utils import force_text
 
 def test_eth_sendTransaction(rpc_client, accounts, hex_accounts):
     result = rpc_client(
@@ -18,8 +19,8 @@ def test_eth_sendTransaction(rpc_client, accounts, hex_accounts):
         method="eth_getTransactionByHash",
         params=[result],
     )
-    assert txn['from'] == hex_accounts[0]
-    assert txn['to'] == hex_accounts[1]
+    assert txn['from'] == force_text(hex_accounts[0])
+    assert txn['to'] == force_text(hex_accounts[1])
     assert txn['value'] == hex(1234)
     assert txn['input'] == '0x1234'
     assert txn['gas'] == hex(100000)
@@ -45,8 +46,8 @@ def test_eth_sendTransaction_with_hex_values(rpc_client, accounts, hex_accounts)
         method="eth_getTransactionByHash",
         params=[result],
     )
-    assert txn['from'] == hex_accounts[0]
-    assert txn['to'] == hex_accounts[1]
+    assert txn['from'] == force_text(hex_accounts[0])
+    assert txn['to'] == force_text(hex_accounts[1])
     assert txn['value'] == hex(1234)
     assert txn['input'] == '0x1234'
     assert txn['gas'] == hex(100000)

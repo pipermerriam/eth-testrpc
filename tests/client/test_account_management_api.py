@@ -29,95 +29,95 @@ def test_new_account(client):
     assert client.unlock_account(address, "some-password")
 
 
-def test_cannot_send_with_locked_account(client, accounts):
+def test_cannot_send_with_locked_account(client, hex_accounts):
     sender = client.new_account("some-password")
 
     amt = 1000000000000
 
     # fund account
-    client.send_transaction(_from=accounts[0], to=sender, value=amt)
+    client.send_transaction(_from=hex_accounts[0], to=sender, value=amt)
     balance = client.get_balance(sender)
     assert balance >= amt
 
     with pytest.raises(ValueError):
-        client.send_transaction(_from=sender, to=accounts[1], value=12345)
+        client.send_transaction(_from=sender, to=hex_accounts[1], value=12345)
 
     # ensure balance didn't change
     assert balance == client.get_balance(sender)
 
 
-def test_send_with_unlocked_account(client, accounts):
+def test_send_with_unlocked_account(client, hex_accounts):
     sender = client.new_account("some-password")
 
     # fund account
     amt = 1000000000000
-    client.send_transaction(_from=accounts[0], to=sender, value=amt)
+    client.send_transaction(_from=hex_accounts[0], to=sender, value=amt)
     assert client.get_balance(sender) >= amt
 
     assert client.unlock_account(sender, "some-password")
 
-    before_bal = client.get_balance(accounts[1])
+    before_bal = client.get_balance(hex_accounts[1])
 
-    client.send_transaction(_from=sender, to=accounts[1], value=12345)
+    client.send_transaction(_from=sender, to=hex_accounts[1], value=12345)
 
-    after_bal = client.get_balance(accounts[1])
+    after_bal = client.get_balance(hex_accounts[1])
 
     assert after_bal == before_bal + 12345
 
 
-def test_locking_an_unlocked_account(client, accounts):
+def test_locking_an_unlocked_account(client, hex_accounts):
     sender = client.new_account("some-password")
 
     # fund account
     amt = 1000000000000
-    client.send_transaction(_from=accounts[0], to=sender, value=amt)
+    client.send_transaction(_from=hex_accounts[0], to=sender, value=amt)
     assert client.get_balance(sender) >= amt
 
     assert client.unlock_account(sender, "some-password")
 
-    client.send_transaction(_from=sender, to=accounts[1], value=12345)
+    client.send_transaction(_from=sender, to=hex_accounts[1], value=12345)
 
     assert client.lock_account(sender)
 
     with pytest.raises(ValueError):
-        client.send_transaction(_from=sender, to=accounts[1], value=12345)
+        client.send_transaction(_from=sender, to=hex_accounts[1], value=12345)
 
 
-def test_unlock_with_duration(client, accounts):
+def test_unlock_with_duration(client, hex_accounts):
     sender = client.new_account("some-password")
 
     # fund account
     amt = 1000000000000
-    client.send_transaction(_from=accounts[0], to=sender, value=amt)
+    client.send_transaction(_from=hex_accounts[0], to=sender, value=amt)
     assert client.get_balance(sender) >= amt
 
     assert client.unlock_account(sender, "some-password", 1)
 
-    client.send_transaction(_from=sender, to=accounts[1], value=12345)
+    client.send_transaction(_from=sender, to=hex_accounts[1], value=12345)
 
     time.sleep(1)
 
     with pytest.raises(ValueError):
-        client.send_transaction(_from=sender, to=accounts[1], value=12345)
+        client.send_transaction(_from=sender, to=hex_accounts[1], value=12345)
 
 
-def test_send_and_sign_transaction(client, accounts):
+def test_send_and_sign_transaction(client, hex_accounts):
     sender = client.new_account("some-password")
 
     # fund account
     amt = 1000000000000
-    client.send_transaction(_from=accounts[0], to=sender, value=amt)
+    client.send_transaction(_from=hex_accounts[0], to=sender, value=amt)
     assert client.get_balance(sender) >= amt
 
-    before_bal = client.get_balance(accounts[1])
+    before_bal = client.get_balance(hex_accounts[1])
 
     client.send_and_sign_transaction(
         "some-password",
         _from=sender,
-        to=accounts[1],
+        to=hex_accounts[1],
         value=12345,
     )
 
-    after_bal = client.get_balance(accounts[1])
+    after_bal = client.get_balance(hex_accounts[1])
 
     assert after_bal == before_bal + 12345

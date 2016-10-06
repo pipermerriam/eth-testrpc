@@ -8,7 +8,7 @@ from testrpc.client.utils import (
 )
 
 
-def test_eth_sendRawTransaction(accounts, client):
+def test_eth_sendRawTransaction(hex_accounts, client):
     tx = Transaction(0, tester.gas_price, tester.gas_limit, tester.accounts[1], 1234, '')
     tx.sign(tester.keys[0])
 
@@ -21,5 +21,5 @@ def test_eth_sendRawTransaction(accounts, client):
     tx_data = client.get_transaction_by_hash(tx_hash)
 
     assert tx_data['hash'] == tx_hash
-    assert tx_data['from'] == accounts[0]
-    assert tx_data['to'] == accounts[1]
+    assert tx_data['from'] == hex_accounts[0]
+    assert tx_data['to'] == hex_accounts[1]

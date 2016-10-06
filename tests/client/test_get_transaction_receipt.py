@@ -6,10 +6,10 @@ def test_get_receipt_for_unknown_tx(client):
         client.get_transaction_receipt("0x0000000000000000000000000000000000000000000000000000000000000000")
 
 
-def test_get_transaction_receipt(client, accounts):
+def test_get_transaction_receipt(client, hex_accounts):
     tx_hash = client.send_transaction(
-        _from=accounts[0],
-        to=accounts[1],
+        _from=hex_accounts[0],
+        to=hex_accounts[1],
         value=1234,
         data="0x1234",
         gas=100000,
