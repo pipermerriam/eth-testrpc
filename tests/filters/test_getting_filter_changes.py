@@ -2,6 +2,8 @@ from sha3 import sha3_256
 
 assert sha3_256(b'').hexdigest() == 'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
+from testrpc.client.utils import force_text
+
 
 def test_filtering_single_topic(rpc_client,
                                 call_emitter_method,
@@ -29,7 +31,7 @@ def test_filtering_single_topic(rpc_client,
 
     assert len(changes) == 1
     log_entry = changes[0]
-    assert LogTopics.LogNoArguments in log_entry['topics']
+    assert force_text(LogTopics.LogNoArguments) in log_entry['topics']
 
     changes = rpc_client(
         method='eth_getFilterChanges',
