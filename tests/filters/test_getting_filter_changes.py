@@ -5,7 +5,7 @@ assert sha3_256(b'').hexdigest() == 'c5d2460186f7233c927e7db2dcc703c0e500b653ca8
 
 def test_filtering_single_topic(rpc_client,
                                 call_emitter_method,
-                                emitter_contract_address,
+                                rpc_emitter_contract_address,
                                 LogFunctions,
                                 LogTopics,
                                 Events):
@@ -15,7 +15,7 @@ def test_filtering_single_topic(rpc_client,
         params=[{
             'from_block': 'earliest',
             'to_block': 'latest',
-            'address': emitter_contract_address,
+            'address': rpc_emitter_contract_address,
             'topics': [],
         }]
     )
