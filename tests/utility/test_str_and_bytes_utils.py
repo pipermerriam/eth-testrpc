@@ -19,8 +19,8 @@ ALL_ASCII_BYTEARRAY = bytearray(range(256))
 @pytest.mark.parametrize(
     'input,expected',
     (
-		(EMPTY_BINARY, EMPTY_TEXT),
-		(EMPTY_TEXT, EMPTY_TEXT),
+        (EMPTY_BINARY, EMPTY_TEXT),
+        (EMPTY_TEXT, EMPTY_TEXT),
         (ALL_ASCII_BYTEARRAY, ALL_ASCII_TEXT),
         (ALL_ASCII_BINARY, ALL_ASCII_TEXT),
         (ALL_ASCII_TEXT, ALL_ASCII_TEXT),
