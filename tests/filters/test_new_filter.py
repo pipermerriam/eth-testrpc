@@ -12,11 +12,11 @@ def test_new_filter_no_events(client):
     assert changes == []
 
 
-def test_new_filter_with_single_no_args_event(client, call_emitter_contract,
+def test_new_filter_with_single_no_args_event(client, client_call_emitter,
                                               Events, LogFunctions, LogTopics):
     filter_id = client.new_filter(from_block="earliest", to_block="latest", address=[], topics=[])
 
-    txn_hash = call_emitter_contract(LogFunctions.logNoArgs, [Events.LogNoArguments])
+    txn_hash = client_call_emitter(LogFunctions.logNoArgs, [Events.LogNoArguments])
 
     changes = client.get_filter_changes(filter_id)
 
@@ -25,11 +25,11 @@ def test_new_filter_with_single_no_args_event(client, call_emitter_contract,
     assert LogTopics.LogNoArguments in log_entry['topics']
 
 
-def test_new_filter_block_numbers_hex(client, call_emitter_contract,
+def test_new_filter_block_numbers_hex(client, client_call_emitter,
                                       Events, LogFunctions, LogTopics):
     filter_id = client.new_filter(from_block="0x0", to_block="0x1", address=[], topics=[])
 
-    txn_hash = call_emitter_contract(LogFunctions.logNoArgs, [Events.LogNoArguments])
+    txn_hash = client_call_emitter(LogFunctions.logNoArgs, [Events.LogNoArguments])
 
     changes = client.get_filter_changes(filter_id)
 
@@ -38,11 +38,11 @@ def test_new_filter_block_numbers_hex(client, call_emitter_contract,
     assert LogTopics.LogNoArguments in log_entry['topics']
 
 
-def test_new_filter_with_anonymous_event(client, call_emitter_contract,
+def test_new_filter_with_anonymous_event(client, client_call_emitter,
                                          LogFunctions, Events):
     filter_id = client.new_filter(from_block="earliest", to_block="latest", address=[], topics=[])
 
-    txn_hash = call_emitter_contract(LogFunctions.logNoArgs, [Events.LogAnonymous])
+    txn_hash = client_call_emitter(LogFunctions.logNoArgs, [Events.LogAnonymous])
 
     changes = client.get_filter_changes(filter_id)
 
@@ -52,7 +52,7 @@ def test_new_filter_with_anonymous_event(client, call_emitter_contract,
 
 
 def test_new_filter_with_topic_based_filtering(client,
-                                               call_emitter_contract,
+                                               client_call_emitter,
                                                LogFunctions,
                                                LogTopics,
                                                Events):
@@ -63,10 +63,10 @@ def test_new_filter_with_topic_based_filtering(client,
         topics=[[LogTopics.LogSingleArg], [LogTopics.LogNoArguments]],
     )
 
-    call_emitter_contract(LogFunctions.logDouble, [Events.LogDoubleWithIndex, 1234, 4321])
-    txn_hash = call_emitter_contract(LogFunctions.logNoArgs, [Events.LogNoArguments])
-    txn_hash = call_emitter_contract(LogFunctions.logSingle, [Events.LogSingleArg, 1234])
-    call_emitter_contract(LogFunctions.logDouble, [Events.LogDoubleWithIndex, 5678, 8765])
+    client_call_emitter(LogFunctions.logDouble, [Events.LogDoubleWithIndex, 1234, 4321])
+    txn_hash = client_call_emitter(LogFunctions.logNoArgs, [Events.LogNoArguments])
+    txn_hash = client_call_emitter(LogFunctions.logSingle, [Events.LogSingleArg, 1234])
+    client_call_emitter(LogFunctions.logDouble, [Events.LogDoubleWithIndex, 5678, 8765])
 
     changes = client.get_filter_changes(filter_id)
 
@@ -78,13 +78,13 @@ def test_new_filter_with_topic_based_filtering(client,
 
 
 def test_new_filter_with_topic_filter_on_indexed_arg(client,
-                                                     call_emitter_contract,
+                                                     client_call_emitter,
                                                      Events,
                                                      LogFunctions,
                                                      LogTopics):
     filter_id = client.new_filter(from_block="earliest", to_block="latest", address=[], topics=[])
 
-    txn_hash = call_emitter_contract(
+    txn_hash = client_call_emitter(
         LogFunctions.logSingle,
         [Events.LogSingleWithIndex, 1234567890],
     )

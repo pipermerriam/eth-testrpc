@@ -1,7 +1,7 @@
 import pytest
 
 
-def test_uninstalling_filter(client, call_emitter_contract):
+def test_uninstalling_filter(client, client_call_emitter):
     filter_id = client.new_filter(from_block="earliest", to_block="latest", address=[], topics=[])
 
     changes = client.get_filter_changes(filter_id)

@@ -1,4 +1,4 @@
-def test_registering_new_filter_with_no_args(rpc_client, call_emitter_method):
+def test_registering_new_filter_with_no_args(rpc_client, rpc_call_emitter):
     filter_id = rpc_client(
         method='eth_newFilter',
         params=[{}]
@@ -11,7 +11,7 @@ def test_registering_new_filter_with_no_args(rpc_client, call_emitter_method):
     assert not changes
 
 
-def test_registering_new_filter_with_no_args(rpc_client, call_emitter_method):
+def test_registering_new_filter_with_no_args(rpc_client, rpc_call_emitter):
     filter_id = rpc_client(
         method='eth_newFilter',
         params=[{

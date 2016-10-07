@@ -250,8 +250,8 @@ def rpc_emitter_contract_address(rpc_client, accounts, EMITTER_CODE):
 
 
 @pytest.fixture()
-def call_emitter_contract(client, accounts, emitter_contract_address):
-    def _call_emitter_contract(method_signature, arguments=None):
+def client_call_emitter(client, accounts, emitter_contract_address):
+    def _client_call_emitter(method_signature, arguments=None):
         if arguments is None:
             arguments = []
         function_sig = encode_data(sha3(method_signature)[:4])
@@ -265,12 +265,12 @@ def call_emitter_contract(client, accounts, emitter_contract_address):
             gas=200000,
         )
         return txn_hash
-    return _call_emitter_contract
+    return _client_call_emitter
 
 
 @pytest.fixture()
-def call_emitter_method(rpc_client, rpc_emitter_contract_address, accounts):
-    def _call_emitter_method(method_signature, arguments=None):
+def rpc_call_emitter(rpc_client, rpc_emitter_contract_address, accounts):
+    def _rpc_call_emitter(method_signature, arguments=None):
         if arguments is None:
             arguments = []
         function_sig = encode_data(sha3(method_signature)[:4])
@@ -288,7 +288,7 @@ def call_emitter_method(rpc_client, rpc_emitter_contract_address, accounts):
         )
 
         return txn_hash
-    return _call_emitter_method
+    return _rpc_call_emitter
 
 
 class _Events(object):

@@ -19,7 +19,7 @@ import pytest
     )
 )
 def test_log_topic_serialization(client,
-                                 call_emitter_contract,
+                                 client_call_emitter,
                                  LogFunctions,
                                  LogTopics,
                                  Events,
@@ -30,7 +30,7 @@ def test_log_topic_serialization(client,
                                  exp_data_length):
     contract_fn_sig = getattr(LogFunctions, contract_fn)
     event_id = getattr(Events, event_name)
-    txn_hash = call_emitter_contract(contract_fn_sig, [event_id] + call_args)
+    txn_hash = client_call_emitter(contract_fn_sig, [event_id] + call_args)
     txn_receipt = client.get_transaction_receipt(txn_hash)
 
     assert len(txn_receipt['logs']) == 1

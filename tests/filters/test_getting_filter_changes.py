@@ -6,7 +6,7 @@ from testrpc.client.utils import force_text
 
 
 def test_filtering_single_topic(rpc_client,
-                                call_emitter_method,
+                                rpc_call_emitter,
                                 rpc_emitter_contract_address,
                                 LogFunctions,
                                 LogTopics,
@@ -22,7 +22,7 @@ def test_filtering_single_topic(rpc_client,
         }]
     )
 
-    call_emitter_method(LogFunctions.logNoArgs, [Events.LogNoArguments])
+    rpc_call_emitter(LogFunctions.logNoArgs, [Events.LogNoArguments])
 
     changes = rpc_client(
         method='eth_getFilterChanges',
