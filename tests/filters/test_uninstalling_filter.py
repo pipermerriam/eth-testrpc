@@ -1,4 +1,4 @@
-def test_registering_new_filter(rpc_client, call_emitter_method):
+def test_registering_new_filter(rpc_client, rpc_call_emitter):
     assert rpc_client(
         method='eth_uninstallFilter',
         params=['some-filter-id-that-doesnt-exist'],

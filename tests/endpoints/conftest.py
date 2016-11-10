@@ -8,21 +8,21 @@ def account_password():
 
 @pytest.fixture()
 def account_private_key():
-    from eth_tester_client.utils import mk_random_privkey
+    from testrpc.client.utils import mk_random_privkey
     return mk_random_privkey()
 
 
 @pytest.fixture()
 def account_public_key(account_private_key):
     from ethereum.utils import privtoaddr
-    from eth_tester_client.utils import encode_address
+    from testrpc.client.utils import encode_address
     return encode_address(privtoaddr(account_private_key))
 
 
 @pytest.fixture()
 def password_account(rpc_client, accounts, account_password,
                      account_private_key, account_public_key):
-    from eth_tester_client.utils import normalize_address
+    from testrpc.client.utils import normalize_address
     address = rpc_client(
         'personal_importRawKey',
         [account_private_key, account_password],

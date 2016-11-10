@@ -1,14 +1,5 @@
-import pytest
-
-from rlp.utils import (
-    big_endian_to_int,
-)
-
-from ethereum.utils import sha3
-
 from testrpc.client.utils import (
-    encode_data,
-    decode_hex,
+    force_bytes,
 )
 
 
@@ -51,34 +42,21 @@ CONTRACT_SOURCE = (
 }""")
 
 
-def test_eth_call(rpc_client, accounts):
-    txn_hash = rpc_client(
-        method="eth_sendTransaction",
-        params=[{
-            "from": accounts[0],
-            "data": CONTRACT_BIN,
-            "value": 1234,
-        }],
+def test_get_code(client, hex_accounts):
+    txn_hash = client.send_transaction(
+        _from=hex_accounts[0],
+        data=CONTRACT_BIN,
+        value=1234,
     )
-    txn_receipt = rpc_client(
-        method="eth_getTransactionReceipt",
-        params=[txn_hash],
-    )
+    txn_receipt = client.get_transaction_receipt(txn_hash)
     contract_address = txn_receipt['contractAddress']
 
     assert contract_address
 
-    function_sig = encode_data(sha3("return13()")[:4])
+    code = client.get_code(contract_address)
+    assert force_bytes(code) == force_bytes(CONTRACT_BIN_RUNTIME)
 
-    should_be_13 = rpc_client(
-        method="eth_call",
-        params=[{
-            "from": accounts[0],
-            "to": contract_address,
-            "data": function_sig,
-        }],
-    )
 
-    result = big_endian_to_int(decode_hex(should_be_13[2:]))
-    assert result == 13
-
+def test_get_code_non_contract(client, hex_accounts):
+    code = client.get_code('0xd3cda913deb6f67967b99d67acdfa1712c293601')
+    assert force_bytes(code) == b'0x'

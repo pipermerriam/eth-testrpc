@@ -8,8 +8,8 @@ from ethereum.tester import (
     languages,
 )
 
-from eth_tester_client import EthTesterClient
-from eth_tester_client.utils import (
+from .client import EthTesterClient
+from .client.utils import (
     force_bytes,
     decode_hex,
     encode_number,

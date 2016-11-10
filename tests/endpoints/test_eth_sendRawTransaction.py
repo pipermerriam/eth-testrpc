@@ -3,7 +3,7 @@ import rlp
 from ethereum import tester
 from ethereum.transactions import Transaction
 
-from eth_tester_client.utils import encode_data
+from testrpc.client.utils import encode_data
 
 
 def test_eth_sendRawTransaction(accounts, rpc_client):

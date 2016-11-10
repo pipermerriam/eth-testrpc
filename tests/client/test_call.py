@@ -51,34 +51,24 @@ CONTRACT_SOURCE = (
 }""")
 
 
-def test_eth_call(rpc_client, accounts):
-    txn_hash = rpc_client(
-        method="eth_sendTransaction",
-        params=[{
-            "from": accounts[0],
-            "data": CONTRACT_BIN,
-            "value": 1234,
-        }],
+def test_eth_call(client, hex_accounts):
+    txn_hash = client.send_transaction(
+        _from=hex_accounts[0],
+        data=CONTRACT_BIN,
+        value=1234,
     )
-    txn_receipt = rpc_client(
-        method="eth_getTransactionReceipt",
-        params=[txn_hash],
-    )
+    txn_receipt = client.get_transaction_receipt(txn_hash)
     contract_address = txn_receipt['contractAddress']
 
     assert contract_address
 
     function_sig = encode_data(sha3("return13()")[:4])
 
-    should_be_13 = rpc_client(
-        method="eth_call",
-        params=[{
-            "from": accounts[0],
-            "to": contract_address,
-            "data": function_sig,
-        }],
+    should_be_13 = client.call(
+        _from=hex_accounts[0],
+        to=contract_address,
+        data=function_sig,
     )
 
     result = big_endian_to_int(decode_hex(should_be_13[2:]))
     assert result == 13
-

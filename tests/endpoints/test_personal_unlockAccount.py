@@ -1,6 +1,6 @@
 import pytest
 
-from eth_tester_client.utils import (
+from testrpc.client.utils import (
     normalize_address,
     mk_random_privkey,
 )
