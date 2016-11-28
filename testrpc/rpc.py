@@ -1,5 +1,4 @@
 import sys
-import pkg_resources
 import logging
 
 from sha3 import sha3_256
@@ -158,14 +157,11 @@ class RPCMethods(object):
         formatted_filter_params = input_filter_params_formatter(filter_params)
         return self.client.new_filter(**formatted_filter_params)
 
-
     def eth_getFilterChanges(self, filter_id):
         return self.client.get_filter_changes(filter_id)
 
-
     def eth_getFilterLogs(self, filter_id):
         return self.client.get_filter_logs(filter_id)
-
 
     def eth_uninstallFilter(self, filter_id):
         return self.client.uninstall_filter(filter_id)
@@ -194,17 +190,14 @@ class RPCMethods(object):
             platform=sys.platform,
         )
 
-
     #
     # net_ API
     #
     def net_version(self):
         return self.RPC_META['net_version']
 
-
     def net_listening(self):
         return self.RPC_META['net_listening']
-
 
     def net_peerCount(self):
         return self.RPC_META['net_peerCount']
