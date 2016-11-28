@@ -5,11 +5,8 @@ import gevent
 
 from click.testing import CliRunner
 
-from testrpc.testrpc import (
-    web3_clientVersion,
-)
-
-from testrpc.__main__ import main
+from testrpc.cli import runserver
+from testrpc.rpc import RPCMethods
 
 
 def get_open_port():
@@ -35,8 +32,8 @@ def test_main_module_for_cli_server_running():
 
     gevent.spawn(kill_it)
 
-    result = runner.invoke(main, ['--port', str(port)])
+    result = runner.invoke(runserver, ['--port', str(port)])
     assert result.exit_code == 0
 
     assert str(port) in result.output
-    assert web3_clientVersion() in result.output
+    assert RPCMethods().web3_clientVersion() in result.output

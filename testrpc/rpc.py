@@ -65,7 +65,7 @@ class RPCMethods(object):
         snapshot_idx = self.client.snapshot_evm()
         return encode_number(snapshot_idx)
 
-    def evm_revert(snapshot_idx=None):
+    def evm_revert(self, snapshot_idx=None):
         try:
             self.client.revert_evm(snapshot_idx)
         except ValueError:
@@ -95,7 +95,7 @@ class RPCMethods(object):
         formatted_transaction = input_transaction_formatter(transaction)
         return self.client.send_transaction(**formatted_transaction)
 
-    def eth_estimateGas(transaction, block_number="latest"):
+    def eth_estimateGas(self, transaction, block_number="latest"):
         formatted_transaction = input_transaction_formatter(transaction)
         return self.client.estimate_gas(**formatted_transaction)
 
@@ -213,12 +213,12 @@ class RPCMethods(object):
     # personal_ API
     #
     def personal_listAccounts(self):
-        return eth_accounts()
+        return self.eth_accounts()
 
     def personal_importRawKey(self, private_key, passphrase):
         return self.client.import_raw_key(private_key, passphrase)
 
-    def personal_lockAccount(selw, address):
+    def personal_lockAccount(self, address):
         return self.client.lock_account(address)
 
     def personal_newAccount(self, passphrase=None):

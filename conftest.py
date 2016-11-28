@@ -50,10 +50,9 @@ def hex_accounts(accounts):
 
 @pytest.yield_fixture()
 def rpc_server():
-    from testrpc.server import application
-    from testrpc.testrpc import full_reset
+    from testrpc.server import get_application
 
-    full_reset()
+    application = get_application()
 
     port = get_open_port()
 
