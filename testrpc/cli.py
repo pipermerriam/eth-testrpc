@@ -14,11 +14,7 @@ from ethereum.tester import (
     accounts,
 )
 
-from .server import application
-from .testrpc import (
-    web3_clientVersion,
-    evm_reset,
-)
+from .server import get_application
 
 
 @click.command()
@@ -33,11 +29,10 @@ from .testrpc import (
     default=8545,
     type=int,
 )
-def main(host, port):
+def runserver(host, port):
+    application = get_application()
 
-    print(web3_clientVersion())
-
-    evm_reset()
+    print(application.rpc_methods.web3_clientVersion())
 
     print("\nAvailable Accounts\n==================")
     for account in accounts:
