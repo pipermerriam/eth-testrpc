@@ -11,9 +11,9 @@ env:
 cache:
   pip: true
 install:
-  - "travis_retry pip install setuptools --upgrade"
+  - "travis_retry pip install setuptools pip --upgrade"
   - "travis_retry pip install tox"
 script:
-  - tox -e $TOX_ENV --recreate
+  - tox -e $TOX_ENV
 after_script:
   - cat .tox/$TOX_ENV/log/*.log
