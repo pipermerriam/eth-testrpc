@@ -8,11 +8,12 @@ env:
     - TOX_ENV=py34
     - TOX_ENV=py35
     - TOX_ENV=flake8
-cache: pip
+cache:
+  pip: true
 install:
   - "travis_retry pip install setuptools --upgrade"
   - "travis_retry pip install tox"
 script:
-  - tox -e $TOX_ENV
+  - tox -e $TOX_ENV --recreate
 after_script:
   - cat .tox/$TOX_ENV/log/*.log
