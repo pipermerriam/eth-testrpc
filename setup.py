@@ -43,7 +43,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'testrpc=testrpc.__main__:main',
+            'testrpc-py=testrpc.cli:runserver',
         ],
     }
 )
