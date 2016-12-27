@@ -37,9 +37,9 @@ setup(
         "gevent>=1.1.2",
         'Werkzeug>=0.11.10',
         'click>=6.6',
-        'ethereum>=1.5.2,<1.6.0',  # Currently latest pyethereum tester module is broken for this use case.
+        'ethereum>=1.5.2',  # Currently latest pyethereum tester module is broken for this use case.
         'json-rpc>=1.10.3',
-        'rlp>=0.4.4',
+        'rlp>=0.4.4,<0.4.7',
     ],
     entry_points={
         'console_scripts': [
