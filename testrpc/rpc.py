@@ -1,7 +1,10 @@
 import sys
 import logging
 
-from sha3 import sha3_256
+try:
+    from sha3 import keccak_256
+except ImportError:
+    from sha3 import sha3_256 as keccak_256
 
 from ethereum.tester import (
     languages,
@@ -37,7 +40,7 @@ class RPCMethods(object):
         self.RPC_META = {
             'eth_protocolVersion': 63,
             'eth_syncing': False,
-            'eth_mining': True,
+            'eth_mining': False,
             'net_version': 1,
             'net_listening': False,
             'net_peerCount': 0,
@@ -181,9 +184,10 @@ class RPCMethods(object):
             value = decode_hex(value)
         else:
             value = force_bytes(value)
-        return encode_32bytes(sha3_256(value).digest())
+        return encode_32bytes(keccak_256(value).digest())
 
-    def web3_clientVersion(self):
+    @classmethod
+    def web3_clientVersion(cls):
         from testrpc import __version__
         return "TestRPC/" + __version__ + "/{platform}/python{v.major}.{v.minor}.{v.micro}".format(
             v=sys.version_info,

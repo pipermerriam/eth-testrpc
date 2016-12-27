@@ -120,9 +120,9 @@ class EthTesterClient(object):
         self.evm.mine()
 
     def wait_for_block(self, block_number, max_wait=0):
-        while self.evm.block.number < block_number:
+        while self.get_block_number() < block_number:
             self.mine_block()
-        return self.get_block_by_number(self.evm.block.number)
+        return self.get_block_by_number(self.get_block_number())
 
     def wait_for_transaction(self, txn_hash, max_wait=0):
         return self.get_transaction_receipt(txn_hash)
@@ -150,11 +150,16 @@ class EthTesterClient(object):
 
     def _get_block_by_number(self, block_number="latest"):
         if block_number == "latest":
-            return self.evm.block
+            if not self.evm.blocks:
+                raise ValueError("No blocks")
+            elif len(self.evm.blocks) > 1:
+                return self.evm.blocks[-2]
+            else:
+                return self.evm.blocks[-1]
         elif block_number == "earliest":
             return self.evm.blocks[0]
         elif block_number == "pending":
-            raise ValueError("Fetching 'pending' block is unsupported")
+            return self.evm.block
         else:
             block_number = normalize_number(block_number)
 
@@ -291,7 +296,10 @@ class EthTesterClient(object):
         return serialize_block(block, full_transactions)
 
     def get_block_number(self):
-        return self.evm.block.number
+        if len(self.evm.blocks) < 2:
+            return 0
+        else:
+            return self.evm.blocks[-2].number
 
     def get_gas_price(self):
         return t.gas_price
