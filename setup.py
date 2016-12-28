@@ -14,7 +14,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='eth-testrpc',
-    version="0.9.0-beta1",
+    version="0.9.0",
     description='An Ethereum simulator for aiding smart contract development.',
     long_description=long_description,
     url='https://github.com/pipermerriam/eth-testrpc',
@@ -37,7 +37,7 @@ setup(
         "gevent>=1.1.2",
         'Werkzeug>=0.11.10',
         'click>=6.6',
-        'ethereum>=1.5.2',  # Currently latest pyethereum tester module is broken for this use case.
+        'ethereum>=1.5.2',
         'json-rpc>=1.10.3',
         'rlp>=0.4.4,<0.4.7',
     ],

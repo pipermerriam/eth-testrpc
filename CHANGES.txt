@@ -4,6 +4,9 @@ Version 0.9.0
 - Merge in ethereum-tester-client codebase
 - Remove *global* aspect of the testrpc server.  Each server now runs in
   isolation from each other.
+- Fix wrong implementation of `getBlockNumber`
+- Fix wrong implementation of getting "latest" block
+- Add getting of "pending" block
 
 Version 0.8.7
 ================================
