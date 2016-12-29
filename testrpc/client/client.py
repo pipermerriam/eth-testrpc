@@ -67,6 +67,8 @@ class EthTesterClient(object):
     locked_accounts = None
     homestead_block_number = 0
     dao_fork_block_number = 0
+    anti_dos_fork_block_number = 0
+    clearing_fork_block_number = 0
     dao_fork_support = True
 
     def __init__(self):
@@ -78,6 +80,8 @@ class EthTesterClient(object):
 
         self.evm.block.config['HOMESTEAD_FORK_BLKNUM'] = self.homestead_block_number  # noqa
         self.evm.block.config['DAO_FORK_BLKNUM'] = self.dao_fork_block_number
+        self.evm.block.config['ANTI_DOS_FORK_BLKNUM'] = self.anti_dos_fork_block_number
+        self.evm.block.config['CLEARING_FORK_BLKNUM'] = self.clearing_fork_block_number
 
         self.passphrase_accounts = {}
         self.passphrase_account_keys = {}

@@ -1,11 +1,14 @@
 import sys
 import logging
 
+import rlp
+
 try:
     from sha3 import keccak_256
 except ImportError:
     from sha3 import sha3_256 as keccak_256
 
+from ethereum import blocks
 from ethereum.tester import (
     languages,
 )
@@ -46,6 +49,8 @@ class RPCMethods(object):
             'net_peerCount': 0,
             'homestead_block_number': self.client.evm.block.config['HOMESTEAD_FORK_BLKNUM'],
             'dao_fork_block_number': self.client.evm.block.config['DAO_FORK_BLKNUM'],
+            'anti_dos_fork_block_number': self.client.evm.block.config['ANTI_DOS_FORK_BLKNUM'],
+            'clearing_fork_block_number': self.client.evm.block.config['CLEARING_FORK_BLKNUM'],
         }
 
     def rpc_configure(self, key, value):
@@ -55,6 +60,10 @@ class RPCMethods(object):
             self.client.evm.block.config['HOMESTEAD_FORK_BLKNUM'] = value
         elif key == 'dao_fork_block_number':
             self.client.evm.block.config['DAO_FORK_BLKNUM'] = value
+        elif key == 'anti_dos_fork_block_number':
+            self.client.evm.block.config['ANTI_DOS_FORK_BLKNUM'] = value
+        elif key == 'clearing_fork_block_number':
+            self.client.evm.block.config['CLEARING_FORK_BLKNUM'] = value
 
     #
     # Snapshot and Reset
@@ -77,6 +86,32 @@ class RPCMethods(object):
 
     def evm_mine(self):
         self.client.mine_block()
+
+    #
+    #  Timetravel
+    #
+    def testing_timeTravel(self, timestamp):
+        if timestamp <= self.client.evm.block.timestamp:
+            raise ValueError(
+                "Cannot travel back in time.  You'll disrupt the space time "
+                "continuum"
+            )
+        self.client.evm.block.finalize()
+        self.client.evm.block.commit_state()
+        self.client.evm.db.put(
+            self.client.evm.block.hash,
+            rlp.encode(self.client.evm.block),
+        )
+
+        block = blocks.Block.init_from_parent(
+            self.client.evm.block,
+            decode_hex(self.eth_coinbase()),
+            timestamp=timestamp,
+        )
+
+        self.client.evm.block = block
+        self.client.evm.blocks.append(block)
+        return timestamp
 
     #
     #  eth_ Functions

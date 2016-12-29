@@ -86,6 +86,10 @@ single block.
 
 * `evm_mine` : No params, no return value.
 
+TestRPC exposes the `testing_timeTravel` method for fast-forwarding to a future timestamp.
+
+* `testing_timeTravel` : Takes an integer timestamp that must be greater than the timestamp of the current latest block.
+
 TestRPC exposes the `rpc_configure` method which can be used to modify the
 static values returned by the following endpoints.
 
@@ -97,14 +101,17 @@ static values returned by the following endpoints.
 * `net_peerCount` (default `0`)
 * `homestead_block_number` (default `0`)
 * `dao_fork_block_number` (default `0`)
+* `anti_dos_fork_block_number` (default `0`)
+* `clearing_fork_block_number` (default `0`)
 
 The `rpc_configure` takes two parameters.
 
 * `key`: string representing the rpc method on which you want to change the return value.
 * `value`: the value that should be returned by the endpoint.
 
-The `homestead` and `dao` fork configurations determine which block number the
-fork rules should come into effect.  Both default to `0`.
+The `homestead`, `dao`, `anti_dos` and `clearing` fork configurations determine
+which block number the respective fork rules should come into effect.  All
+default to `0`.
 
 
 ### Releasing a new version (for eth-testrpc developers)
