@@ -79,6 +79,7 @@ def get_application():
     add_method_with_lock(rpc_methods.evm_revert, 'evm_revert')
     add_method_with_lock(rpc_methods.evm_mine, 'evm_mine')
     add_method_with_lock(rpc_methods.rpc_configure, 'rpc_configure')
+    add_method_with_lock(rpc_methods.testing_timeTravel, 'testing_timeTravel')
     add_method_with_lock(rpc_methods.personal_importRawKey, 'personal_importRawKey')
     add_method_with_lock(rpc_methods.personal_listAccounts, 'personal_listAccounts')
     add_method_with_lock(rpc_methods.personal_lockAccount, 'personal_lockAccount')
