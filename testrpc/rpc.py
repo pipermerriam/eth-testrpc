@@ -84,8 +84,9 @@ class RPCMethods(object):
         else:
             return True
 
-    def evm_mine(self):
-        self.client.mine_block()
+    def evm_mine(self, num_blocks=1):
+        for _ in range(num_blocks):
+            self.client.mine_block()
 
     #
     #  Timetravel
