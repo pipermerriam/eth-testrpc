@@ -81,10 +81,10 @@ cases for these methods are as follows:
 * `evm_snapshot` : Run at the beginning of each test, snapshotting the state of the evm.
 * `evm_revert` : Run at the end of each test, reverting back to a known clean state.
 
-TestRPC also exposes the `evm_mine` method for advancing the test evm by a
-single block.
+TestRPC also exposes the `evm_mine` method for advancing the test evm by some
+number of blocks.
 
-* `evm_mine` : No params, no return value.
+* `evm_mine` : Optionally supply an integer for the number of blocks to mine.  Default is 1 block. No return value.
 
 TestRPC exposes the `testing_timeTravel` method for fast-forwarding to a future timestamp.
 
