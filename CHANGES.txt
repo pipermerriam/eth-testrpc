@@ -1,3 +1,9 @@
+Version 0.9.2
+================================
+
+- New `testing_timeTravel` endpoint.
+- Support for both Anti-DOS fork and State Clearing fork block numbers
+
 Version 0.9.1
 ================================
 
