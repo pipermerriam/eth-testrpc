@@ -19,6 +19,7 @@ from testrpc.client.utils import (  # noqa: E402
     encode_data,
     strip_0x,
     force_bytes,
+    force_text,
     encode_address,
     normalize_address,
 )
@@ -135,10 +136,10 @@ def rpc_client(rpc_server):
                 },
             )
             with contextlib.closing(client):
-                response = client.post(body=payload_data)
+                response = client.post('/', body=payload_data)
                 response_body = response.read()
 
-            result = json.loads(response_body)
+            result = json.loads(force_text(response_body))
         else:
             import requests
             response = requests.post(

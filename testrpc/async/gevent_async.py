@@ -2,13 +2,15 @@ import gevent
 from gevent.pywsgi import (  # noqa: F401
     WSGIServer,
 )
+from gevent import (  # noqa; F401
+    subprocess,
+    threading,
+    socket,
+)
 
 
 sleep = gevent.sleep
-socket = gevent.socket
 spawn = gevent.spawn
-subprocess = gevent.subprocess
-threading = gevent.threading
 
 
 class Timeout(gevent.Timeout):
