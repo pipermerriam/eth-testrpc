@@ -1,3 +1,8 @@
+Version 1.0.0
+================================
+
+- Remove hard dependency on gevent threading tools.
+
 Version 0.9.3
 ================================
 
