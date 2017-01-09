@@ -52,7 +52,10 @@ def runserver(host, port):
         while True:
             sleep(random.random())
     except KeyboardInterrupt:
-        server.stop()
+        try:
+            server.stop()
+        except AttributeError:
+            server.shutdown()
 
 
 if __name__ == "__main__":
