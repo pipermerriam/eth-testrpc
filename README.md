@@ -24,6 +24,12 @@ Or, to upgrade:
 pip install eth-testrpc --upgrade
 ```
 
+Or, to install with gevent support
+
+```
+pip install eth-testrcp[gevent]
+```
+
 ### Run
 
 Installing through pip will make the `testrpc` command available on your machine:
