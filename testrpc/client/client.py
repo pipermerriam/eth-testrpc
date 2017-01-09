@@ -8,7 +8,7 @@ import time
 import itertools
 import functools
 
-from gevent.threading import Lock
+from testrpc.async import threading
 
 import rlp
 
@@ -72,7 +72,7 @@ class EthTesterClient(object):
     dao_fork_support = True
 
     def __init__(self):
-        self._evm_lock = Lock()
+        self._evm_lock = threading.Lock()
 
         self.snapshots = []
 

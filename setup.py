@@ -34,13 +34,17 @@ setup(
     keywords='ethereum blockchain development testing',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=[
-        "gevent>=1.1.2",
         'Werkzeug>=0.11.10',
         'click>=6.6',
         'ethereum>=1.5.2',
         'json-rpc>=1.10.3',
         'rlp>=0.4.4,<0.4.7',
     ],
+    extras_require={
+        'gevent': [
+            "gevent>=1.1.1,<1.2.0",
+        ],
+    },
     entry_points={
         'console_scripts': [
             'testrpc-py=testrpc.cli:runserver',
