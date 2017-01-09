@@ -1,26 +1,56 @@
-import pytest
+# noqa: e402
+import os
+import sys
+import contextlib
 
-from gevent import monkey
-monkey.patch_socket()
-import gevent
-from gevent import socket
-from gevent.pywsgi import (
-    WSGIServer,
-)
+if 'TESTRPC_ASYNC_GEVENT' in os.environ:
+    from gevent import monkey
+    monkey.patch_socket()
 
-import json
-import requests
-import textwrap
+import pytest  # noqa: E402
 
-from ethereum.utils import sha3
+import json  # noqa: E402
+import textwrap  # noqa: E402
 
-from testrpc.client.utils import (
+from ethereum.utils import sha3  # noqa: E402
+
+from testrpc.client.utils import (  # noqa: E402
     encode_number,
-    encode_hex,
     encode_data,
     strip_0x,
     force_bytes,
+    force_text,
+    encode_address,
+    normalize_address,
 )
+from testrpc.async import (  # noqa: E402
+    make_server,
+    spawn,
+    Timeout,
+    sleep,
+    socket,
+)
+
+
+if sys.version_info.major == 2:
+    ConnectionRefusedError = socket.timeout
+
+
+def wait_for_http_connection(port, timeout=5):
+    with Timeout(timeout) as _timeout:
+        while True:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(1)
+            try:
+                s.connect(('127.0.0.1', port))
+            except (socket.timeout, ConnectionRefusedError):
+                sleep(0.1)
+                _timeout.check()
+                continue
+            else:
+                break
+        else:
+            raise ValueError("Unable to establish HTTP connection")
 
 
 def get_open_port():
@@ -31,20 +61,16 @@ def get_open_port():
     s.close()
     return port
 
+
 @pytest.fixture(scope="session")
 def accounts():
     from ethereum import tester
-    from testrpc.client.utils import normalize_address
     return [normalize_address(acct) for acct in tester.accounts]
     #  return [b"0x" + encode_hex(acct) for acct in tester.accounts]
 
 
 @pytest.fixture(scope="session")
 def hex_accounts(accounts):
-    from testrpc.client.utils import (
-        encode_address,
-        force_text,
-    )
     return [encode_address(acct) for acct in accounts]
 
 
@@ -56,15 +82,21 @@ def rpc_server():
 
     port = get_open_port()
 
-    server = WSGIServer(
-        ('127.0.0.1', port),
+    server = make_server(
+        '127.0.0.1',
+        port,
         application,
     )
-    gevent.spawn(server.serve_forever)
+    thread = spawn(server.serve_forever)
+    wait_for_http_connection(port)
 
     yield server
 
-    server.stop()
+    try:
+        server.stop()
+    except AttributeError:
+        server.shutdown()
+    thread.join()
 
 
 nonce = 0
@@ -74,10 +106,14 @@ nonce = 0
 def rpc_client(rpc_server):
     from testrpc.client.utils import force_obj_to_text
 
-    host, port = rpc_server.address
+    try:
+        host, port = rpc_server.address
+    except AttributeError:
+        host, port = rpc_server.server_address
+
     endpoint = "http://{host}:{port}".format(host=host, port=port)
 
-    def make_request(method, params=None, raise_on_error=True):
+    def make_request(method, params=None):
         global nonce
         nonce += 1  # NOQA
         payload = {
@@ -87,18 +123,39 @@ def rpc_client(rpc_server):
             "params": params or [],
         }
         payload_data = json.dumps(force_obj_to_text(payload, True))
-        response = requests.post(endpoint, data=payload_data)
 
-        if raise_on_error:
-            assert response.status_code == 200
+        if 'TESTRPC_ASYNC_GEVENT' in os.environ:
+            from geventhttpclient import HTTPClient
+            client = HTTPClient(
+                host=host,
+                port=port,
+                connection_timeout=10,
+                network_timeout=10,
+                headers={
+                    'Content-Type': 'application/json',
+                },
+            )
+            with contextlib.closing(client):
+                response = client.post('/', body=payload_data)
+                response_body = response.read()
+
+            result = json.loads(force_text(response_body))
+        else:
+            import requests
+            response = requests.post(
+                endpoint,
+                data=payload_data,
+                headers={
+                    'Content-Type': 'application/json',
+                },
+            )
 
             result = response.json()
 
-            if 'error' in result:
-                raise AssertionError(result['error'])
+        if 'error' in result:
+            raise AssertionError(result['error'])
 
-            assert set(result.keys()) == {"id", "jsonrpc", "result"}
-        return response.json()['result']
+        return result['result']
 
     make_request.server = rpc_server
 

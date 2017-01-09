@@ -3,11 +3,6 @@ from __future__ import print_function
 import random
 import codecs
 
-import gevent
-from gevent.pywsgi import (
-    WSGIServer,
-)
-
 import click
 
 from ethereum.tester import (
@@ -15,6 +10,11 @@ from ethereum.tester import (
 )
 
 from .server import get_application
+from .async import (
+    make_server,
+    spawn,
+    sleep,
+)
 
 
 @click.command()
@@ -40,18 +40,22 @@ def runserver(host, port):
 
     print("\nListening on %s:%s" % (host, port))
 
-    server = WSGIServer(
-        (host, port),
+    server = make_server(
+        host,
+        port,
         application,
     )
 
-    gevent.spawn(server.serve_forever)
+    spawn(server.serve_forever)
 
     try:
         while True:
-            gevent.sleep(random.random())
+            sleep(random.random())
     except KeyboardInterrupt:
-        server.stop()
+        try:
+            server.stop()
+        except AttributeError:
+            server.shutdown()
 
 
 if __name__ == "__main__":

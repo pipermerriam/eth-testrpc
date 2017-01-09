@@ -24,6 +24,12 @@ Or, to upgrade:
 pip install eth-testrpc --upgrade
 ```
 
+Or, to install with gevent support
+
+```
+pip install eth-testrcp[gevent]
+```
+
 ### Run
 
 Installing through pip will make the `testrpc` command available on your machine:
@@ -132,6 +138,12 @@ git push --tags
 ```
 make release
 ```
+
+
+### GEvent
+
+To use the library with full gevent support set the envronment variable
+`TESTRPC_ASYNC_GEVENT`.
 
 
 ### License

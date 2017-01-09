@@ -1,12 +1,12 @@
 import os
 import signal
 
-import gevent
-
 from click.testing import CliRunner
 
 from testrpc.cli import runserver
 from testrpc.rpc import RPCMethods
+from testrpc import async
+from testrpc.async import socket
 
 
 def get_open_port():
@@ -27,10 +27,10 @@ def test_main_module_for_cli_server_running():
     pid = os.getpid()
 
     def kill_it():
-        gevent.sleep(2)
+        async.sleep(2)
         os.kill(pid, signal.SIGINT)
 
-    gevent.spawn(kill_it)
+    async.spawn(kill_it)
 
     result = runner.invoke(runserver, ['--port', str(port)])
     assert result.exit_code == 0

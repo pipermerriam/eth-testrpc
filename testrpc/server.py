@@ -1,13 +1,12 @@
 import json
 import functools
 
-from gevent.threading import Lock
-
 from werkzeug.wrappers import Request, Response
 
 from jsonrpc import JSONRPCResponseManager, dispatcher
 
 from .rpc import RPCMethods
+from .async import threading
 from .client.utils import (
     force_obj_to_text,
 )
@@ -25,7 +24,7 @@ def get_application():
     # multithreaded HTTP server, the EVM itself is not thread-safe, so we must take
     # care when interacting with it.
     rpc_methods = RPCMethods()
-    evm_lock = Lock()
+    evm_lock = threading.Lock()
 
     def with_lock(rpc_fn):
         @functools.wraps(rpc_fn)
