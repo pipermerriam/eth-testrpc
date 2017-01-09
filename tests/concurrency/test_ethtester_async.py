@@ -15,18 +15,17 @@ def test_async_requests():
     to_addr = utils.encode_hex(tester.accounts[1])
 
     def spam_block_number():
-        for i in range(5):
+        for i in range(2):
             try:
                 client.send_transaction(
                     to=to_addr,
                     value=1,
                 )
-                client.mine_block()
             except Exception as e:
                 errors.append(e)
                 pytest.fail(''.join(e.args))
 
-    for i in range(5):
+    for i in range(3):
         thread = async.spawn(spam_block_number)
         threads.append(thread)
 
