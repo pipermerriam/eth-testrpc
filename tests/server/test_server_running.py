@@ -5,6 +5,7 @@ from click.testing import CliRunner
 
 from testrpc.cli import runserver
 from testrpc.rpc import RPCMethods
+from testrpc import async
 from testrpc.async import socket
 
 

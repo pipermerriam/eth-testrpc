@@ -152,6 +152,9 @@ def rpc_client(rpc_server):
 
             result = response.json()
 
+        if 'error' in result:
+            raise AssertionError(result['error'])
+
         return result['result']
 
     make_request.server = rpc_server
