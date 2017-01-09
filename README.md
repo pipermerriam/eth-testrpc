@@ -134,6 +134,12 @@ make release
 ```
 
 
+### GEvent
+
+To use the library with full gevent support set the envronment variable
+`TESTRPC_ASYNC_GEVENT`.
+
+
 ### License
 
 MIT
