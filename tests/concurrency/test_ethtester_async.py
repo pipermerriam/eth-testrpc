@@ -21,6 +21,7 @@ def test_async_requests():
                     to=to_addr,
                     value=1,
                 )
+                client.mine_block()
             except Exception as e:
                 errors.append(e)
                 pytest.fail(''.join(e.args))
