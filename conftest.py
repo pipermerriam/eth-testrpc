@@ -3,7 +3,7 @@ import os
 import sys
 import contextlib
 
-if 'TESTRPC_ASYNC_GEVENT' in os.environ:
+if os.environ.get('TESTRPC_THREADING_BACKEND', os.environ.get('THREADING_BACKEND', 'stdlib')) == 'gevent':
     from gevent import monkey
     monkey.patch_socket()
 
