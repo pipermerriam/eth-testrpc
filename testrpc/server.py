@@ -6,7 +6,7 @@ from werkzeug.wrappers import Request, Response
 from jsonrpc import JSONRPCResponseManager, dispatcher
 
 from .rpc import RPCMethods
-from .async import threading
+from .compat import threading
 from .client.utils import (
     force_obj_to_text,
 )

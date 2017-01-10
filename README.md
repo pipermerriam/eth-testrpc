@@ -24,11 +24,13 @@ Or, to upgrade:
 pip install eth-testrpc --upgrade
 ```
 
-Or, to install with gevent support
+Or, to install with gevent threads
 
 ```
-pip install eth-testrcp[gevent]
+pip install eth-testrpc[gevent]
 ```
+
+And then set the environment variable `TESTRPC_THREADING_BACKEND=gevent`
 
 ### Run
 
@@ -138,12 +140,6 @@ git push --tags
 ```
 make release
 ```
-
-
-### GEvent
-
-To use the library with full gevent support set the envronment variable
-`TESTRPC_ASYNC_GEVENT`.
 
 
 ### License

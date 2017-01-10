@@ -10,7 +10,7 @@ from ethereum.tester import (
 )
 
 from .server import get_application
-from .async import (
+from .compat import (
     make_server,
     spawn,
     sleep,

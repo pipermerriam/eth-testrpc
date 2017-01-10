@@ -3,7 +3,7 @@ import os
 import sys
 import contextlib
 
-if 'TESTRPC_ASYNC_GEVENT' in os.environ:
+if os.environ.get('TESTRPC_THREADING_BACKEND', os.environ.get('THREADING_BACKEND', 'stdlib')) == 'gevent':
     from gevent import monkey
     monkey.patch_socket()
 
@@ -23,7 +23,7 @@ from testrpc.client.utils import (  # noqa: E402
     encode_address,
     normalize_address,
 )
-from testrpc.async import (  # noqa: E402
+from testrpc.compat import (  # noqa: E402
     make_server,
     spawn,
     Timeout,
