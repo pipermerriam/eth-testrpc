@@ -8,7 +8,7 @@ import time
 import itertools
 import functools
 
-from testrpc.async import threading
+from testrpc.compat import threading
 
 import rlp
 

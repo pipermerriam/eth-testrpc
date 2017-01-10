@@ -23,7 +23,7 @@ from testrpc.client.utils import (  # noqa: E402
     encode_address,
     normalize_address,
 )
-from testrpc.async import (  # noqa: E402
+from testrpc.compat import (  # noqa: E402
     make_server,
     spawn,
     Timeout,

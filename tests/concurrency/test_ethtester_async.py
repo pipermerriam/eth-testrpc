@@ -4,7 +4,7 @@ from ethereum import tester
 from ethereum import utils
 
 from testrpc.client import EthTesterClient
-from testrpc import async
+from testrpc.compat import spawn
 
 
 def test_async_requests():
@@ -26,7 +26,7 @@ def test_async_requests():
                 pytest.fail(''.join(e.args))
 
     for i in range(3):
-        thread = async.spawn(spam_block_number)
+        thread = spawn(spam_block_number)
         threads.append(thread)
 
     assert threads

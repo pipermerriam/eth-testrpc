@@ -5,8 +5,11 @@ from click.testing import CliRunner
 
 from testrpc.cli import runserver
 from testrpc.rpc import RPCMethods
-from testrpc import async
-from testrpc.async import socket
+from testrpc.compat import (
+    socket,
+    sleep,
+    spawn,
+)
 
 
 def get_open_port():
@@ -27,10 +30,10 @@ def test_main_module_for_cli_server_running():
     pid = os.getpid()
 
     def kill_it():
-        async.sleep(2)
+        sleep(2)
         os.kill(pid, signal.SIGINT)
 
-    async.spawn(kill_it)
+    spawn(kill_it)
 
     result = runner.invoke(runserver, ['--port', str(port)])
     assert result.exit_code == 0
