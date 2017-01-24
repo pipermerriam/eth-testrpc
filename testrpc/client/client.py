@@ -4,6 +4,7 @@ the `eth-testrpc` project by ConsenSys
 
 https://github.com/ConsenSys/eth-testrpc
 """
+import os
 import time
 import itertools
 import functools
@@ -14,6 +15,7 @@ import rlp
 
 from ethereum import transactions
 from ethereum import tester as t
+from ethereum import config
 from ethereum.utils import (
     privtoaddr,
 )
@@ -44,7 +46,8 @@ from .filters import (
 
 
 # Set the gas
-DEFAULT_GAS_LIMIT = t.gas_limit = t.GAS_LIMIT = 3141592
+DEFAULT_GAS_LIMIT = t.gas_limit = t.GAS_LIMIT = int(os.environ.get('TESTRPC_GAS_LIMIT', 4000000))
+config.default_config['GENESIS_GAS_LIMIT'] = DEFAULT_GAS_LIMIT
 
 
 def with_lock(client_method):

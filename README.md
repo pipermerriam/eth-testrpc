@@ -121,6 +121,9 @@ The `homestead`, `dao`, `anti_dos` and `clearing` fork configurations determine
 which block number the respective fork rules should come into effect.  All
 default to `0`.
 
+TestRPC uses a default gas limit of 4000000.  To change this set the
+environment variable `TESTRPC_GAS_LIMIT` to the desired value.
+
 
 ### Releasing a new version (for eth-testrpc developers)
 
