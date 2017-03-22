@@ -36,9 +36,9 @@ setup(
     install_requires=[
         'Werkzeug>=0.11.10',
         'click>=6.6',
-        'ethereum>=1.5.2',
+        'ethereum>=1.6.1',
         'json-rpc>=1.10.3',
-        'rlp>=0.4.4,<0.4.7',
+        'rlp>=0.4.7',
     ],
     extras_require={
         'gevent': [
