@@ -1,5 +1,10 @@
 import json
 import functools
+import sys
+
+#import logging as log
+#from ethereum import slogging as slog
+
 
 from werkzeug.wrappers import Request, Response
 
@@ -86,6 +91,7 @@ def get_application():
     add_method_with_lock(rpc_methods.personal_unlockAccount, 'personal_unlockAccount')
     add_method_with_lock(rpc_methods.personal_signAndSendTransaction,
                          'personal_signAndSendTransaction')
+    add_method_with_lock(rpc_methods.debug_traceTransaction, 'debug_traceTransaction')
 
     @Request.application
     def application(request):

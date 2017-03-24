@@ -14,7 +14,7 @@ from testrpc.compat import threading
 import rlp
 
 from ethereum import transactions
-from ethereum import tester as t
+import tester as t
 from ethereum import config
 from ethereum.utils import (
     privtoaddr,
@@ -49,6 +49,7 @@ from .filters import (
 DEFAULT_GAS_LIMIT = t.gas_limit = t.GAS_LIMIT = int(os.environ.get('TESTRPC_GAS_LIMIT', 4000000))
 config.default_config['GENESIS_GAS_LIMIT'] = DEFAULT_GAS_LIMIT
 
+tracedTransactions = {}
 
 def with_lock(client_method):
     @functools.wraps(client_method)
@@ -504,3 +505,8 @@ class EthTesterClient(object):
         )))
 
         return all_log_entries
+    
+    def traceTransaction(self, tx_hash):
+        if not tx_hash in tracedTransactions:
+            raise ValueError("Transaction %s not found" % tx_hash)
+	return tracedTransaction[tx_hash]
