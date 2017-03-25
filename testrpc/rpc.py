@@ -268,8 +268,8 @@ class RPCMethods(object):
     #
     # debug_ API
     #
-    def debug_traceTransaction(self, tx_hash):
+    def debug_traceTransaction(self, tx_hash, pars):
         try:
-            return self.client.traceTransaction(tx_hash)
+            return self.client.traceTransaction(tx_hash, pars)
         except ValueError:
             return None
