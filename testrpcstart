@@ -1,0 +1,2 @@
+#!/bin/sh
+python testrpc.py --host 192.168.2.198 --port 51666 --trace

@@ -12,6 +12,7 @@ from ethereum import blocks
 from ethereum.tester import (
     languages,
 )
+from ethereum import config
 
 from .client import EthTesterClient
 from .client.utils import (

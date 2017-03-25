@@ -2,10 +2,6 @@ import json
 import functools
 import sys
 
-#import logging as log
-#from ethereum import slogging as slog
-
-
 from werkzeug.wrappers import Request, Response
 
 from jsonrpc import JSONRPCResponseManager, dispatcher
