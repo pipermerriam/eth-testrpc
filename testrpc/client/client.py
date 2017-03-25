@@ -507,5 +507,5 @@ class EthTesterClient(object):
 
         return all_log_entries
     
-    def traceTransaction(self, tx_hash):
+    def traceTransaction(self, tx_hash, params):
 	return self.trace.getTrace(tx_hash)
