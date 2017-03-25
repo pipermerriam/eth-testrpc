@@ -41,6 +41,7 @@ $ testrpc
 ```
 
 This will run testrpc on localhost:8545. You can pass through a different port (-p, --port) or domain (-d, --domain).
+With --trace parameter you can activate EVM transaction tracing (if the pyethereum support it).
 
 ### Implemented methods
 
