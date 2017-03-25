@@ -12,6 +12,7 @@ from ethereum import blocks
 from ethereum.tester import (
     languages,
 )
+from ethereum import config
 
 from .client import EthTesterClient
 from .client.utils import (
@@ -263,3 +264,12 @@ class RPCMethods(object):
     def personal_signAndSendTransaction(self, transaction, passphrase):
         formatted_transaction = input_transaction_formatter(transaction)
         return self.client.send_and_sign_transaction(passphrase, **formatted_transaction)
+    
+    #
+    # debug_ API
+    #
+    def debug_traceTransaction(self, tx_hash, pars):
+        try:
+            return self.client.traceTransaction(tx_hash, pars)
+        except ValueError:
+            return None

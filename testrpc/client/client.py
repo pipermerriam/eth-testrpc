@@ -19,6 +19,7 @@ from ethereum import config
 from ethereum.utils import (
     privtoaddr,
 )
+from ethereum.trace import Trace
 
 from .utils import (
     is_string,
@@ -48,7 +49,6 @@ from .filters import (
 # Set the gas
 DEFAULT_GAS_LIMIT = t.gas_limit = t.GAS_LIMIT = int(os.environ.get('TESTRPC_GAS_LIMIT', 4000000))
 config.default_config['GENESIS_GAS_LIMIT'] = DEFAULT_GAS_LIMIT
-
 
 def with_lock(client_method):
     @functools.wraps(client_method)
@@ -92,6 +92,8 @@ class EthTesterClient(object):
 
         self.log_filters = {}
         self.log_filters_id_generator = itertools.count()
+
+        self.trace = Trace()
 
     @with_lock
     def reset_evm(self, snapshot_idx=None):
@@ -504,3 +506,6 @@ class EthTesterClient(object):
         )))
 
         return all_log_entries
+    
+    def traceTransaction(self, tx_hash, params):
+	return self.trace.getTrace(tx_hash)

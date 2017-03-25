@@ -41,6 +41,7 @@ $ testrpc
 ```
 
 This will run testrpc on localhost:8545. You can pass through a different port (-p, --port) or domain (-d, --domain).
+With --trace parameter you can activate EVM transaction tracing (if the pyethereum support it).
 
 ### Implemented methods
 
@@ -124,6 +125,66 @@ default to `0`.
 TestRPC uses a default gas limit of 4000000.  To change this set the
 environment variable `TESTRPC_GAS_LIMIT` to the desired value.
 
+#### web3.js
+
+You can implement the extended method for web3.js like this:
+```javascript
+var Web3 = require('web3');
+var web3 = new Web3();
+web3._extend({
+	property: 'evm',
+	methods:
+	[
+		new web3._extend.Method({
+			name: 'reset',
+			call: 'evm_reset',
+		}),
+		new web3._extend.Method({
+			name: 'revert',
+			call: 'evm_revert',
+			params: 1,
+		}),
+		new web3._extend.Method({
+			name: 'mine',
+			call: 'evm_mine',
+			params: 1,
+		}),
+		new web3._extend.Method({
+			name: 'timeTravel',
+			call: 'testing_timeTravel',
+			params: 1,
+		}),
+		new web3._extend.Property({
+			name: 'snapshot',
+			call: 'evm_snapshot',
+			params: 0,
+			outputFormatter: web3._extend.utils.toDecimal
+		}),
+		new web3._extend.Method({
+			name: 'configure',
+			call: 'rpc_configure',
+			params: 2,
+			inputFormatter: [null, null]
+		}),
+	],
+	properties:
+	[]
+});
+web3._extend({
+	property: 'debug',
+	methods:
+	[
+		new web3._extend.Method({
+			name: 'traceTransaction',
+			call: 'debug_traceTransaction',
+			params: 1,
+			inputFormatter: null,
+		}),
+	],
+	properties:
+	[]
+});
+```
 
 ### Releasing a new version (for eth-testrpc developers)
 
