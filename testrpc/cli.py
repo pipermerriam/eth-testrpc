@@ -1,6 +1,5 @@
 from __future__ import print_function
 
-import os
 import random
 import codecs
 
@@ -45,7 +44,7 @@ def runserver(host, port, trace):
     for account in accounts:
         print('0x' + codecs.decode(codecs.encode(account, 'hex'), 'utf8'))
 
-    print("\nTransaction tracing is %s." % ( "enabled" if trace else "disabled"  ))
+    print("\nTransaction tracing is %s." % ("enabled" if trace else "disabled"))
 
     print("\nListening on %s:%s" % (host, port))
 

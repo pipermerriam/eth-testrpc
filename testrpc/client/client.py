@@ -507,9 +507,11 @@ class EthTesterClient(object):
         )))
 
         return all_log_entries
-    
-    def traceTransaction(self, tx_hash, params):
-	return self.trace.getTrace(tx_hash)
 
-    def storageRangeAt(self, block_number, tx_index, contract_address, storage_begin, storage_enend, storage_max_result):
-        return self.trace.getStorage(self._get_block_by_hash(block_hash), tx_index, contract_address, storage_begin, storage_enend, storage_max_result)
+    def traceTransaction(self, tx_hash, params):
+        return self.trace.getTrace(tx_hash)
+
+    def storageRangeAt(self, block_number, tx_index, contract_address, 
+        storage_begin, storage_enend, storage_max_result):
+        return self.trace.getStorage(self._get_block_by_hash(block_hash), tx_index, 
+            contract_address, storage_begin, storage_enend, storage_max_result)

@@ -263,7 +263,7 @@ class RPCMethods(object):
     def personal_signAndSendTransaction(self, transaction, passphrase):
         formatted_transaction = input_transaction_formatter(transaction)
         return self.client.send_and_sign_transaction(passphrase, **formatted_transaction)
-    
+
     #
     # debug_ API
     #
@@ -273,5 +273,6 @@ class RPCMethods(object):
         except ValueError:
             return None
 
-    def debug_storageRangeAt(self, block_number, tx_index, contract_address, storage_begin, storage_enend, storage_max_result):
-	return self.client.storageRangeAt( block_number, tx_index, contract_address, storage_begin, storage_enend, storage_max_result)
+    def debug_storageRangeAt(self, block_number, tx_index, contract_address, 
+        storage_begin, storage_enend, storage_max_result):
+        return self.client.storageRangeAt( block_number, tx_index, contract_address, storage_begin, storage_enend, storage_max_result)
