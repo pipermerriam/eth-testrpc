@@ -180,6 +180,12 @@ web3._extend({
 			params: 1,
 			inputFormatter: null,
 		}),
+		new web3._extend.Method({
+			name: 'storageRangeAt',
+			call: 'debug_storageRangeAt',
+			params: 6,
+			inputFormatter: [web3._extend.utils.toDecimal, web3._extend.utils.toDecimal, null, null, null, web3._extend.utils.toDecimal],
+		}),
 	],
 	properties:
 	[]
