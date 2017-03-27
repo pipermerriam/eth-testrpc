@@ -509,3 +509,5 @@ class EthTesterClient(object):
     
     def traceTransaction(self, tx_hash, params):
 	return self.trace.getTrace(tx_hash)
+    def debug_storageRangeAt(self, param1, param2, param3, param4, param5, param6):
+        return { complete: True, storage: {} }
