@@ -50,6 +50,7 @@ from .filters import (
 DEFAULT_GAS_LIMIT = t.gas_limit = t.GAS_LIMIT = int(os.environ.get('TESTRPC_GAS_LIMIT', 4000000))
 config.default_config['GENESIS_GAS_LIMIT'] = DEFAULT_GAS_LIMIT
 
+
 def with_lock(client_method):
     @functools.wraps(client_method)
     def inner(self, *args, **kwargs):
@@ -510,5 +511,5 @@ class EthTesterClient(object):
     def traceTransaction(self, tx_hash, params):
 	return self.trace.getTrace(tx_hash)
 
-    def storageRangeAt(self, param1, param2, param3, param4, param5, param6):
-        return { "complete": True, "storage": {} }
+    def storageRangeAt(self, block_number, tx_index, contract_address, storage_begin, storage_enend, storage_max_result):
+        return self.trace.getStorage(self._get_block_by_hash(block_hash), tx_index, contract_address, storage_begin, storage_enend, storage_max_result)

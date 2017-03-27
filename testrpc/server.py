@@ -1,6 +1,5 @@
 import json
 import functools
-import sys
 
 from werkzeug.wrappers import Request, Response
 

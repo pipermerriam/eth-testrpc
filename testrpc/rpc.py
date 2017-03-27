@@ -12,7 +12,6 @@ from ethereum import blocks
 from ethereum.tester import (
     languages,
 )
-from ethereum import config
 
 from .client import EthTesterClient
 from .client.utils import (
@@ -274,5 +273,5 @@ class RPCMethods(object):
         except ValueError:
             return None
 
-    def debug_storageRangeAt(self, param1, param2, param3, param4, param5, param6):
-	return self.client.storageRangeAt(param1, param2, param3, param4, param5, param6)
+    def debug_storageRangeAt(self, block_number, tx_index, contract_address, storage_begin, storage_enend, storage_max_result):
+	return self.client.storageRangeAt( block_number, tx_index, contract_address, storage_begin, storage_enend, storage_max_result)

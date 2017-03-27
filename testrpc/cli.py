@@ -54,6 +54,7 @@ def runserver(host, port, trace):
         port,
         application,
     )
+
     spawn(server.serve_forever)
 
     try:
