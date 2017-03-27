@@ -273,5 +273,6 @@ class RPCMethods(object):
             return self.client.traceTransaction(tx_hash, pars)
         except ValueError:
             return None
+
     def debug_storageRangeAt(self, param1, param2, param3, param4, param5, param6):
 	return self.client.storageRangeAt(param1, param2, param3, param4, param5, param6)
