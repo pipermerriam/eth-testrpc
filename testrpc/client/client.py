@@ -511,7 +511,11 @@ class EthTesterClient(object):
     def traceTransaction(self, tx_hash, params):
         return self.trace.getTrace(tx_hash)
 
-    def storageRangeAt(self, block_number, tx_index, contract_address, 
+    def storageRangeAt(self, block_number_or_hash, tx_index, contract_address, 
         storage_begin, storage_enend, storage_max_result):
-        return self.trace.getStorage(self._get_block_by_hash(block_hash), tx_index, 
-            contract_address, storage_begin, storage_enend, storage_max_result)
+	if is_hex(block_number_or_hash):
+            block_number = self._get_block_by_hash(block_number_or_hash)
+        else:
+            block_number = block_number_or_hash
+        return self.trace.getStorage(block_number, tx_index, contract_address,
+            storage_begin, storage_enend, storage_max_result)

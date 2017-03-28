@@ -35,7 +35,6 @@ from .compat import (
     is_flag=True,
 )
 def runserver(host, port, trace):
-    Trace.enabled = trace
     application = get_application()
 
     print(application.rpc_methods.web3_clientVersion())
@@ -53,6 +52,8 @@ def runserver(host, port, trace):
         port,
         application,
     )
+
+    Trace.enabled = trace
 
     spawn(server.serve_forever)
 

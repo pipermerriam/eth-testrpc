@@ -2,6 +2,7 @@ import sys
 import functools
 import random
 import codecs
+import re
 
 from rlp.utils import (
     int_to_big_endian,
@@ -191,3 +192,7 @@ def normalize_block_identifier(block_identifier):
         return block_identifier
     else:
         return normalize_number(block_identifier)
+
+is_hex_re = re.compile(r'^[+\-]?'+r'0'+r'[xX]'+r'(0|'+r'([1-9A-Fa-f][0-9A-Fa-f]*))$')
+def is_hex(data):
+    return bool(is_hex_re.match(data))

@@ -25,6 +25,7 @@ from .utils import (
     input_transaction_formatter,
     input_filter_params_formatter,
     normalize_block_number,
+    is_hex,
 )
 
 
@@ -273,6 +274,7 @@ class RPCMethods(object):
         except ValueError:
             return None
 
-    def debug_storageRangeAt(self, block_number, tx_index, contract_address, 
+    def debug_storageRangeAt(self, block_number_or_hash, tx_index, contract_address, 
         storage_begin, storage_enend, storage_max_result):
-        return self.client.storageRangeAt( block_number, tx_index, contract_address, storage_begin, storage_enend, storage_max_result)
+        return self.client.storageRangeAt( block_number_or_hash, tx_index,
+            contract_address, storage_begin, storage_enend, storage_max_result)
