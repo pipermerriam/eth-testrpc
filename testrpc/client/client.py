@@ -33,7 +33,8 @@ from .utils import (
     decode_hex,
     mk_random_privkey,
     is_array,
-    normalize_block_identifier)
+    normalize_block_identifier,
+    is_hex)
 from .serializers import (
     serialize_txn,
     serialize_txn_receipt,
