@@ -86,6 +86,8 @@ def get_application():
     add_method_with_lock(rpc_methods.personal_unlockAccount, 'personal_unlockAccount')
     add_method_with_lock(rpc_methods.personal_signAndSendTransaction,
                          'personal_signAndSendTransaction')
+    add_method_with_lock(rpc_methods.debug_traceTransaction, 'debug_traceTransaction')
+    add_method_with_lock(rpc_methods.debug_storageRangeAt, 'debug_storageRangeAt')
 
     @Request.application
     def application(request):

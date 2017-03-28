@@ -8,6 +8,7 @@ import click
 from ethereum.tester import (
     accounts,
 )
+from ethereum.trace import Trace
 
 from .server import get_application
 from .compat import (
@@ -15,7 +16,6 @@ from .compat import (
     spawn,
     sleep,
 )
-
 
 @click.command()
 @click.option(
@@ -29,7 +29,12 @@ from .compat import (
     default=8545,
     type=int,
 )
-def runserver(host, port):
+@click.option(
+    '--trace',
+    '-t',
+    is_flag=True,
+)
+def runserver(host, port, trace):
     application = get_application()
 
     print(application.rpc_methods.web3_clientVersion())
@@ -38,6 +43,8 @@ def runserver(host, port):
     for account in accounts:
         print('0x' + codecs.decode(codecs.encode(account, 'hex'), 'utf8'))
 
+    print("\nTransaction tracing is %s." % ("enabled" if trace else "disabled"))
+
     print("\nListening on %s:%s" % (host, port))
 
     server = make_server(
@@ -45,6 +52,8 @@ def runserver(host, port):
         port,
         application,
     )
+
+    Trace.enabled = trace
 
     spawn(server.serve_forever)
 

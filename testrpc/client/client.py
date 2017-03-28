@@ -19,6 +19,7 @@ from ethereum import config
 from ethereum.utils import (
     privtoaddr,
 )
+from ethereum.trace import Trace
 
 from .utils import (
     is_string,
@@ -32,7 +33,8 @@ from .utils import (
     decode_hex,
     mk_random_privkey,
     is_array,
-    normalize_block_identifier)
+    normalize_block_identifier,
+    is_hex)
 from .serializers import (
     serialize_txn,
     serialize_txn_receipt,
@@ -92,6 +94,8 @@ class EthTesterClient(object):
 
         self.log_filters = {}
         self.log_filters_id_generator = itertools.count()
+
+        self.trace = Trace()
 
     @with_lock
     def reset_evm(self, snapshot_idx=None):
@@ -504,3 +508,15 @@ class EthTesterClient(object):
         )))
 
         return all_log_entries
+
+    def traceTransaction(self, tx_hash, params):
+        return self.trace.getTrace(tx_hash)
+
+    def storageRangeAt(self, block_number_or_hash, tx_index, contract_address, 
+        storage_begin, storage_enend, storage_max_result):
+	if is_hex(block_number_or_hash):
+            block_number = self._get_block_by_hash(block_number_or_hash)
+        else:
+            block_number = block_number_or_hash
+        return self.trace.getStorage(block_number, tx_index, contract_address,
+            storage_begin, storage_enend, storage_max_result)

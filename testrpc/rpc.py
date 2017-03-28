@@ -263,3 +263,17 @@ class RPCMethods(object):
     def personal_signAndSendTransaction(self, transaction, passphrase):
         formatted_transaction = input_transaction_formatter(transaction)
         return self.client.send_and_sign_transaction(passphrase, **formatted_transaction)
+
+    #
+    # debug_ API
+    #
+    def debug_traceTransaction(self, tx_hash, pars):
+        try:
+            return self.client.traceTransaction(tx_hash, pars)
+        except ValueError:
+            return None
+
+    def debug_storageRangeAt(self, block_number_or_hash, tx_index, contract_address, 
+        storage_begin, storage_enend, storage_max_result):
+        return self.client.storageRangeAt( block_number_or_hash, tx_index,
+            contract_address, storage_begin, storage_enend, storage_max_result)
