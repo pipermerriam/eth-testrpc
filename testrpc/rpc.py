@@ -25,7 +25,6 @@ from .utils import (
     input_transaction_formatter,
     input_filter_params_formatter,
     normalize_block_number,
-    is_hex,
 )
 
 
