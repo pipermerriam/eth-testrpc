@@ -4,7 +4,7 @@ def test_get_earliest_block(client, hex_accounts):
 
     block = client.get_block_by_number("earliest")
 
-    assert block['number'] == b'0x0'
+    assert block['number'] == b'0x1'
 
 
 def test_get_latest_block(client, hex_accounts):

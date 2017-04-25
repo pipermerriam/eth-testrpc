@@ -164,7 +164,7 @@ class EthTesterClient(object):
             else:
                 return self.evm.blocks[-1]
         elif block_number == "earliest":
-            return self.evm.blocks[0]
+            return self.evm.blocks[1]
         elif block_number == "pending":
             return self.evm.block
         else:
