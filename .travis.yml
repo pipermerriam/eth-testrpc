@@ -4,12 +4,22 @@ python:
   - "3.5"
 env:
   matrix:
-    - TOX_ENV=py27-stdlib
-    - TOX_ENV=py34-stdlib
-    - TOX_ENV=py35-stdlib
-    - TOX_ENV=py27-gevent
-    - TOX_ENV=py34-gevent
-    - TOX_ENV=py35-gevent
+    # stdlib-pyethereum16
+    - TOX_ENV=py27-stdlib-pyethereum16
+    - TOX_ENV=py34-stdlib-pyethereum16
+    - TOX_ENV=py35-stdlib-pyethereum16
+    # stdlib-pyethereum20
+    - TOX_ENV=py27-stdlib-pyethereum20
+    - TOX_ENV=py34-stdlib-pyethereum20
+    - TOX_ENV=py35-stdlib-pyethereum20
+    # gevent-pyethereum16
+    - TOX_ENV=py27-gevent-pyethereum16
+    - TOX_ENV=py34-gevent-pyethereum16
+    - TOX_ENV=py35-gevent-pyethereum16
+    # gevent-pyethereum20
+    - TOX_ENV=py27-gevent-pyethereum20
+    - TOX_ENV=py34-gevent-pyethereum20
+    - TOX_ENV=py35-gevent-pyethereum20
     - TOX_ENV=flake8
 cache:
   pip: true
