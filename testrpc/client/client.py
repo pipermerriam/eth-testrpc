@@ -315,6 +315,10 @@ class EthTesterClient(object):
         _block = self._get_block_by_number(block)
         return _block.get_balance(strip_0x(address))
 
+    def set_balance(self, address, value, block="latest"):
+        _block = self._get_block_by_number(block)
+        return _block.set_balance(strip_0x(address), value)
+
     def call(self, *args, **kwargs):
         if len(args) >= 7 and args[6] != "latest":
             raise ValueError("Using call on any block other than latest is unsupported")

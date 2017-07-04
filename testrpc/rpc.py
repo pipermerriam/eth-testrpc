@@ -160,6 +160,9 @@ class RPCMethods(object):
     def eth_getBalance(self, address, block_number="latest"):
         return self.client.get_balance(address, normalize_block_number(block_number))
 
+    def eth_setBalance(self, address, value, block_number="latest"):
+        return self.client.set_balance(address, value, normalize_block_number(block_number))
+
     def eth_getTransactionCount(self, address, block_number="latest"):
         return encode_number(self.client.get_transaction_count(
             address,
