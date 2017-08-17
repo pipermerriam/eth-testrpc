@@ -34,7 +34,7 @@ And then set the environment variable `TESTRPC_THREADING_BACKEND=gevent`
 
 ### Run
 
-Installing through pip will make the `testrpc` command available on your machine:
+Installing through pip will make the `testrpc-py` command available on your machine:
 
 ```
 $ testrpc
