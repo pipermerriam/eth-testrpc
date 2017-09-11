@@ -37,10 +37,10 @@ And then set the environment variable `TESTRPC_THREADING_BACKEND=gevent`
 Installing through pip will make the `testrpc-py` command available on your machine:
 
 ```
-$ testrpc
+$ testrpc-py
 ```
 
-This will run testrpc on localhost:8545. You can pass through a different port (-p, --port) or domain (-d, --domain).
+This will run testrpc on localhost:8545. You can pass through a different port (-p, --port) or host (-h, --host).
 
 ### Implemented methods
 
