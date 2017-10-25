@@ -3,8 +3,6 @@ from rlp.utils import (
     int_to_big_endian,
 )
 
-from ethereum.utils import zpad
-
 from .utils import (
     encode_32bytes,
     encode_number,
@@ -78,8 +76,7 @@ def serialize_block(block, full_transactions):
     else:
         transactions = [encode_32bytes(txn.hash) for txn in block.transaction_list]
 
-    unpadded_logs_bloom = int_to_big_endian(block.bloom)
-    logs_bloom = zpad(unpadded_logs_bloom, 256)
+    logs_bloom_bytes = int_to_big_endian(block.bloom)
 
     return {
         "number": encode_number(block.number),
@@ -87,8 +84,7 @@ def serialize_block(block, full_transactions):
         "parentHash": encode_32bytes(block.prevhash),
         "nonce": encode_32bytes(block.nonce),
         "sha3Uncles": encode_32bytes(block.uncles_hash),
-        # TODO logsBloom / padding
-        "logsBloom": logs_bloom,
+        "logsBloom": encode_data(logs_bloom_bytes, 256),
         "transactionsRoot": encode_32bytes(block.tx_list_root),
         "stateRoot": encode_32bytes(block.state_root),
         "miner": encode_address(block.coinbase),

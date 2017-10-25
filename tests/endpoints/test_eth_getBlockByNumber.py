@@ -4,3 +4,4 @@ def test_eth_getBlockByNumber(rpc_client):
     assert block_0
 
     assert block_0['number'] == "0x0"
+    assert block_0['logsBloom'] == "0x" + "00" * 256
