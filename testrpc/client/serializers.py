@@ -79,7 +79,7 @@ def serialize_block(block, full_transactions):
         transactions = [encode_32bytes(txn.hash) for txn in block.transaction_list]
 
     unpadded_logs_bloom = int_to_big_endian(block.bloom)
-    logs_bloom = zpad(unpadded_logs_bloom, (256 - len(unpadded_logs_bloom)))
+    logs_bloom = zpad(unpadded_logs_bloom, 256)
 
     return {
         "number": encode_number(block.number),
