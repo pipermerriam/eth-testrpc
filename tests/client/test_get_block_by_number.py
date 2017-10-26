@@ -6,7 +6,7 @@ def test_get_block_with_no_transactions(client, hex_accounts):
     assert block['number'] == b"0x1"
     assert block['miner'] == hex_accounts[0]
     assert len(block['transactions']) == 0
-    assert len(block['logsBloom']) == 256
+    assert block['logsBloom'] == b"0x" + b"00" * 256
 
 
 def test_get_block_with_transactions(client, hex_accounts):
