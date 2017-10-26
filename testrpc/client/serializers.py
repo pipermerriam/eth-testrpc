@@ -82,7 +82,7 @@ def serialize_block(block, full_transactions):
         "number": encode_number(block.number),
         "hash": encode_32bytes(block.hash),
         "parentHash": encode_32bytes(block.prevhash),
-        "nonce": encode_32bytes(block.nonce),
+        "nonce": encode_data(block.nonce, 8),
         "sha3Uncles": encode_32bytes(block.uncles_hash),
         "logsBloom": encode_data(logs_bloom_bytes, 256),
         "transactionsRoot": encode_32bytes(block.tx_list_root),
