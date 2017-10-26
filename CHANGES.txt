@@ -1,3 +1,8 @@
+Version 1.3.2
+================================
+
+- Bugfix for `logsBloom` not being returned as a hex encoded value.
+
 Version 1.3.1
 ================================
 
