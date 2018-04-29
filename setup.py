@@ -38,7 +38,7 @@ setup(
         'click>=6.6',
         'ethereum>=1.6.1,<2.0.0',
         'json-rpc>=1.10.3',
-        'rlp>=0.4.7',
+        'rlp>=0.4.7,<=0.6.0',
     ],
     extras_require={
         'gevent': [
