@@ -321,8 +321,10 @@ class EthTesterClient(object):
         if kwargs.get('block', 'latest') != "latest":
             raise ValueError("Using call on any block other than latest is unsupported")
         snapshot_idx = self.snapshot_evm()
-        output = self._send_transaction(*args, **kwargs)
-        self.revert_evm(snapshot_idx)
+        try:
+            output = self._send_transaction(*args, **kwargs)
+        finally:
+            self.revert_evm(snapshot_idx)
 
         return encode_data(output)
 
