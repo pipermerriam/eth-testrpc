@@ -53,6 +53,7 @@ def get_application():
     add_method_with_lock(rpc_methods.eth_compileSolidity, 'eth_compileSolidity')
     add_method_with_lock(rpc_methods.eth_getCode, 'eth_getCode')
     add_method_with_lock(rpc_methods.eth_getBalance, 'eth_getBalance')
+    add_method_with_lock(rpc_methods.eth_setBalance, 'eth_setBalance')
     add_method_with_lock(rpc_methods.eth_getTransactionCount, 'eth_getTransactionCount')
     add_method_with_lock(rpc_methods.eth_getTransactionByHash, 'eth_getTransactionByHash')
     add_method_with_lock(rpc_methods.eth_getTransactionReceipt, 'eth_getTransactionReceipt')

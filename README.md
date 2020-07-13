@@ -57,6 +57,7 @@ The RPC methods currently implemented are:
 * `eth_compileSolidity`
 * `eth_getCode` (only supports block number “latest”)
 * `eth_getBalance`
+* `eth_setBalance`
 * `eth_getTransactionCount`
 * `eth_getTransactionByHash`
 * `eth_getTransactionReceipt`
